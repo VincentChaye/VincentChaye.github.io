@@ -1,5 +1,5 @@
 import { updateMap, getMap } from "./leaflet.js";
-import { loadCragsFromGeoJSON } from "./falaiseLoc.js";
+import { loadCragsFromGeoJSON, SEARCH_CONFIG } from "./falaiseLoc.js";
 
 const watchPosition = (options) => {
     navigator.geolocation.watchPosition(onSuccess, onError, options);
@@ -29,4 +29,8 @@ watchPosition({
 
 
 const map = getMap();
+
+SEARCH_CONFIG.googleApiKey = "AIzaSyCRirnB_e4ZLncSXsBCgKGD64LRr5ymVTE"; 
+SEARCH_CONFIG.googleCx = "536abfba31bb74c67";  
+
 loadCragsFromGeoJSON(map, "#crag-info", "./data/falaise.geojson");
