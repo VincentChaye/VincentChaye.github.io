@@ -1,97 +1,84 @@
 /* --- RESET SIMPLE --- */
-* {
-	box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html,
-body {
-	height: 100%;
-	margin: 0;
-	font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 /* --- GRID PRINCIPALE --- */
 .page {
-	height: 100vh;
-	/* pleine hauteur de fenêtre */
-	display: grid;
-	grid-template-areas:
-		"zone1 zone1 zone1"
-		"zone3 zone2 zone4";
-	grid-template-columns: 260px 1fr 260px;
-	/* colonnes : aside / main / aside */
-	grid-template-rows: auto 1fr;
-	/* ligne 1 auto (titre+infos), ligne 2 prend le reste */
-	gap: 12px;
-	padding: 12px;
+  height: 100vh;
+  display: grid;
+  grid-template-areas:
+    "zone1 zone1 zone1"
+    "zone3 zone2 zone4";
+  grid-template-columns: 260px 1fr 260px; /* aside gauche / carte / aside droit */
+  grid-template-rows: auto 1fr;           /* header auto, contenu prend le reste */
+  gap: 12px;
+  padding: 12px;
 }
 
 /* --- ZONES --- */
 .zone1 {
-	grid-area: zone1;
-	display: grid;
-	grid-template-columns: 1fr;
-	/* h1 + geoloc sous le h1 */
-	row-gap: 8px;
+  grid-area: zone1;
+  display: flex;                /* titre + bouton sur la même ligne */
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;              /* passe à la ligne si trop étroit */
 }
 
-.zone2 {
-	grid-area: zone2;
+.zone2 { grid-area: zone2; }
+.zone3 { grid-area: zone3; }
+.zone4 { grid-area: zone4; overflow: auto; }
+
+.zone3, .zone4 {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
 }
 
-.zone3 {
-	grid-area: zone3;
-}
+/* --- TITRE + BOUTON --- */
+h1 { margin: 0; }
 
-.zone4 {
-	grid-area: zone4;
+#route-btn {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #f7f7f7;
+  cursor: pointer;
 }
-
-/* --- STYLE DE BASE (optionnel, pour voir la structure) --- */
-.zone3,
-.zone4 {
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	padding: 12px;
-}
+#route-btn:hover { background: #eee; }
 
 /* --- CARTE --- */
 #map {
-	height: 100%;
-	/* remplit toute la hauteur de la zone 2 */
-	min-height: 300px;
-	/* garde une hauteur minimale si la fenêtre est petite */
-	border-radius: 8px;
-	overflow: hidden;
+  height: 100%;          /* remplit la zone 2 */
+  min-height: 300px;     /* garde une hauteur minimale */
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-h1 {
-	margin: 0;
-}
-
+/* --- ICÔNE GRIMPEUR --- */
 .climber-icon {
-	font-size: 30px;
-	line-height: 30px;
-	text-align: center;
+  font-size: 40px;       /* cohérent avec iconSize [40,40] */
+  line-height: 40px;
+  text-align: center;
 }
-
 
 /* --- RESPONSIVE (mobile : empiler 1 → 2 → 3 → 4) --- */
 @media (max-width: 780px) {
-	.page {
-		grid-template-areas:
-			"zone1"
-			"zone2"
-			"zone3"
-			"zone4";
-		grid-template-columns: 1fr;
-		grid-template-rows: auto 50vh auto auto;
-		/* la carte prend une bonne hauteur */
-		height: auto;
-		/* laisse la page grandir en hauteur */
-	}
+  .page {
+    grid-template-areas:
+      "zone1"
+      "zone2"
+      "zone3"
+      "zone4";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 50vh auto auto; /* la carte garde une bonne hauteur */
+    height: auto; /* laisse la page grandir */
+  }
 
-	#map {
-		min-height: 50vh;
-	}
+  #map { min-height: 50vh; }
 }
