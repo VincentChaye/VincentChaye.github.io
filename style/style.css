@@ -23,12 +23,13 @@ html, body {
 /* --- ZONES --- */
 .zone1 {
   grid-area: zone1;
-  display: flex;                /* titre + bouton sur la même ligne */
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;              /* passe à la ligne si trop étroit */
+  flex-wrap: wrap;
 }
+.zone1 .btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .zone2 { grid-area: zone2; }
 .zone3 { grid-area: zone3; }
@@ -43,14 +44,16 @@ html, body {
 /* --- TITRE + BOUTON --- */
 h1 { margin: 0; }
 
-#route-btn {
+#route-btn, #clear-route-btn, #center-btn {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 10px;
   background: #f7f7f7;
   cursor: pointer;
 }
-#route-btn:hover { background: #eee; }
+#route-btn:hover, #clear-route-btn:hover, #center-btn:hover { background: #eee; }
+#clear-route-btn { border-color: #e0b5b5; background: #fdeaea; }
+#clear-route-btn:hover { background: #f9dede; }
 
 /* --- CARTE --- */
 #map {
