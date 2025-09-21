@@ -1,0 +1,23 @@
+# Ajout d’une falaise extérieure en diff
+python add_crag.py \
+  -f ../data/falaise.geojson \
+  --name "le village Marvel" \
+  --lon 6.7943107 --lat 43.6458139 \
+  --topo "pas d'info" \
+  --type exterieur \
+  --discipline diff
+
+# Ajout d’une salle (intérieur) en bloc
+python add_crag.py \
+  -f ./data/falaise.geojson \
+  --name "Salle ClimbUp Nice" \
+  --lon 7.1985 --lat 43.6897 \
+  --topo "https://climb-up.example/salle-nice" \
+  --type interieur \
+  --discipline bloc
+
+# Forcer l’ajout même si doublon détecté
+python add_crag.py -f ./data/falaise.geojson --name "Verdon - Escales" \
+  --lon 6.3630 --lat 43.7370 \
+  --topo "https://thecrag.com/crags/verdon" \
+  --type exterieur --discipline diff --force

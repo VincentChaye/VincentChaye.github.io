@@ -70,6 +70,23 @@ h1 { margin: 0; }
   text-align: center;
 }
 
+/* cluster custom */
+.climb-cluster {
+  background: transparent;
+  border: none;
+}
+.climb-cluster .cluster-badge {
+  display: grid;
+  place-items: center;
+  width: 44px; height: 44px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid #7b3fe4;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  font-weight: 700;
+  font-size: 14px;
+}
+
 /* --- RESPONSIVE (mobile : empiler 1 → 2 → 3 → 4) --- */
 @media (max-width: 780px) {
   .page {

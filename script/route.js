@@ -1,4 +1,3 @@
-// script/route.js
 let map = null;
 let routeLayer = null;
 let currentPos = null;
