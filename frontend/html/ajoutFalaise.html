@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>Ajout d'une falaise</title>
+
+    <link rel="stylesheet" href="../style/style-ajout-falaise.css">
+    <script src="../script/ajoutFalaise.js"></script>
+</head>
+
+<body>
+
+    <form id="addFalaiseForm">
+        <h1>Formulaire d'ajout d'une falaise</h1>
+
+        <label for="zone-name">Nom de la zone</label>
+        <input type="text" id="zone-name" name="zone-name" required />
+
+        <label for="latitude">Latitude</label>
+        <input type="number" step="any" id="latitude" name="latitude" required />
+
+        <label for="longitude">Longitude</label>
+        <input type="number" step="any" id="longitude" name="longitude" required />
+
+        <div class="type-radio-group">
+            <p><strong>Type de zone</strong></p>
+            <label>
+                <input type="radio" name="type" value="falaise" required> Falaise
+            </label>
+            <label>
+                <input type="radio" name="type" value="salle"> Salle
+            </label>
+        </div>
+
+        <div class="sous-type-radio-group">
+            <p><strong>Sous type de zone</strong></p>
+            <label>
+                <input type="radio" name="sous-type" value="bloc" required> Bloc
+            </label>
+            <label>
+                <input type="radio" name="sous-type" value="diff"> Diff
+            </label>
+        </div>
+
+        <label for="niveau-min">Niveau minimum</label>
+        <select id="niveau-min" name="niveau-min" required>
+            <option value="">-- Sélectionnez --</option>
+            <option value="5a">5A</option>
+            <option value="5b">5B</option>
+            <option value="5c">5C</option>
+        </select>
+
+        <label for="niveau-max">Niveau maximum</label>
+        <select id="niveau-max" name="niveau-max" required>
+            <option value="">-- Sélectionnez --</option>
+            <option value="8a">8A</option>
+            <option value="8b">8B</option>
+            <option value="8c">8C</option>
+        </select>
+
+        <button type="submit">Envoyer</button>
+    </form>
+</body>

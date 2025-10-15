@@ -47,6 +47,10 @@ document.getElementById("center-btn")?.addEventListener("click", () => {
   centerOnMe();
 });
 
+document.getElementById("ajout-falaise-btn").addEventListener("click", () => {
+  window.location.href = "html/ajoutFalaise.html";
+});
+
 SEARCH_CONFIG.googleApiKey = "AIzaSyCRirnB_e4ZLncSXsBCgKGD64LRr5ymVTE";
 SEARCH_CONFIG.googleCx = "536abfba31bb74c67";
 

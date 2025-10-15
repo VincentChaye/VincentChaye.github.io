@@ -44,14 +44,14 @@ html, body {
 /* --- TITRE + BOUTON --- */
 h1 { margin: 0; }
 
-#route-btn, #clear-route-btn, #center-btn {
+#route-btn, #clear-route-btn, #center-btn, #ajout-falaise-btn {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 10px;
   background: #f7f7f7;
   cursor: pointer;
 }
-#route-btn:hover, #clear-route-btn:hover, #center-btn:hover { background: #eee; }
+#route-btn:hover, #clear-route-btn:hover, #center-btn:hover, #ajout-falaise-btn:hover { background: #eee; }
 #clear-route-btn { border-color: #e0b5b5; background: #fdeaea; }
 #clear-route-btn:hover { background: #f9dede; }
 
