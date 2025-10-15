@@ -1,4 +1,5 @@
 import { setTargetCrag } from "./route.js";
+import { API_BASE_URL } from "../config.js"; // <<< ajoute ce fichier à la racine de /frontend
 
 export const SEARCH_CONFIG = {
   lang: "fr",
@@ -120,4 +121,54 @@ export async function loadCragsFromGeoJSON(layerOrMap, infoTarget, urlOrObject) 
   const fc =
     typeof urlOrObject === "string" ? await fetch(urlOrObject).then((r) => r.json()) : urlOrObject;
   addCragsFromGeoJSON(layerOrMap, infoTarget, fc);
+}
+
+/* =========================
+   === API BACKEND (NEW) ===
+   ========================= */
+
+// Appel API: récupère une FeatureCollection depuis le backend (option bbox)
+async function fetchSpotsFeatureCollection({ minLng, minLat, maxLng, maxLat, limit = 1000 } = {}) {
+  const u = new URL(`${API_BASE_URL}/api/spots`);
+  if (
+    [minLng, minLat, maxLng, maxLat].every((v) => typeof v === "number" && !Number.isNaN(v))
+  ) {
+    u.searchParams.set("minLng", String(minLng));
+    u.searchParams.set("minLat", String(minLat));
+    u.searchParams.set("maxLng", String(maxLng));
+    u.searchParams.set("maxLat", String(maxLat));
+  }
+  u.searchParams.set("limit", String(limit));
+  const r = await fetch(u.toString());
+  if (!r.ok) throw new Error("API spots failed");
+  return r.json(); // FeatureCollection
+}
+
+// Charge depuis l’API en fonction de la bbox de la map
+export async function loadCragsFromAPI(map, layerOrMap, infoTarget) {
+  const b = map.getBounds();
+  const fc = await fetchSpotsFeatureCollection({
+    minLng: b.getWest(),
+    minLat: b.getSouth(),
+    maxLng: b.getEast(),
+    maxLat: b.getNorth()
+  });
+  addCragsFromGeoJSON(layerOrMap, infoTarget, fc);
+}
+
+// Création d’une falaise via l’API
+export async function createSpotOnAPI({ name, grade, info, lng, lat }) {
+  const body = {
+    name,
+    grade,
+    info,
+    geometry: { type: "Point", coordinates: [Number(lng), Number(lat)] }
+  };
+  const r = await fetch(`${API_BASE_URL}/api/spots`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error("create spot failed");
+  return r.json(); // { id: ... }
 }

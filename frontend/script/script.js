@@ -1,5 +1,5 @@
 import { updateMap, getMap, centerOnMe, getCragLayer } from "./leaflet.js";
-import { loadCragsFromGeoJSON, SEARCH_CONFIG } from "./falaiseLoc.js";
+import { loadCragsFromAPI, SEARCH_CONFIG } from "./falaiseLoc.js";
 import { initRoute, drawRouteToTarget, clearRoute } from "./route.js";
 
 const watchPosition = (options) => {
@@ -25,6 +25,7 @@ watchPosition({ enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
 const map = getMap();
 initRoute(map);
 
+// --------- Itinéraire ----------
 document.getElementById("route-btn")?.addEventListener("click", async () => {
   try {
     const { km, minutes, target } = await drawRouteToTarget();
@@ -51,9 +52,34 @@ document.getElementById("ajout-falaise-btn").addEventListener("click", () => {
   window.location.href = "html/ajoutFalaise.html";
 });
 
-SEARCH_CONFIG.googleApiKey = "AIzaSyCRirnB_e4ZLncSXsBCgKGD64LRr5ymVTE";
+// --------- Recherche externe (Google/Wiki) ----------
+SEARCH_CONFIG.googleApiKey = "AIzaSyCRirnB_e4ZLncSXsBCgKGD64LRr5ymVTE"; //  Pense à restreindre la clé côté Google Cloud ( a faire plus tard )
 SEARCH_CONFIG.googleCx = "536abfba31bb74c67";
 
-// ⬇️ Charge les crags dans le layer de clustering plutôt que directement sur la map
+// --------- Chargement des falaises depuis l'API ----------
 const cragLayer = getCragLayer();
-loadCragsFromGeoJSON(cragLayer, "#crag-info", "./data/falaise.geojson");
+
+async function refreshCrags() {
+  // Efface l'ancien contenu 
+  if (cragLayer?.clearLayers) cragLayer.clearLayers();
+
+  // Charge via l'API en fonction de la bbox courante
+  await loadCragsFromAPI(map, cragLayer, "#crag-info");
+}
+
+// Throttle simple pour éviter les multiples appels pendant les déplacements
+let refreshTimer = null;
+function scheduleRefresh() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(() => {
+    refreshCrags().catch(console.error);
+  }, 250); 
+}
+
+// 1er chargement quand la carte est prête
+map.whenReady(() => {
+  scheduleRefresh();
+});
+
+// Recharger quand la vue change
+map.on("moveend zoomend", scheduleRefresh);
