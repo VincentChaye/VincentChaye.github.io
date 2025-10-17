@@ -60,11 +60,11 @@ SEARCH_CONFIG.googleCx = "536abfba31bb74c67";
 const cragLayer = getCragLayer();
 
 async function refreshCrags() {
-  // Efface l'ancien contenu 
-  if (cragLayer?.clearLayers) cragLayer.clearLayers();
-
-  // Charge via l'API en fonction de la bbox courante
-  await loadCragsFromAPI(map, cragLayer, "#crag-info");
+  try {
+    await loadCragsFromAPI(map, cragLayer, "#info");
+  } catch (e) {
+    console.error("Erreur refresh:", e);
+  }
 }
 
 // Throttle simple pour éviter les multiples appels pendant les déplacements
