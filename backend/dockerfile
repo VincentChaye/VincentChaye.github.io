@@ -1,0 +1,24 @@
+# backend/Dockerfile
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build --if-present
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+RUN apk add --no-cache curl
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN addgroup -S nodejs && adduser -S nodeuser -G nodejs
+USER nodeuser
+ENV PORT=8080
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD curl -fsS http://localhost:8080/ping || exit 1
+CMD ["node", "server.js"]
