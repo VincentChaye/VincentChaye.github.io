@@ -1,60 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="fr">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ZoneDeGrimpe</title>
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-		integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
-	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
-	<link rel="icon" type="image/png" href="./public/ZoneDeGrimpeIcon.png">
-	<link rel="stylesheet" href="style/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZoneDeGrimpe — Accueil</title>
+  <meta name="description" content="Cartographier et explorer des zones de grimpe." />
+  <link rel="icon" type="image/png" href="./assets/ZoneDeGrimpeIcon.png" />
+  <meta property="og:title" content="ZoneDeGrimpe" />
+  <meta property="og:description" content="Cartographier et explorer des zones de grimpe." />
+  <meta property="og:image" content="./assets/ZoneDeGrimpeIcon.png" />
+  <link rel="stylesheet" href="./style/style.css" />
 </head>
+<body class="theme">
+  <header class="app-header">
+    <a class="brand" href="./">
+      <img src="./assets/ZoneDeGrimpeIcon.png" alt="ZoneDeGrimpe" class="brand__icon" />
+      <span class="brand__title">ZoneDeGrimpe</span>
+    </a>
+    <button id="hamburger" class="hamburger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav" class="nav" aria-label="Navigation principale">
+      <a href="./index.html">Accueil</a>
+      <a href="./materiel.html">Matériel</a>
+      <a href="./map.html">Carte</a>
+      <a href="./parametres.html">Paramètres</a>
+      <button id="themeToggle" class="btn btn--ghost" type="button" title="Basculer le thème">Thème</button>
+    </nav>
+  </header>
 
-<body>
-	<div class="page">
-		<header class="zone1">
-			<h1>ZoneDeGrimpe</h1>
-			<div class="btns">
-				<button id="ajout-falaise-btn">Ajouter une falaise</button>
-				<button id="route-btn">Tracer l’itinéraire</button>
-				<button id="clear-route-btn">Supprimer l’itinéraire</button>
-				<button id="center-btn">Centrer sur moi</button>
-			</div>
-		</header>
+  <!-- Banner / Splash minimal -->
+  <section class="banner" style="--brand:#06668C">
+    <div class="banner__content">
+      <img src="./assets/ZoneDeGrimpeIcon.png" alt="" class="banner__logo" />
+      <h1 class="banner__title">Trouve ta prochaine voie</h1>
+      <p class="banner__subtitle">Explore les zones de grimpe, organise ton matériel, règle ton compte.</p>
+      <div class="quick-actions">
+        <a class="card" href="./map.html">
+          <h3>Carte</h3><p>Spots, filtres, itinéraires</p>
+        </a>
+        <a class="card" href="./materiel.html">
+          <h3>Matériel</h3><p>Ajoute, édite, suit ton équipement</p>
+        </a>
+        <a class="card" href="./parametres.html">
+          <h3>Paramètres</h3><p>Profil, préférences, sauvegarde</p>
+        </a>
+      </div>
+    </div>
+  </section>
 
+  <main class="container" id="main">
+    <section class="modules-grid" id="modulesGrid" aria-label="Modules dynamiques">
+      <!-- Sections dynamiques futures -->
+      <article class="module">
+        <h2>Announcements</h2>
+        <p>Aucun message pour le moment.</p>
+      </article>
+    </section>
+  </main>
 
+  <footer class="app-footer">
+    <p>© <span id="year"></span> ZoneDeGrimpe</p>
+  </footer>
 
-		<aside class="zone3">
-			<strong>Informations :</strong>
-			<ul class="geoloc"></ul>
-		</aside>
-
-		<main class="zone2">
-			<div id="map"></div>
-		</main>
-
-		<aside class="zone4">
-			<strong>Infos site</strong>
-			<div id="info">no info</div>
-
-			<script>
-				window.__gcse = { callback: () => window.gcseReady = true };
-			</script>
-			<script async src="https://cse.google.com/cse.js?cx=536abfba31bb74c67"></script>
-			<div class="gcse-searchresults-only" data-gname="cragResults"></div>
-		</aside>
-
-
-	</div>
-
-	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-		integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-	<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-
-	<script type="module" src="script/script.js"></script>
+  <script type="module" src="./js/main.js"></script>
 </body>
-
 </html>

@@ -1,0 +1,209 @@
+import { API_BASE_URL, CACHE_KEYS, CACHE_TTL_MS } from "./config.js";
+
+/* ---------- cache helpers ---------- */
+function getCache(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const { ts, data } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL_MS) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+function setCache(key, data) {
+  localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+}
+
+/* ---------- coercion/normalisation ---------- */
+function coerceArray(json) {
+  if (!json) return [];
+  if (Array.isArray(json)) return json;
+
+  // GeoJSON FeatureCollection (éventuellement avec total/hasMore)
+  if (json.type === "FeatureCollection" && Array.isArray(json.features)) {
+    return json.features;
+  }
+
+  // Variantes fréquentes d’API
+  if (Array.isArray(json.data)) return json.data;
+  if (Array.isArray(json.results)) return json.results;
+  if (Array.isArray(json.spots)) return json.spots;
+  if (Array.isArray(json.items)) return json.items;
+
+  // Un seul objet → on l’enveloppe
+  if (typeof json === "object") return [json];
+
+  return [];
+}
+
+function num(v) {
+  if (typeof v === "number") return v;
+  if (typeof v === "string") {
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+function toSpot(s, i) {
+  // GeoJSON Feature
+  if (s && s.type === "Feature" && s.geometry && Array.isArray(s.geometry.coordinates)) {
+    const [lngRaw, latRaw] = s.geometry.coordinates;
+    const lat = num(latRaw), lng = num(lngRaw);
+    const p = s.properties || s.props || {};
+    return {
+      id: p.id ?? p._id ?? s.id ?? `spot-${i}`,
+      name: p.name ?? p.titre ?? "Sans nom",
+      type: p.type ?? p.soustype ?? "inconnu",
+      orientation: p.orientation ?? p?.info_complementaires?.orientation ?? null,
+      url: p.url ?? null,
+      description: p.description ?? null,
+      lat, lng,
+      raw: s,
+    };
+  }
+
+  // Doc Mongo {location:{lat,lng}} ou Point [lng,lat] ou variantes à plat
+  let lat = num(s?.location?.lat);
+  let lng = num(s?.location?.lng);
+
+  if ((lat == null || lng == null) && s?.location?.type === "Point" && Array.isArray(s.location.coordinates)) {
+    const [lngRaw, latRaw] = s.location.coordinates;
+    lng = num(lngRaw);
+    lat = num(latRaw);
+  }
+  // fallback très permissif
+  if (lat == null && s?.lat != null) lat = num(s.lat);
+  if (lng == null && s?.lng != null) lng = num(s.lng);
+
+  return {
+    id: s.id ?? s._id ?? `spot-${i}`,
+    name: s.name ?? s.titre ?? "Sans nom",
+    type: s.type ?? s.soustype ?? "inconnu",
+    orientation: s?.info_complementaires?.orientation ?? s.orientation ?? null,
+    url: s.url ?? null,
+    description: s.description ?? null,
+    lat, lng,
+    raw: s,
+  };
+}
+
+function normalize(arr) {
+  const before = arr.length;
+  const norm = arr.map(toSpot).filter(s => typeof s.lat === "number" && typeof s.lng === "number");
+  console.log(`[fetchSpotsAll] API: ${before} éléments → normalisés: ${norm.length}`);
+  if (!norm.length && before) {
+    console.warn("[normalize] Exemple élément brut:", arr[0]);
+  }
+  return norm;
+}
+
+/* ---------- fetch util ---------- */
+async function tryFetch(url) {
+  let r;
+  try {
+    r = await fetch(url, {
+      headers: { Accept: "application/json" },
+      cache: "no-store" // évite les 304 en dev
+    });
+  } catch (netErr) {
+    throw new Error(`[network_error] ${netErr?.message || netErr}`);
+  }
+
+  if (!r.ok) {
+    const body = await r.text().catch(() => "(no body)");
+    throw new Error(`[http_${r.status}] ${r.statusText} — ${body.slice(0, 200)}`);
+  }
+
+  // Certains proxies renvoient 204/empty → gérons-le proprement
+  const txt = await r.text();
+  if (!txt) return null;
+
+  try {
+    return JSON.parse(txt);
+  } catch (parseErr) {
+    throw new Error(`[json_parse_error] ${String(parseErr)} — preview: ${txt.slice(0, 200)}`);
+  }
+}
+
+/* ---------- fetch paginé ---------- */
+export async function fetchSpots({ useCache = true, pageSize = 10000, extraParams = { format: "geojson" } } = {}) {
+  if (useCache) {
+    const cached = getCache(CACHE_KEYS.SPOTS);
+    if (cached) return cached;
+  }
+
+  const out = [];
+  let usedMode = null; // "skip" | "page" | "single"
+  let page = 1;
+  let skip = 0;
+
+  // 1) skip/limit
+  while (true) {
+    const url = new URL("spots", API_BASE_URL);
+    url.searchParams.set("limit", String(pageSize));
+    url.searchParams.set("skip", String(skip));
+    for (const [k, v] of Object.entries(extraParams || {})) url.searchParams.set(k, String(v));
+
+    const json = await tryFetch(url.toString());
+    const arr = coerceArray(json);
+
+    if (!arr.length) {
+      if (skip === 0) break;
+      usedMode = "skip";
+      break;
+    }
+
+    out.push(...arr);
+    if (arr.length < pageSize) {
+      usedMode = "skip";
+      break;
+    }
+    skip += pageSize;
+  }
+
+  // 2) page/perPage
+  if (!out.length) {
+    while (true) {
+      const url = new URL("spots", API_BASE_URL);
+      url.searchParams.set("perPage", String(pageSize));
+      url.searchParams.set("page", String(page));
+      for (const [k, v] of Object.entries(extraParams || {})) url.searchParams.set(k, String(v));
+
+      const json = await tryFetch(url.toString());
+      const arr = coerceArray(json);
+
+      if (!arr.length) {
+        if (page === 1) break;
+        usedMode = "page";
+        break;
+      }
+
+      out.push(...arr);
+      if (arr.length < pageSize) {
+        usedMode = "page";
+        break;
+      }
+      page += 1;
+    }
+  }
+
+  // 3) single fetch
+  if (!out.length) {
+    const url = new URL("spots", API_BASE_URL);
+    for (const [k, v] of Object.entries(extraParams || {})) url.searchParams.set(k, String(v));
+
+    const json = await tryFetch(url.toString());
+    const arr = coerceArray(json);
+    out.push(...arr);
+    usedMode = "single";
+  }
+
+  console.log(`[fetchSpotsAll] mode=${usedMode} total bruts=${out.length}`);
+  const normalized = normalize(out);
+
+  setCache(CACHE_KEYS.SPOTS, normalized);
+  return normalized;
+}
