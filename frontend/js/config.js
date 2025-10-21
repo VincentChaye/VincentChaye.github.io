@@ -1,17 +1,34 @@
 // config.js
+
+// URL du backend en production
 const PROD_API = "https://zonedegrimpe-api-f8fehxc0hhcmdfh5.francecentral-01.azurewebsites.net";
 
-function isLocalHost(host) {
-  return /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/i.test(host);
+// Détection locale
+function isLocalHost(hostname) {
+  return /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/i.test(hostname);
 }
 
-export const API_BASE_URL =
-  (typeof import !== "undefined" && import.meta?.env?.VITE_API_BASE_URL)
-  || (typeof window !== "undefined" && isLocalHost(window.location.hostname)
-      ? "http://localhost:3000"
-      : PROD_API);
+// Récupération sûre de la variable d'environnement Vite (si présente)
+let envBaseUrl = undefined;
+try {
+  // eslint-disable-next-line no-undef
+  envBaseUrl = import.meta?.env?.VITE_API_BASE_URL;
+} catch {
+  envBaseUrl = undefined;
+}
 
-// <<< nouveau : préfixe de chemin >>>
+// Détermination automatique de l’URL de base
+export const API_BASE_URL =
+  envBaseUrl ||
+  (typeof window !== "undefined" && isLocalHost(window.location.hostname)
+    ? "http://localhost:3000"
+    : PROD_API);
+
+// Préfixe pour les routes backend
 export const API_PATH_PREFIX = "/api";
-export const CACHE_TTL_MS = 1000 * 60 * 10; // si pas déjà défini
-export const CACHE_KEYS = { SPOTS: "spots_cache_v1" }; // si pas déjà défini
+
+// Constantes pour le cache
+export const CACHE_TTL_MS = 1000 * 60 * 10; // 10 minutes
+export const CACHE_KEYS = {
+  SPOTS: "cache_spots_v1",
+};
