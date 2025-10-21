@@ -1,5 +1,4 @@
 name: Build & Push to GHCR
-
 on:
   push:
     branches: [ main, dev ]
@@ -27,7 +26,7 @@ jobs:
         working-directory: backend
         env:
           OWNER: ${{ github.repository_owner }}
-          BRANCH: ${{ github.ref_name }}   # 'main' ou 'dev'
+          BRANCH: ${{ github.ref_name }}
           SHA: ${{ github.sha }}
         run: |
           OWNER_LC=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')
