@@ -1,4 +1,4 @@
-import { initCommonUI } from "./ui.js";
+// initCommonUI sera disponible globalement via ui.js
 
 // --- Auth guard: redirige vers login si pas de token ---
 (function ensureAuth() {
@@ -49,7 +49,9 @@ async function fetchJSON(url, opts = {}) {
 }
 
 // ===== UI refs
-initCommonUI();
+if (typeof initCommonUI === 'function') {
+  initCommonUI();
+}
 const listEl     = document.getElementById("gearList");
 const addBtn     = document.getElementById("addGearBtn");
 const modal      = document.getElementById("gearModal");
@@ -110,7 +112,7 @@ function formToPayload(fd) {
 }
 
 function rowToCard(it) {
-  const name  = it?.specs?.name || `${it?.specs?.brand ?? ""} ${it?.specs?.model ?? ""}`.trim() || it?.category || "Équipement";
+  const name  = it?.specs?.name || `${it?.specs?.brand ?? ""} ${it?.specs?.model ?? ""}`.trim() || it?.category || "Équipement sans nom";
   const brand = it?.specs?.brand ?? "";
   const model = it?.specs?.model ?? "";
   const cond  = it?.lifecycle?.condition ?? "good";

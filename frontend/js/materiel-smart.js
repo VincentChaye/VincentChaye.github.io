@@ -145,8 +145,8 @@ function createSmartForm() {
     <div class="form-section">
       <h3>Informations générales</h3>
       
-      <label>Nom de l'équipement *
-        <input name="name" required class="input" placeholder="Ex: Corde principale, Casque rouge..." />
+      <label>Nom de l'équipement (optionnel)
+        <input name="name" class="input" placeholder="Ex: Corde principale, Casque rouge..." />
       </label>
       
       <label>Catégorie *
@@ -425,7 +425,7 @@ function fillFormFromRow(item) {
 
 // === Affichage des cartes ===
 function rowToCard(item) {
-  const name = item?.specs?.name || `${item?.specs?.brand || ""} ${item?.specs?.model || ""}`.trim() || item?.category || "Équipement";
+  const name = item?.specs?.name || `${item?.specs?.brand || ""} ${item?.specs?.model || ""}`.trim() || item?.category || "Équipement sans nom";
   const brand = item?.specs?.brand || "";
   const model = item?.specs?.model || "";
   const condition = item?.lifecycle?.condition || "good";
@@ -625,9 +625,311 @@ if (modal) modal.addEventListener("close", () => {
 if (search) search.addEventListener("input", refresh);
 if (tagFilter) tagFilter.addEventListener("change", refresh);
 
+// === Gestion des onglets ===
+function initTabs() {
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.dataset.tab;
+      
+      // Désactiver tous les onglets
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      // Activer l'onglet sélectionné
+      button.classList.add('active');
+      const targetContent = document.getElementById(`tab-${targetTab}`);
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
+      
+      // Actions spécifiques selon l'onglet
+      switch(targetTab) {
+        case 'inventory':
+          refresh();
+          break;
+        case 'maintenance':
+          initMaintenanceTab();
+          break;
+        case 'advice':
+          initAdviceTab();
+          break;
+        case 'stats':
+          initStatsTab();
+          break;
+      }
+    });
+  });
+}
+
+function initMaintenanceTab() {
+  const checkInspectionsBtn = document.getElementById('checkInspectionsBtn');
+  const checkRetireBtn = document.getElementById('checkRetireBtn');
+  const inspectionDays = document.getElementById('inspectionDays');
+  const retireThreshold = document.getElementById('retireThreshold');
+  const inspectionsList = document.getElementById('inspectionsList');
+  const retireList = document.getElementById('retireList');
+
+  if (checkInspectionsBtn) {
+    checkInspectionsBtn.addEventListener('click', async () => {
+      const days = parseInt(inspectionDays.value) || 30;
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() + days);
+      
+      const items = await apiList();
+      const needsInspection = items.filter(item => {
+        if (!item.lifecycle?.nextInspectionAt) return false;
+        const nextInspection = new Date(item.lifecycle.nextInspectionAt);
+        return nextInspection <= cutoffDate;
+      });
+      
+      if (needsInspection.length === 0) {
+        inspectionsList.innerHTML = '<p class="info-text">✅ Aucune inspection prévue dans cette période</p>';
+      } else {
+        inspectionsList.innerHTML = needsInspection.map(item => {
+          const name = item?.specs?.name || item?.category || "Équipement";
+          const nextDate = new Date(item.lifecycle.nextInspectionAt).toLocaleDateString();
+          const daysUntil = Math.ceil((new Date(item.lifecycle.nextInspectionAt) - new Date()) / (1000 * 60 * 60 * 24));
+          const urgency = daysUntil < 0 ? 'urgent' : daysUntil <= 7 ? 'warning' : 'normal';
+          
+          return `
+            <div class="maintenance-item ${urgency}">
+              <h4>${escapeHTML(name)}</h4>
+              <p>Inspection prévue : ${nextDate} ${daysUntil < 0 ? `(en retard de ${Math.abs(daysUntil)} jours)` : `(dans ${daysUntil} jours)`}</p>
+            </div>
+          `;
+        }).join('');
+      }
+    });
+  }
+
+  if (checkRetireBtn) {
+    checkRetireBtn.addEventListener('click', async () => {
+      const threshold = parseFloat(retireThreshold.value) || 0.8;
+      const items = await apiList();
+      const toRetire = items.filter(item => {
+        const usage = item.lifecycle?.usageCount || 0;
+        const category = item.category;
+        const config = MATERIAL_CONFIG.categories[category];
+        
+        if (!config?.maxUsage) return false;
+        
+        const usageRatio = usage / config.maxUsage;
+        return usageRatio >= threshold;
+      });
+      
+      if (toRetire.length === 0) {
+        retireList.innerHTML = '<p class="info-text">✅ Aucun matériel à remplacer selon ce seuil</p>';
+      } else {
+        retireList.innerHTML = toRetire.map(item => {
+          const name = item?.specs?.name || item?.category || "Équipement";
+          const usage = item.lifecycle?.usageCount || 0;
+          const config = MATERIAL_CONFIG.categories[item.category];
+          const percentage = Math.round((usage / config.maxUsage) * 100);
+          
+          return `
+            <div class="maintenance-item urgent">
+              <h4>${escapeHTML(name)}</h4>
+              <p>Usure : ${usage}/${config.maxUsage} utilisations (${percentage}%)</p>
+            </div>
+          `;
+        }).join('');
+      }
+    });
+  }
+}
+
+function initAdviceTab() {
+  const getMaterialAdviceBtn = document.getElementById('getMaterialAdviceBtn');
+  const getSpotsAdviceBtn = document.getElementById('getSpotsAdviceBtn');
+  const getLocationBtn = document.getElementById('getLocationBtn');
+  
+  if (getLocationBtn) {
+    getLocationBtn.addEventListener('click', () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            document.getElementById('adviceLat').value = position.coords.latitude.toFixed(6);
+            document.getElementById('adviceLng').value = position.coords.longitude.toFixed(6);
+            document.getElementById('spotsLat').value = position.coords.latitude.toFixed(6);
+            document.getElementById('spotsLng').value = position.coords.longitude.toFixed(6);
+          },
+          (error) => {
+            alert('Impossible d\'obtenir votre position : ' + error.message);
+          }
+        );
+      } else {
+        alert('La géolocalisation n\'est pas supportée par votre navigateur');
+      }
+    });
+  }
+
+  if (getMaterialAdviceBtn) {
+    getMaterialAdviceBtn.addEventListener('click', async () => {
+      const materialAdvice = document.getElementById('materialAdvice');
+      materialAdvice.innerHTML = '<p>Analyse en cours...</p>';
+      
+      try {
+        const items = await apiList();
+        const analysis = analyzeMaterial(items);
+        materialAdvice.innerHTML = analysis;
+      } catch (err) {
+        materialAdvice.innerHTML = `<p class="error">Erreur : ${err.message}</p>`;
+      }
+    });
+  }
+
+  if (getSpotsAdviceBtn) {
+    getSpotsAdviceBtn.addEventListener('click', async () => {
+      const spotsAdvice = document.getElementById('spotsAdvice');
+      spotsAdvice.innerHTML = '<p>Recherche en cours...</p>';
+      
+      // Simulation d'une recherche de spots
+      setTimeout(() => {
+        spotsAdvice.innerHTML = `
+          <div class="advice-results">
+            <p class="info-text">🏔️ Fonctionnalité en développement</p>
+            <p>La recherche de spots sera bientôt disponible avec l'intégration de la base de données des falaises.</p>
+          </div>
+        `;
+      }, 1000);
+    });
+  }
+}
+
+function analyzeMaterial(items) {
+  if (items.length === 0) {
+    return '<p class="info-text">📦 Aucun matériel à analyser. Ajoutez du matériel pour obtenir des conseils.</p>';
+  }
+
+  const categories = {};
+  let totalValue = 0;
+  let needsInspection = 0;
+  let needsReplacement = 0;
+
+  items.forEach(item => {
+    const category = item.category || 'Autre';
+    categories[category] = (categories[category] || 0) + 1;
+    
+    if (item.specs?.price) {
+      totalValue += item.specs.price;
+    }
+    
+    // Vérification inspection
+    if (item.lifecycle?.nextInspectionAt) {
+      const nextInspection = new Date(item.lifecycle.nextInspectionAt);
+      const daysUntil = Math.ceil((nextInspection - new Date()) / (1000 * 60 * 60 * 24));
+      if (daysUntil <= 30) needsInspection++;
+    }
+    
+    // Vérification remplacement
+    const usage = item.lifecycle?.usageCount || 0;
+    const config = MATERIAL_CONFIG.categories[category];
+    if (config?.maxUsage && usage / config.maxUsage >= 0.8) {
+      needsReplacement++;
+    }
+  });
+
+  let html = '<div class="analysis-results">';
+  
+  html += `<h4>📊 Résumé de votre inventaire</h4>`;
+  html += `<p><strong>${items.length}</strong> équipements au total</p>`;
+  
+  html += '<h4>📦 Répartition par catégorie</h4>';
+  html += '<ul>';
+  Object.entries(categories).forEach(([cat, count]) => {
+    html += `<li>${cat} : ${count} équipement${count > 1 ? 's' : ''}</li>`;
+  });
+  html += '</ul>';
+  
+  if (totalValue > 0) {
+    html += `<h4>💰 Valeur estimée</h4>`;
+    html += `<p><strong>${totalValue.toFixed(2)}€</strong> au total</p>`;
+  }
+  
+  if (needsInspection > 0 || needsReplacement > 0) {
+    html += '<h4>⚠️ Actions recommandées</h4>';
+    if (needsInspection > 0) {
+      html += `<p class="warning">🔍 ${needsInspection} équipement${needsInspection > 1 ? 's' : ''} nécessite${needsInspection > 1 ? 'nt' : ''} une inspection prochainement</p>`;
+    }
+    if (needsReplacement > 0) {
+      html += `<p class="urgent">🔄 ${needsReplacement} équipement${needsReplacement > 1 ? 's' : ''} à remplacer bientôt</p>`;
+    }
+  } else {
+    html += '<p class="success">✅ Votre matériel semble en bon état !</p>';
+  }
+  
+  html += '</div>';
+  return html;
+}
+
+function initStatsTab() {
+  const inventoryStats = document.getElementById('inventoryStats');
+  const valueStats = document.getElementById('valueStats');
+  const conditionStats = document.getElementById('conditionStats');
+  
+  apiList().then(items => {
+    // Stats inventaire
+    const categories = {};
+    items.forEach(item => {
+      const cat = item.category || 'Autre';
+      categories[cat] = (categories[cat] || 0) + 1;
+    });
+    
+    let inventoryHTML = `<p><strong>${items.length}</strong> équipements</p>`;
+    inventoryHTML += '<div class="stats-breakdown">';
+    Object.entries(categories).forEach(([cat, count]) => {
+      inventoryHTML += `<div class="stat-item">${cat}: ${count}</div>`;
+    });
+    inventoryHTML += '</div>';
+    inventoryStats.innerHTML = inventoryHTML;
+    
+    // Stats valeur
+    const totalValue = items.reduce((sum, item) => sum + (item.specs?.price || 0), 0);
+    const avgValue = items.length > 0 ? totalValue / items.length : 0;
+    
+    let valueHTML = `<p><strong>${totalValue.toFixed(2)}€</strong> au total</p>`;
+    if (avgValue > 0) {
+      valueHTML += `<p>Moyenne: ${avgValue.toFixed(2)}€</p>`;
+    }
+    valueStats.innerHTML = valueHTML;
+    
+    // Stats condition
+    const conditions = {};
+    items.forEach(item => {
+      const cond = item.lifecycle?.condition || 'good';
+      conditions[cond] = (conditions[cond] || 0) + 1;
+    });
+    
+    let conditionHTML = '<div class="condition-breakdown">';
+    Object.entries(conditions).forEach(([cond, count]) => {
+      const label = MATERIAL_CONFIG.states[cond] || cond;
+      const percentage = Math.round((count / items.length) * 100);
+      conditionHTML += `
+        <div class="condition-stat">
+          <span class="condition-label">${label}</span>
+          <span class="condition-count">${count} (${percentage}%)</span>
+        </div>
+      `;
+    });
+    conditionHTML += '</div>';
+    conditionStats.innerHTML = conditionHTML;
+    
+  }).catch(err => {
+    console.error('Erreur lors du chargement des stats:', err);
+    inventoryStats.innerHTML = '<p class="error">Erreur de chargement</p>';
+    valueStats.innerHTML = '<p class="error">Erreur de chargement</p>';
+    conditionStats.innerHTML = '<p class="error">Erreur de chargement</p>';
+  });
+}
+
 // === Initialisation ===
 document.addEventListener("DOMContentLoaded", () => {
   initializeUIElements();
+  initTabs();
+  
   if (form && listEl && addBtn && modal && search && tagFilter) {
     createSmartForm();
     refresh();
