@@ -112,7 +112,9 @@ function spotCardHTML(s) {
       <div class="spot-actions">
         ${url}
         <a class="btn" href="${dir}" target="_blank" rel="noopener">🚗 Itinéraire</a>
-        <button class="btn btn--ghost" onclick="window.shareSpot && shareSpot('${s.id}')" title="Partager ce spot">📤</button>
+        <button class="btn btn--ghost" onclick="window.shareSpot && shareSpot('${s.id}')">Partager</button>
+        <button class="btn btn--primary" onclick="window.editSpot && editSpot('${s.id}')">Modifier</button>
+        <button class="btn btn--ghost" onclick="window.viewSpotDetails && viewSpotDetails('${s.id}')">Voir détails</button>
       </div>
     </div>
   `;
@@ -269,6 +271,161 @@ window.shareSpot = function(spotId) {
     }).catch(() => {
       alert(`Lien du spot : ${url}`);
     });
+  }
+};
+
+/* ---------- Fonction pour voir les détails complets ---------- */
+window.viewSpotDetails = function(spotId) {
+  const spot = allSpots.find(s => s.id === spotId);
+  if (!spot) return;
+  
+  const detailsHTML = `
+    <div class="spot-details">
+      <h3 class="spot-title">Détails complets</h3>
+      <div class="spot-info-list">
+        <div class="spot-info-item"><strong>Nom :</strong> ${spot.name || 'Non renseigné'}</div>
+        <div class="spot-info-item"><strong>Type :</strong> ${spot.type || 'Non renseigné'}</div>
+        <div class="spot-info-item"><strong>Sous-type :</strong> ${spot.soustype || 'Non renseigné'}</div>
+        <div class="spot-info-item"><strong>Niveau min :</strong> ${spot.niveau_min || 'Non renseigné'}</div>
+        <div class="spot-info-item"><strong>Niveau max :</strong> ${spot.niveau_max || 'Non renseigné'}</div>
+        <div class="spot-info-item"><strong>Orientation :</strong> ${spot.orientation || 'Non renseignée'}</div>
+        <div class="spot-info-item"><strong>Nombre de voies :</strong> ${spot.id_voix?.length || 0}</div>
+        ${spot.description ? `<div class="spot-info-item"><strong>Description :</strong> ${spot.description}</div>` : ''}
+        ${spot.info_complementaires ? `<div class="spot-info-item"><strong>Infos complémentaires :</strong> ${spot.info_complementaires}</div>` : ''}
+        ${spot.url ? `<div class="spot-info-item"><strong>URL :</strong> <a href="${spot.url}" target="_blank" rel="noopener">${spot.url}</a></div>` : ''}
+        <div class="spot-info-item"><strong>Coordonnées :</strong> ${spot.lat.toFixed(6)}, ${spot.lng.toFixed(6)}</div>
+      </div>
+      <div class="spot-actions">
+        <button class="btn" onclick="window.editSpot && editSpot('${spot.id}')">Modifier</button>
+        <button class="btn btn--ghost" onclick="closeSheet()">Fermer</button>
+      </div>
+    </div>
+  `;
+  
+  openSheet(detailsHTML);
+};
+
+/* ---------- Fonction pour modifier un spot ---------- */
+window.editSpot = function(spotId) {
+  const spot = allSpots.find(s => s.id === spotId);
+  if (!spot) return;
+  
+  const formHTML = `
+    <div class="spot-edit-form">
+      <h3 class="spot-title">Modifier le spot</h3>
+      <form id="editSpotForm" onsubmit="return false;">
+        <div class="form-group">
+          <label for="editName">Nom du spot *</label>
+          <input type="text" id="editName" name="name" value="${spot.name || ''}" required maxlength="120">
+        </div>
+        
+        <div class="form-group">
+          <label for="editSoustype">Sous-type</label>
+          <select id="editSoustype" name="soustype">
+            <option value="">-- Sélectionner --</option>
+            <option value="diff" ${spot.soustype === 'diff' ? 'selected' : ''}>Difficulté (diff)</option>
+            <option value="bloc" ${spot.soustype === 'bloc' ? 'selected' : ''}>Bloc</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="editNiveauMin">Niveau minimum</label>
+          <input type="text" id="editNiveauMin" name="niveau_min" value="${spot.niveau_min || ''}" placeholder="Ex: 4a, 5c" maxlength="10">
+        </div>
+        
+        <div class="form-group">
+          <label for="editNiveauMax">Niveau maximum</label>
+          <input type="text" id="editNiveauMax" name="niveau_max" value="${spot.niveau_max || ''}" placeholder="Ex: 7b, 8a+" maxlength="10">
+        </div>
+        
+        <div class="form-group">
+          <label for="editOrientation">Orientation</label>
+          <select id="editOrientation" name="orientation">
+            <option value="">-- Sélectionner --</option>
+            <option value="N" ${spot.orientation === 'N' ? 'selected' : ''}>Nord (N)</option>
+            <option value="NE" ${spot.orientation === 'NE' ? 'selected' : ''}>Nord-Est (NE)</option>
+            <option value="E" ${spot.orientation === 'E' ? 'selected' : ''}>Est (E)</option>
+            <option value="SE" ${spot.orientation === 'SE' ? 'selected' : ''}>Sud-Est (SE)</option>
+            <option value="S" ${spot.orientation === 'S' ? 'selected' : ''}>Sud (S)</option>
+            <option value="SO" ${spot.orientation === 'SO' ? 'selected' : ''}>Sud-Ouest (SO)</option>
+            <option value="O" ${spot.orientation === 'O' ? 'selected' : ''}>Ouest (O)</option>
+            <option value="NO" ${spot.orientation === 'NO' ? 'selected' : ''}>Nord-Ouest (NO)</option>
+          </select>
+        </div>
+        
+        <div class="spot-actions">
+          <button type="button" class="btn" onclick="window.submitSpotEdit && submitSpotEdit('${spot.id}')">Enregistrer</button>
+          <button type="button" class="btn btn--ghost" onclick="closeSheet()">Annuler</button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  openSheet(formHTML);
+};
+
+/* ---------- Fonction pour soumettre la modification ---------- */
+window.submitSpotEdit = async function(spotId) {
+  const form = document.getElementById('editSpotForm');
+  if (!form) return;
+  
+  const formData = new FormData(form);
+  const updates = {};
+  
+  // Récupérer seulement les champs modifiables
+  const name = formData.get('name')?.trim();
+  const soustype = formData.get('soustype')?.trim();
+  const niveau_min = formData.get('niveau_min')?.trim();
+  const niveau_max = formData.get('niveau_max')?.trim();
+  const orientation = formData.get('orientation')?.trim();
+  
+  if (name) updates.name = name;
+  if (soustype) updates.soustype = soustype;
+  if (niveau_min) updates.niveau_min = niveau_min;
+  if (niveau_max) updates.niveau_max = niveau_max;
+  if (orientation) updates.orientation = orientation;
+  
+  // Si aucune modification
+  if (Object.keys(updates).length === 0) {
+    alert('Aucune modification à enregistrer.');
+    return;
+  }
+  
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/spots/${spotId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify(updates)
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Erreur lors de la modification');
+    }
+    
+    const result = await response.json();
+    
+    // Mettre à jour le spot dans allSpots
+    const spotIndex = allSpots.findIndex(s => s.id === spotId);
+    if (spotIndex !== -1) {
+      allSpots[spotIndex] = { ...allSpots[spotIndex], ...updates };
+    }
+    
+    alert('Modifications enregistrées avec succès !');
+    closeSheet();
+    
+    // Recharger les spots pour avoir les données à jour
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
+    
+  } catch (error) {
+    console.error('Erreur lors de la modification:', error);
+    alert(`Erreur: ${error.message}`);
   }
 };
 

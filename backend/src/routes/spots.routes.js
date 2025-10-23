@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { ObjectId } from "mongodb";
-import { createSpotSchema } from "../validators.js";
+import { createSpotSchema, updateSpotSchema } from "../validators.js";
 
 export function spotsRouter(db) {
   const r = Router();
@@ -199,6 +199,45 @@ export function spotsRouter(db) {
       if (!doc) return res.status(404).json({ error: "not_found" });
       res.json(doc);
     } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: "server_error" });
+    }
+  });
+
+  // --- Mettre à jour un spot (PATCH) ---
+  r.patch("/:id", async (req, res) => {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "bad_id" });
+    }
+    
+    try {
+      // Valider les données de mise à jour
+      const updates = updateSpotSchema.parse(req.body);
+      
+      // Préparer l'objet de mise à jour
+      const updateDoc = {
+        $set: {
+          ...updates,
+          updatedAt: new Date()
+        }
+      };
+      
+      // Effectuer la mise à jour
+      const result = await spots.findOneAndUpdate(
+        { _id: new ObjectId(req.params.id) },
+        updateDoc,
+        { returnDocument: 'after' }
+      );
+      
+      if (!result) {
+        return res.status(404).json({ error: "not_found" });
+      }
+      
+      res.json({ ok: true, spot: result });
+    } catch (e) {
+      if (e.name === 'ZodError') {
+        return res.status(400).json({ error: "invalid_payload", detail: String(e) });
+      }
       console.error(e);
       res.status(500).json({ error: "server_error" });
     }
