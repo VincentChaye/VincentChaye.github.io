@@ -613,47 +613,60 @@ function openAddGearModal() {
 
 
 
-if (form) form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+// === Event listeners (configurés après le DOM) ===
+function setupEventListeners() {
+  // Soumission du formulaire
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-  try {
-    const submitBtn = form.querySelector('#gearSubmitBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Enregistrement...";
+      try {
+        const submitBtn = form.querySelector('#gearSubmitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Enregistrement...";
 
-    const fd = new FormData(form);
-    const payload = formToPayload(fd);
+        const fd = new FormData(form);
+        const payload = formToPayload(fd);
 
-    if (editingId) {
-      await apiPatch(editingId, payload);
-    } else {
-      await apiCreate(payload);
-    }
+        console.log("📦 Envoi du payload:", payload);
 
-    if (modal) modal.close();
-    await refresh();
+        if (editingId) {
+          console.log("✏️ Modification de l'équipement", editingId);
+          await apiPatch(editingId, payload);
+        } else {
+          console.log("➕ Ajout d'un nouvel équipement");
+          const newId = await apiCreate(payload);
+          console.log("✅ Équipement ajouté avec l'ID:", newId);
+        }
 
-  } catch (err) {
-    console.error("Erreur lors de l'enregistrement:", err);
-    alert(`Erreur : ${err.message}`);
-  } finally {
-    const submitBtn = form.querySelector('#gearSubmitBtn');
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Enregistrer";
-    }
+        if (modal) modal.close();
+        await refresh();
+
+      } catch (err) {
+        console.error("❌ Erreur lors de l'enregistrement:", err);
+        alert(`Erreur : ${err.message}`);
+      } finally {
+        const submitBtn = form.querySelector('#gearSubmitBtn');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Enregistrer";
+        }
+      }
+    });
   }
-});
 
-// Fermeture du modal
-if (modal) modal.addEventListener("close", () => {
-  editingId = null;
-  if (form) form.reset();
-});
+  // Fermeture du modal
+  if (modal) {
+    modal.addEventListener("close", () => {
+      editingId = null;
+      if (form) form.reset();
+    });
+  }
 
-// Recherche et filtres
-if (search) search.addEventListener("input", refresh);
-if (tagFilter) tagFilter.addEventListener("change", refresh);
+  // Recherche et filtres
+  if (search) search.addEventListener("input", refresh);
+  if (tagFilter) tagFilter.addEventListener("change", refresh);
+}
 
 // === Gestion des onglets ===
 function initTabs() {
@@ -1002,6 +1015,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Créer le formulaire intelligent
   createSmartForm();
   console.log("Formulaire intelligent créé");
+
+  // Configurer les event listeners (IMPORTANT : après createSmartForm)
+  setupEventListeners();
+  console.log("Event listeners configurés");
 
   // Charger les données
   refresh();
