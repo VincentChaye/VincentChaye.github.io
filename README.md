@@ -4,6 +4,38 @@
 
 ---
 
+## ⚡ Quick Start (Démarrage rapide)
+
+Pour lancer rapidement le projet en local :
+
+```bash
+# 1. Cloner et installer
+git clone https://github.com/vincentchaye/ZoneDeGrimpe.git
+cd ZoneDeGrimpe
+
+# 2. Installer les dépendances
+cd backend && npm install
+cd ../frontend && npm install
+
+# 3. Configurer l'environnement
+cd ../backend
+cp .env.example .env
+# Éditez .env et remplacez <VOTRE_USER> et <VOTRE_PASSWORD> par vos identifiants MongoDB
+
+# 4. Lancer le backend (terminal 1)
+npm start
+
+# 5. Lancer le frontend (terminal 2)
+cd ../frontend
+npm run dev
+
+# 6. Ouvrir http://localhost:3001 dans votre navigateur
+```
+
+> **Important** : Vous aurez besoin des identifiants MongoDB Atlas. Voir la section [Installation](#️-installation-et-configuration) pour plus de détails.
+
+---
+
 ## 📋 Table des matières
 
 1. [À propos du projet](#-à-propos-du-projet)
@@ -25,7 +57,7 @@
 
 ## 🎯 À propos du projet
 
-ZoneDeGrimpe est une plateforme interactive qui combine cartographie intelligente et gestion de matériel d'escalade. L'application s'adresse aux grimpeurs de tous niveaux qui souhaitent :
+ZoneDeGrimpe est une plateforme interactive que j'ai créée pour combiner cartographie intelligente et gestion de matériel d'escalade. L'application s'adresse aux grimpeurs de tous niveaux qui souhaitent :
 
 - **Découvrir** de nouveaux sites d'escalade en France et ailleurs
 - **Planifier** leurs sorties avec des informations détaillées (orientation, cotation, type de grimpe)
@@ -34,6 +66,15 @@ ZoneDeGrimpe est une plateforme interactive qui combine cartographie intelligent
 - **Recevoir** des conseils personnalisés basés sur leur matériel et leurs préférences
 
 Le projet intègre des données issues d'**OpenStreetMap** via l'API Overpass, enrichies et stockées dans MongoDB.
+
+### 🏗️ État du projet
+
+- ✅ **Base de données** : Opérationnelle avec ~10 000+ spots d'escalade
+- ✅ **Backend API** : Déployée sur Azure (production)
+- ✅ **Frontend** : Interface web responsive fonctionnelle
+- 🔧 **En développement** : Nouvelles fonctionnalités (voir Roadmap)
+
+> 📌 **Note** : Ce projet est actuellement en développement actif. Les données affichées sont réelles et proviennent d'OpenStreetMap. Certaines fonctionnalités sont encore en phase de test.
 
 ---
 
@@ -142,9 +183,16 @@ Avant de commencer, assurez-vous d'avoir installé :
 
 - **Node.js** >= 18.x ([télécharger](https://nodejs.org/))
 - **npm** >= 9.x (inclus avec Node.js)
-- **MongoDB** (local ou compte [MongoDB Atlas](https://www.mongodb.com/cloud/atlas))
 - **Git** (pour cloner le projet)
 - Un éditeur de code (VS Code recommandé)
+
+### Accès à la base de données
+
+Le projet utilise MongoDB Atlas (cloud). Vous avez besoin de :
+- ✅ Accès au cluster MongoDB `zonedegrimpe.qs1fs3v.mongodb.net`
+- ✅ Identifiants utilisateur MongoDB (user/password)
+
+> **Note pour les contributeurs externes** : Si vous n'avez pas accès à la base de données de production, vous pouvez créer votre propre cluster MongoDB Atlas gratuit ou utiliser MongoDB en local pour le développement.
 
 ---
 
@@ -153,9 +201,11 @@ Avant de commencer, assurez-vous d'avoir installé :
 ### 1. Cloner le dépôt
 
 ```bash
-git clone https://github.com/<votre-utilisateur>/ZoneDeGrimpe.git
+git clone https://github.com/vincentchaye/ZoneDeGrimpe.git
 cd ZoneDeGrimpe
 ```
+
+> **Note** : Si vous avez déjà cloné le projet, faites simplement `git pull` pour obtenir les dernières modifications.
 
 ### 2. Installer les dépendances du backend
 
@@ -180,49 +230,34 @@ npm install
 - servor (serveur de développement)
 - eslint, prettier (outils de qualité de code)
 
-### 4. Configurer MongoDB
+### 4. Configurer l'accès à MongoDB
 
-#### Option A : MongoDB Atlas (Cloud - Recommandé)
+Le projet utilise **MongoDB Atlas** (cloud) avec une base de données déjà configurée.
 
-1. Créez un compte gratuit sur [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Créez un nouveau cluster (Free Tier M0)
-3. Créez un utilisateur de base de données (Database Access)
-4. Autorisez votre IP (Network Access → Allow Access from Anywhere)
-5. Récupérez votre **connection string** :
-   ```
-   mongodb+srv://<user>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
-   ```
+**Base de données existante :**
+- **Cluster** : `zonedegrimpe.qs1fs3v.mongodb.net`
+- **Base de données** : `ZoneDeGrimpe`
+- **Collections** : `climbing_spot`, `users`, `user_materiel`, `materiel_specs`, etc.
 
-#### Option B : MongoDB local
-
-1. Installez MongoDB Community Edition
-2. Démarrez le service MongoDB :
-   ```bash
-   # Linux/macOS
-   sudo systemctl start mongod
-   
-   # Windows (dans Services)
-   net start MongoDB
-   ```
-3. Votre connection string sera :
-   ```
-   mongodb://localhost:27017
-   ```
+La base contient déjà :
+- ✅ ~10 000+ spots d'escalade importés depuis OpenStreetMap
+- ✅ Index géospatiaux configurés
+- ✅ Données de test pour le matériel
 
 ### 5. Créer le fichier `.env` dans le backend
 
-Créez un fichier `.env` dans le dossier `backend/` :
+Créez un fichier `.env` dans le dossier `backend/` avec vos identifiants MongoDB :
 
 ```bash
 cd backend
 touch .env
 ```
 
-Ajoutez le contenu suivant (adaptez selon vos besoins) :
+Ajoutez le contenu suivant avec **vos propres identifiants** :
 
 ```env
-# MongoDB Configuration
-MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
+# MongoDB Configuration (utilisez vos identifiants MongoDB Atlas)
+MONGODB_URI=mongodb+srv://<VOTRE_USER>:<VOTRE_PASSWORD>@zonedegrimpe.qs1fs3v.mongodb.net/?retryWrites=true&w=majority&appName=ZoneDeGrimpe
 DB_NAME=ZoneDeGrimpe
 
 # Server Configuration
@@ -232,24 +267,61 @@ NODE_ENV=development
 # CORS Configuration (origines autorisées, séparées par des virgules)
 ALLOWED_ORIGIN=http://localhost:3001,http://127.0.0.1:5500
 
-# JWT Secret (générez une clé sécurisée)
+# JWT Secret (générez une nouvelle clé sécurisée unique)
 JWT_SECRET=votre_cle_secrete_tres_longue_et_complexe_ici_123456789
 
 # JWT Expiration (optionnel)
 JWT_EXPIRES_IN=7d
 ```
 
-> ⚠️ **Important** : Ne commitez JAMAIS le fichier `.env` dans Git ! Il est déjà dans `.gitignore`.
+> ⚠️ **Important** : 
+> - Remplacez `<VOTRE_USER>` et `<VOTRE_PASSWORD>` par vos identifiants MongoDB Atlas
+> - Ne commitez JAMAIS le fichier `.env` dans Git ! Il est déjà dans `.gitignore`
+> - Générez une nouvelle clé JWT unique (voir ci-dessous)
 
 ### 6. Générer une clé JWT sécurisée
 
-Pour générer une clé JWT aléatoire sécurisée :
+Pour générer une clé JWT aléatoire sécurisée unique :
 
 ```bash
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
-Copiez le résultat dans `JWT_SECRET` de votre `.env`.
+Copiez le résultat et remplacez la valeur de `JWT_SECRET` dans votre `.env`.
+
+### 7. Vérifier l'accès à MongoDB Atlas
+
+Pour vérifier que vous avez bien accès à la base de données :
+
+1. Connectez-vous à [MongoDB Atlas](https://cloud.mongodb.com/)
+2. Sélectionnez le cluster **ZoneDeGrimpe**
+3. Vérifiez que votre **IP est autorisée** dans Network Access
+   - Si ce n'est pas le cas : `Network Access` → `Add IP Address` → `Allow Access from Anywhere` (pour le développement)
+4. Vérifiez vos **identifiants utilisateur** dans Database Access
+
+#### 🔑 Récupérer la connection string
+
+Si vous avez perdu votre connection string :
+
+1. Dans MongoDB Atlas, cliquez sur **Connect** sur votre cluster
+2. Choisissez **Drivers**
+3. Copiez la connection string qui ressemble à :
+   ```
+   mongodb+srv://<username>:<password>@zonedegrimpe.qs1fs3v.mongodb.net/?retryWrites=true&w=majority&appName=ZoneDeGrimpe
+   ```
+4. Remplacez `<username>` et `<password>` par vos vrais identifiants
+5. Collez dans `MONGODB_URI` de votre fichier `.env`
+
+#### 🔐 Créer un nouvel utilisateur (si nécessaire)
+
+Si vous devez créer de nouveaux identifiants :
+
+1. Dans MongoDB Atlas : `Database Access` → `Add New Database User`
+2. Choisissez **Password Authentication**
+3. Créez un username et un mot de passe fort
+4. Donnez les privilèges **Read and write to any database**
+5. Cliquez sur **Add User**
+6. Utilisez ces nouveaux identifiants dans votre `.env`
 
 ---
 
@@ -449,8 +521,26 @@ Cet index est automatiquement créé au démarrage du serveur.
 | Commande | Description |
 |----------|-------------|
 | `npm start` | Démarre le serveur API (production) |
-| `npm run update-spots` | Met à jour les données de spots depuis Overpass |
-| `npm run test-extraction` | Teste l'extraction de données |
+| `npm run update-spots` | Met à jour les données de spots depuis Overpass API |
+| `npm run test-extraction` | Teste l'extraction de données (web scraping) |
+
+#### 🔄 Mise à jour des données de spots
+
+Pour mettre à jour la base de données avec les dernières données OpenStreetMap :
+
+```bash
+cd backend
+npm run update-spots
+```
+
+Ce script :
+- 📡 Interroge l'API Overpass pour récupérer les nouveaux spots
+- 🔄 Met à jour les spots existants
+- ➕ Ajoute les nouveaux spots découverts
+- 📊 Enrichit les données avec des informations complémentaires
+- 💾 Sauvegarde tout dans MongoDB
+
+> ⚠️ **Attention** : Cette opération peut prendre plusieurs minutes et consomme des ressources. À utiliser avec parcimonie.
 
 ### Frontend
 
@@ -541,13 +631,16 @@ railway up
 
 ## 🤝 Contribution
 
-Les contributions sont les bienvenues ! Pour contribuer :
+Ce projet est actuellement en développement actif par Vincent Chayé. 
 
-1. **Forkez** le projet
-2. Créez une **branche** pour votre feature (`git checkout -b feature/amazing-feature`)
-3. **Committez** vos changements (`git commit -m 'Add amazing feature'`)
-4. **Pushez** vers la branche (`git push origin feature/amazing-feature`)
-5. Ouvrez une **Pull Request**
+Si vous souhaitez contribuer ou signaler un bug :
+
+1. **Ouvrez une issue** sur GitHub pour discuter des changements
+2. **Forkez** le projet si vous souhaitez proposer des modifications
+3. Créez une **branche** pour votre feature (`git checkout -b feature/amazing-feature`)
+4. **Committez** vos changements (`git commit -m 'Add amazing feature'`)
+5. **Pushez** vers la branche (`git push origin feature/amazing-feature`)
+6. Ouvrez une **Pull Request** avec une description détaillée
 
 ### Standards de code
 
@@ -555,6 +648,7 @@ Les contributions sont les bienvenues ! Pour contribuer :
 - Formatez avec **Prettier**
 - Commentez les fonctions complexes
 - Écrivez des messages de commit descriptifs
+- Testez localement avant de soumettre une PR
 
 ---
 
@@ -568,11 +662,13 @@ Ce projet est un projet personnel éducatif. Contactez l'auteur pour toute quest
 
 **Vincent Chayé**
 
-- 🧗 Grimpeur passionné
+- 🧗 Grimpeur passionné & créateur de ZoneDeGrimpe
 - 💻 Étudiant & développeur full-stack
 - 📍 Valbonne, France
 - 📧 Email : [vincent.chaye@icloud.com](mailto:vincent.chaye@icloud.com)
-- 🔗 GitHub : [github.com/vincentchaye](https://github.com/vincentchaye) *(ajustez selon votre profil)*
+- 💼 LinkedIn : [linkedin.com/in/vincent-chaye](https://linkedin.com/in/vincent-chaye)
+
+> 💡 **À propos** : Ce projet a été créé dans le cadre de mes études et de ma passion pour l'escalade. L'objectif est de créer un outil pratique pour la communauté des grimpeurs, en combinant mes compétences en développement web avec mon expérience de terrain.
 
 ---
 
@@ -585,14 +681,76 @@ Ce projet est un projet personnel éducatif. Contactez l'auteur pour toute quest
 
 ---
 
-## 📞 Support
+## 📞 Support et dépannage
 
-Si vous rencontrez des problèmes :
+### 🔧 Problèmes courants
 
-1. Vérifiez que MongoDB est accessible
-2. Vérifiez que les variables d'environnement sont correctes
-3. Consultez les logs du serveur (`npm start`)
-4. Ouvrez une issue sur GitHub
+#### ❌ Erreur : "MongoServerError: Authentication failed"
+
+**Cause** : Identifiants MongoDB incorrects
+
+**Solution** :
+1. Vérifiez votre fichier `.env` : les identifiants `MONGODB_URI` sont-ils corrects ?
+2. Connectez-vous à [MongoDB Atlas](https://cloud.mongodb.com/)
+3. Allez dans `Database Access` → Vérifiez que l'utilisateur existe
+4. Si besoin, réinitialisez le mot de passe de l'utilisateur
+5. Mettez à jour le `.env` avec les nouveaux identifiants
+
+#### ❌ Erreur : "MongoServerError: IP address not allowed"
+
+**Cause** : Votre IP n'est pas autorisée dans MongoDB Atlas
+
+**Solution** :
+1. Connectez-vous à [MongoDB Atlas](https://cloud.mongodb.com/)
+2. Allez dans `Network Access`
+3. Cliquez sur `Add IP Address`
+4. Choisissez `Allow Access from Anywhere` (0.0.0.0/0) pour le développement
+5. Sauvegardez et réessayez après ~2 minutes
+
+#### ❌ Erreur : "CORS policy: No 'Access-Control-Allow-Origin'"
+
+**Cause** : Le frontend n'est pas autorisé à communiquer avec le backend
+
+**Solution** :
+1. Vérifiez que le backend tourne sur le bon port (3000 par défaut)
+2. Vérifiez que `ALLOWED_ORIGIN` dans `.env` contient l'URL de votre frontend
+3. Exemple : `ALLOWED_ORIGIN=http://localhost:3001,http://127.0.0.1:5500`
+4. Redémarrez le serveur backend après modification du `.env`
+
+#### ❌ Erreur : "Cannot find module"
+
+**Cause** : Dépendances manquantes
+
+**Solution** :
+```bash
+# Backend
+cd backend
+rm -rf node_modules package-lock.json
+npm install
+
+# Frontend
+cd ../frontend
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### ⚠️ Le serveur démarre mais aucune donnée ne s'affiche
+
+**Vérifications** :
+1. Vérifiez que MongoDB est connecté (regardez les logs du serveur)
+2. Testez l'API : `curl http://localhost:3000/api/health` → devrait retourner `{"ok":true}`
+3. Testez les spots : `curl http://localhost:3000/api/spots` → devrait retourner du GeoJSON
+4. Vérifiez la configuration de l'URL API dans `frontend/js/config.js`
+
+### 💬 Besoin d'aide ?
+
+Si vous rencontrez d'autres problèmes :
+
+1. ✅ Consultez les logs du serveur (terminal backend)
+2. ✅ Consultez la console du navigateur (F12 → Console)
+3. ✅ Vérifiez que toutes les variables d'environnement sont définies
+4. ✅ Assurez-vous que MongoDB est bien accessible
+5. 📧 Contactez-moi : [vincent.chaye@icloud.com](mailto:vincent.chaye@icloud.com)
 
 ---
 
