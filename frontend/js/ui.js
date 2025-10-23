@@ -83,7 +83,10 @@ function applyTheme(mode) {
   document.body.style.color = isDark ? "#E8EEF4" : "#0E1A22";
 }
 
-// Export pour les modules ES6
+// Export ES6
+export { initCommonUI, applyTheme };
+
+// Export CommonJS pour compatibilité
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { initCommonUI, applyTheme };
 }
