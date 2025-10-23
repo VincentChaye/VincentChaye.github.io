@@ -32,17 +32,31 @@ const envAllowed = (process.env.ALLOWED_ORIGIN || "")
 const allowedList = [...new Set([...devDefaults, ...envAllowed])];
 
 // Autoriser aussi *.azurewebsites.net et *.github.io (https) via check souple
+// + réseau local (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
 function isAllowedOrigin(origin) {
   if (!origin) return true; // curl/postman
   if (allowedList.includes(origin)) return true;
   try {
     const u = new URL(origin);
+    // Autoriser HTTPS Azure et GitHub
     if (
       u.protocol === "https:" &&
       (u.hostname.endsWith(".azurewebsites.net") ||
         u.hostname.endsWith(".github.io"))
     ) {
       return true;
+    }
+    // Autoriser HTTP depuis réseau local (IP privées)
+    if (u.protocol === "http:") {
+      const ip = u.hostname;
+      // Réseaux privés: 192.168.x.x, 10.x.x.x, 172.16-31.x.x
+      if (
+        /^192\.168\.\d{1,3}\.\d{1,3}$/.test(ip) ||
+        /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip) ||
+        /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(ip)
+      ) {
+        return true;
+      }
     }
   } catch { }
   return false;
