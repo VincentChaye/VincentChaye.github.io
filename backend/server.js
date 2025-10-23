@@ -96,6 +96,23 @@ if (hasUri) {
   console.warn("MONGODB_URI manquante → mode sans DB (listes vides)");
 }
 
+const corsConfig = {
+  origin: (origin, cb) => {
+    if (isAllowedOrigin(origin)) return cb(null, true);
+    cb(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Authorization", "Content-Type", "Accept"],
+  exposedHeaders: ["Content-Type", "Content-Length"],
+  optionsSuccessStatus: 200, // certains proxy aiment mieux 200 que 204
+};
+
+app.use(cors(corsConfig));
+// Répondre explicitement à TOUTES les pré-requêtes
+app.options("*", cors(corsConfig));
+
+
 // --- Listen (0.0.0.0 pour conteneur)
 const port = process.env.PORT || 3000;
 app.listen(port, "0.0.0.0", () => console.log(`API running on :${port}`));
