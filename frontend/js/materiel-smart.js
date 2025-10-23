@@ -1,4 +1,4 @@
-import { initCommonUI } from "./ui.js";
+// UI functions will be loaded from ui.js script tag
 
 // --- Auth guard: redirige vers login si pas de token ---
 (function ensureAuth() {
@@ -103,14 +103,20 @@ const MATERIAL_CONFIG = {
 };
 
 // === UI refs ===
-initCommonUI();
-const listEl = document.getElementById("gearList");
-const addBtn = document.getElementById("addGearBtn");
-const modal = document.getElementById("gearModal");
-const form = document.getElementById("gearForm");
-const title = document.getElementById("gearFormTitle");
-const search = document.getElementById("gearSearch");
-const tagFilter = document.getElementById("gearTagFilter");
+let listEl, addBtn, modal, form, title, search, tagFilter;
+
+function initializeUIElements() {
+  if (typeof initCommonUI === 'function') {
+    initCommonUI();
+  }
+  listEl = document.getElementById("gearList");
+  addBtn = document.getElementById("addGearBtn");
+  modal = document.getElementById("gearModal");
+  form = document.getElementById("gearForm");
+  title = document.getElementById("gearFormTitle");
+  search = document.getElementById("gearSearch");
+  tagFilter = document.getElementById("gearTagFilter");
+}
 
 let rows = [];
 let editingId = null;
@@ -227,7 +233,7 @@ function createSmartForm() {
     <input type="hidden" name="id" />
   `;
   
-  form.innerHTML = formHTML;
+  if (form) form.innerHTML = formHTML;
   setupFormInteractions();
 }
 
@@ -481,7 +487,7 @@ function rowToCard(item) {
 // === API calls ===
 async function apiList() {
   const qs = new URLSearchParams();
-  if (tagFilter.value) qs.set("category", tagFilter.value);
+  if (tagFilter && tagFilter.value) qs.set("category", tagFilter.value);
   const res = await fetchJSON(`${ENDPOINT.USER_MAT}?${qs.toString()}`);
   return res.items || [];
 }
@@ -508,7 +514,7 @@ async function apiDelete(id) {
 // === UI actions ===
 async function refresh() {
   try {
-    const q = (search.value || "").toLowerCase();
+    const q = (search && search.value || "").toLowerCase();
     rows = await apiList();
 
     const filtered = rows.filter(item => {
@@ -516,7 +522,7 @@ async function refresh() {
       return !q || searchText.includes(q);
     });
 
-    listEl.innerHTML = filtered.length
+    if (listEl) listEl.innerHTML = filtered.length
       ? filtered.map(rowToCard).join("")
       : `<div class="empty-state">
           <p>📦 Aucun matériel pour le moment</p>
@@ -524,17 +530,17 @@ async function refresh() {
         </div>`;
 
     // Attacher les événements
-    listEl.querySelectorAll("[data-edit]").forEach(btn => {
+    if (listEl) listEl.querySelectorAll("[data-edit]").forEach(btn => {
       btn.addEventListener("click", () => {
         const item = rows.find(x => String(x._id) === btn.dataset.edit);
         editingId = item?._id || null;
-        title.textContent = "Modifier l'équipement";
+        if (title) title.textContent = "Modifier l'équipement";
         fillFormFromRow(item);
-        modal.showModal();
+        if (modal) modal.showModal();
       });
     });
 
-    listEl.querySelectorAll("[data-del]").forEach(btn => {
+    if (listEl) listEl.querySelectorAll("[data-del]").forEach(btn => {
       btn.addEventListener("click", async () => {
         const item = rows.find(x => String(x._id) === btn.dataset.del);
         const itemName = item?.specs?.name || item?.category || "cet équipement";
@@ -552,7 +558,7 @@ async function refresh() {
 
   } catch (err) {
     console.error("Erreur lors du chargement:", err);
-    listEl.innerHTML = `<div class="error-state">
+    if (listEl) listEl.innerHTML = `<div class="error-state">
       <p>❌ Erreur de chargement</p>
       <p>${escapeHTML(err.message)}</p>
       <button class="btn" onclick="refresh()">Réessayer</button>
@@ -561,9 +567,9 @@ async function refresh() {
 }
 
 // === Event listeners ===
-addBtn.addEventListener("click", () => {
+if (addBtn) addBtn.addEventListener("click", () => {
   editingId = null;
-  title.textContent = "Nouvel équipement";
+  if (title) title.textContent = "Nouvel équipement";
   form.reset();
   
   // Réinitialiser les interactions du formulaire
@@ -574,10 +580,10 @@ addBtn.addEventListener("click", () => {
     }
   }, 100);
   
-  modal.showModal();
+  if (modal) modal.showModal();
 });
 
-form.addEventListener("submit", async (e) => {
+if (form) form.addEventListener("submit", async (e) => {
   e.preventDefault();
   
   try {
@@ -594,7 +600,7 @@ form.addEventListener("submit", async (e) => {
       await apiCreate(payload);
     }
     
-    modal.close();
+    if (modal) modal.close();
     await refresh();
     
   } catch (err) {
@@ -610,19 +616,24 @@ form.addEventListener("submit", async (e) => {
 });
 
 // Fermeture du modal
-modal.addEventListener("close", () => {
+if (modal) modal.addEventListener("close", () => {
   editingId = null;
-  form.reset();
+  if (form) form.reset();
 });
 
 // Recherche et filtres
-search.addEventListener("input", refresh);
-tagFilter.addEventListener("change", refresh);
+if (search) search.addEventListener("input", refresh);
+if (tagFilter) tagFilter.addEventListener("change", refresh);
 
 // === Initialisation ===
 document.addEventListener("DOMContentLoaded", () => {
-  createSmartForm();
-  refresh();
+  initializeUIElements();
+  if (form && listEl && addBtn && modal && search && tagFilter) {
+    createSmartForm();
+    refresh();
+  } else {
+    console.error('Required DOM elements not found');
+  }
 });
 
 // Export pour les tests
