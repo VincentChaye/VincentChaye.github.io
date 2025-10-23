@@ -1,0 +1,40 @@
+name: Build & Push to GHCR
+on:
+  push:
+    branches: [ main, dev ]
+    paths: [ 'backend/**' ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push
+        working-directory: backend
+        env:
+          OWNER: ${{ github.repository_owner }}
+          BRANCH: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          OWNER_LC=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/${OWNER_LC}/zonedegrimpe-api"
+          docker build -t "$IMAGE:$BRANCH" -t "$IMAGE:$SHA" .
+          docker push "$IMAGE:$BRANCH"
+          docker push "$IMAGE:$SHA"
+          if [ "$BRANCH" = "main" ]; then
+            docker tag "$IMAGE:$BRANCH" "$IMAGE:latest"
+            docker push "$IMAGE:latest"
+          fi

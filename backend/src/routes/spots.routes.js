@@ -6,13 +6,20 @@ export function spotsRouter(db) {
   const r = Router();
   const spots = db.collection("climbing_spot");
 
-  // Assure l'index géospatial sur le bon champ
+  // Index géospatial requis pour $near / $geoWithin
   spots.createIndex({ location: "2dsphere" }).catch(() => {});
+
+  // Projection minimale pour l'affichage carte (liste de spots)
+  const MAP_PROJECTION = {
+  _id: 1,       // identifiant pour faire un GET /api/spots/:id au clic
+  name: 1,      // titre du marker / hover
+  location: 1   // coordonnées GeoJSON [lng, lat]
+};
 
   // --- Créer un spot ---
   r.post("/", async (req, res) => {
     try {
-      const parsed = createSpotSchema.parse(req.body); // doit inclure location valide
+      const parsed = createSpotSchema.parse(req.body); // doit inclure location valide (GeoJSON Point)
       const doc = { ...parsed, createdAt: new Date() };
       const { insertedId } = await spots.insertOne(doc);
       res.status(201).json({ ok: true, id: insertedId });
@@ -21,22 +28,33 @@ export function spotsRouter(db) {
     }
   });
 
+  
   // --- Recherche par proximité (PLACÉE AVANT /:id) ---
   r.get("/near", async (req, res) => {
     const { lng, lat, radius = 5000, limit = 100, format = "geojson" } = req.query;
-    if (!lng || !lat) return res.status(400).json({ error: "missing_params" });
+    if (lng == null || lat == null) {
+      return res.status(400).json({ error: "missing_params", detail: "lng and lat are required" });
+    }
+
+    const lngNum = parseFloat(lng);
+    const latNum = parseFloat(lat);
+    const radNum = parseFloat(radius);
+    const limNum = Math.max(1, Math.min(parseInt(limit, 10) || 100, 20000)); // garde une borne haute
 
     try {
       const docs = await spots
-        .find({
-          location: {
-            $near: {
-              $geometry: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] },
-              $maxDistance: parseFloat(radius),
+        .find(
+          {
+            location: {
+              $near: {
+                $geometry: { type: "Point", coordinates: [lngNum, latNum] },
+                $maxDistance: radNum,
+              },
             },
           },
-        })
-        .limit(+limit)
+          { projection: MAP_PROJECTION } // << projection pour la carte
+        )
+        .limit(limNum)
         .toArray();
 
       // Format plat (compat front)
@@ -90,8 +108,10 @@ export function spotsRouter(db) {
     try {
       const { minLng, minLat, maxLng, maxLat, limit = 1000, format = "geojson" } = req.query;
 
+      const limNum = Math.max(1, Math.min(parseInt(limit, 10) || 1000, 20000)); // borne haute
       let query = {};
-      if (minLng && minLat && maxLng && maxLat) {
+
+      if (minLng != null && minLat != null && maxLng != null && maxLat != null) {
         const minx = +minLng, miny = +minLat, maxx = +maxLng, maxy = +maxLat;
         query = {
           location: {
@@ -111,7 +131,10 @@ export function spotsRouter(db) {
         };
       }
 
-      const docs = await spots.find(query).limit(+limit).toArray();
+      const docs = await spots
+        .find(query, { projection: MAP_PROJECTION }) // << projection pour la carte
+        .limit(limNum)
+        .toArray();
 
       if (format === "flat") {
         const flat = docs.map((d) => ({
@@ -157,21 +180,33 @@ export function spotsRouter(db) {
     }
   });
 
-  // --- Lire un spot ---
+  // --- Lire une falaise (DÉTAIL COMPLET) ---
   r.get("/:id", async (req, res) => {
-    if (!ObjectId.isValid(req.params.id))
+    if (!ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: "bad_id" });
-    const doc = await spots.findOne({ _id: new ObjectId(req.params.id) });
-    if (!doc) return res.status(404).json({ error: "not_found" });
-    res.json(doc);
+    }
+    try {
+      const doc = await spots.findOne({ _id: new ObjectId(req.params.id) }); // renvoie TOUT le document
+      if (!doc) return res.status(404).json({ error: "not_found" });
+      res.json(doc);
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: "server_error" });
+    }
   });
 
   // --- Supprimer un spot ---
   r.delete("/:id", async (req, res) => {
-    if (!ObjectId.isValid(req.params.id))
+    if (!ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: "bad_id" });
-    const result = await spots.deleteOne({ _id: new ObjectId(req.params.id) });
-    res.json({ deleted: result.deletedCount === 1 });
+    }
+    try {
+      const result = await spots.deleteOne({ _id: new ObjectId(req.params.id) });
+      res.json({ deleted: result.deletedCount === 1 });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: "server_error" });
+    }
   });
 
   return r;

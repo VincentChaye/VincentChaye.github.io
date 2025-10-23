@@ -1,7 +1,34 @@
-export const API_BASE_URL = "http://localhost:3000/api/";
-export const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+// config.js
+
+// URL du backend en production
+const PROD_API = "https://zonedegrimpe-api-f8fehxc0hhcmdfh5.francecentral-01.azurewebsites.net";
+
+// Détection locale
+function isLocalHost(hostname) {
+  return /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/i.test(hostname);
+}
+
+// Récupération sûre de la variable d'environnement Vite (si présente)
+let envBaseUrl = undefined;
+try {
+  // eslint-disable-next-line no-undef
+  envBaseUrl = import.meta?.env?.VITE_API_BASE_URL;
+} catch {
+  envBaseUrl = undefined;
+}
+
+// Détermination automatique de l’URL de base
+export const API_BASE_URL =
+  envBaseUrl ||
+  (typeof window !== "undefined" && isLocalHost(window.location.hostname)
+    ? "http://localhost:3000"
+    : PROD_API);
+
+// Préfixe pour les routes backend
+export const API_PATH_PREFIX = "/api";
+
+// Constantes pour le cache
+export const CACHE_TTL_MS = 1000 * 60 * 10; // 10 minutes
 export const CACHE_KEYS = {
-  SPOTS: "zdg_spots_cache_v1",
-  SETTINGS: "zdg_settings_v1",
-  GEAR: "zdg_gear_v1"
+  SPOTS: "cache_spots_v1",
 };

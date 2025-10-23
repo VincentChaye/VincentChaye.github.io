@@ -309,3 +309,81 @@ body,
 .app-footer {
   transition: background 0.3s ease, color 0.3s ease;
 }
+
+/* === Scoped: pages Paramètres / Login / Register === */
+body.page-auth .auth-wrap,
+body.page-auth #authGate,
+body.page-auth #accountView,
+body.page-auth .auth-panel,
+body.page-auth form.page-auth-form {
+  max-width: 480px;
+  margin: 2rem auto;
+  background: var(--surface);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+}
+
+body.page-auth h1,
+body.page-auth h2,
+body.page-auth .auth-title {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-family: var(--font-heading);
+}
+
+/* Champs uniquement dans les pages auth */
+body.page-auth form input,
+body.page-auth form select,
+body.page-auth form textarea {
+  width: 100%;
+  padding: .6rem .75rem;
+  border: 1px solid #d0dae4;
+  border-radius: .6rem;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+body.page-auth form input:focus,
+body.page-auth form select:focus,
+body.page-auth form textarea:focus {
+  outline: none;
+  border-color: var(--c1);
+  box-shadow: 0 0 0 2px rgba(6,102,140,.2);
+}
+
+/* Boutons plein largeur : uniquement sur ces pages */
+body.page-auth form .btn {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* Petits liens sous les formulaires */
+body.page-auth .alt-links {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: .9rem;
+}
+body.page-auth .alt-links a { color: var(--c1); }
+body.page-auth .alt-links a:hover { text-decoration: underline; }
+
+/* Utilitaires locaux (ne fassent rien ailleurs) */
+body.page-auth .muted { opacity: .7; }
+body.page-auth .mt-8 { margin-top: .5rem; }
+body.page-auth .mt-12 { margin-top: .75rem; }
+body.page-auth .mt-16 { margin-top: 1rem; }
+body.page-auth .gap-12 { gap: .75rem; }
+body.page-auth .row { display: flex; gap: .75rem; flex-wrap: wrap; justify-content: center; }
+
+@media (max-width: 480px) {
+  body.page-auth .auth-wrap,
+  body.page-auth #authGate,
+  body.page-auth #accountView,
+  body.page-auth .auth-panel,
+  body.page-auth form.page-auth-form {
+    margin: 1rem;
+    padding: 1rem;
+  }
+}
+

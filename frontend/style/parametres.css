@@ -1,0 +1,110 @@
+/* Tout est encapsulé sous .settings pour ne pas casser index/login/register */
+.settings {
+  max-width: 920px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Cards repliables */
+.settings .card {
+  border: 1px solid var(--c2, #427aa1);
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  background: rgba(255,255,255,0.02);
+  overflow: hidden;
+}
+
+.settings .card > summary.card__title {
+  list-style: none;
+  cursor: pointer;
+  padding: 1rem 1.25rem;
+  font-family: "Globet", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--c1, #06668c);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings .card > summary::-webkit-details-marker { display: none; }
+.settings .card[open] > summary.card__title { border-bottom: 1px solid rgba(0,0,0,0.08); }
+
+.settings .card__content { padding: 1rem 1.25rem 1.25rem; }
+
+/* Lignes d’info */
+.settings .field {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: .75rem 1rem;
+  align-items: center;
+  padding: .5rem 0;
+  border-bottom: 1px dashed rgba(0,0,0,0.08);
+}
+.settings .field:last-child { border-bottom: none; }
+
+.settings .field__label {
+  font-weight: 700;
+  opacity: .8;
+}
+.settings .field__value {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  word-break: break-word;
+}
+
+/* Avatar */
+.settings .field--avatar .avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0,0,0,0.08);
+}
+
+/* Boutons (scopés, n’écrasent pas les .btn globaux si tu en as) */
+.settings .btn {
+  padding: .6rem 1rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--c1, #06668c);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+.settings .btn:hover { filter: brightness(1.05); }
+.settings .btn.outline {
+  background: transparent;
+  color: var(--c1, #06668c);
+  border-color: var(--c1, #06668c);
+}
+.settings .btn.danger {
+  background: #b00020;
+}
+
+/* Petits boutons icône pour édition */
+.settings .icon-btn {
+  border: 1px solid rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.03);
+  border-radius: 8px;
+  padding: .25rem .45rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.settings .icon-btn:hover { background: rgba(0,0,0,0.06); }
+
+/* Actions dans la carte Compte */
+.settings .actions {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin: .25rem 0 .5rem;
+}
+
+/* Petits textes d'aide */
+.settings .hint {
+  font-size: .9rem;
+  opacity: .8;
+  margin: .25rem 0 0;
+}

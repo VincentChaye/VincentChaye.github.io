@@ -1,4 +1,8 @@
+// api.js
 import { API_BASE_URL, CACHE_KEYS, CACHE_TTL_MS } from "./config.js";
+
+/* ---------- constantes ---------- */
+const API_PREFIX = "/api"; // préfixe commun aux routes backend
 
 /* ---------- cache helpers ---------- */
 function getCache(key) {
@@ -100,20 +104,34 @@ function normalize(arr) {
   return norm;
 }
 
+/* ---------- URL helper ---------- */
+function apiUrl(path, params) {
+  const full = new URL(`${API_PREFIX}${path}`, API_BASE_URL);
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== null) full.searchParams.set(k, String(v));
+    }
+  }
+  return full.toString();
+}
+
 /* ---------- fetch util ---------- */
 async function tryFetch(url) {
   let r;
   try {
     r = await fetch(url, {
       headers: { Accept: "application/json" },
-      cache: "no-store" // évite les 304 en dev
+      cache: "no-store", // évite les 304 en dev
+      mode: "cors",
     });
   } catch (netErr) {
+    console.error("[network_error]", netErr, "url=", url);
     throw new Error(`[network_error] ${netErr?.message || netErr}`);
   }
 
   if (!r.ok) {
     const body = await r.text().catch(() => "(no body)");
+    console.error(`[http_${r.status}]`, url, body.slice(0, 200));
     throw new Error(`[http_${r.status}] ${r.statusText} — ${body.slice(0, 200)}`);
   }
 
@@ -129,7 +147,11 @@ async function tryFetch(url) {
 }
 
 /* ---------- fetch paginé ---------- */
-export async function fetchSpots({ useCache = true, pageSize = 10000, extraParams = { format: "geojson" } } = {}) {
+export async function fetchSpots({
+  useCache = true,
+  pageSize = 10000,
+  extraParams = { format: "geojson" },
+} = {}) {
   if (useCache) {
     const cached = getCache(CACHE_KEYS.SPOTS);
     if (cached) return cached;
@@ -142,12 +164,8 @@ export async function fetchSpots({ useCache = true, pageSize = 10000, extraParam
 
   // 1) skip/limit
   while (true) {
-    const url = new URL("spots", API_BASE_URL);
-    url.searchParams.set("limit", String(pageSize));
-    url.searchParams.set("skip", String(skip));
-    for (const [k, v] of Object.entries(extraParams || {})) url.searchParams.set(k, String(v));
-
-    const json = await tryFetch(url.toString());
+    const url = apiUrl("/spots", { limit: pageSize, skip, ...extraParams });
+    const json = await tryFetch(url);
     const arr = coerceArray(json);
 
     if (!arr.length) {
@@ -167,12 +185,8 @@ export async function fetchSpots({ useCache = true, pageSize = 10000, extraParam
   // 2) page/perPage
   if (!out.length) {
     while (true) {
-      const url = new URL("spots", API_BASE_URL);
-      url.searchParams.set("perPage", String(pageSize));
-      url.searchParams.set("page", String(page));
-      for (const [k, v] of Object.entries(extraParams || {})) url.searchParams.set(k, String(v));
-
-      const json = await tryFetch(url.toString());
+      const url = apiUrl("/spots", { perPage: pageSize, page, ...extraParams });
+      const json = await tryFetch(url);
       const arr = coerceArray(json);
 
       if (!arr.length) {
@@ -192,10 +206,8 @@ export async function fetchSpots({ useCache = true, pageSize = 10000, extraParam
 
   // 3) single fetch
   if (!out.length) {
-    const url = new URL("spots", API_BASE_URL);
-    for (const [k, v] of Object.entries(extraParams || {})) url.searchParams.set(k, String(v));
-
-    const json = await tryFetch(url.toString());
+    const url = apiUrl("/spots", { ...extraParams });
+    const json = await tryFetch(url);
     const arr = coerceArray(json);
     out.push(...arr);
     usedMode = "single";

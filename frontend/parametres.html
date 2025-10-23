@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ZoneDeGrimpe — Paramètres</title>
   <link rel="icon" href="./assets/ZoneDeGrimpeIcon.png" />
   <link rel="stylesheet" href="./style/style.css" />
+  <!-- CSS spécifique et sûr pour Paramètres -->
+  <link rel="stylesheet" href="./style/parametres.css" />
 </head>
+
 <body class="theme">
   <header class="app-header">
     <a class="brand" href="./">
@@ -19,69 +23,80 @@
     <nav id="nav" class="nav">
       <a href="./index.html">Accueil</a>
       <a href="./materiel.html">Matériel</a>
-      <a href="./map.html">Carte</a>
-      <a class="active" href="./parametres.html">Paramètres</a>
-      <button id="themeToggle" class="btn btn--ghost" type="button">Thème</button>
+      <a class="is-active" href="./parametres.html">Paramètres</a>
     </nav>
   </header>
 
-  <section class="banner banner--page">
-    <h1>Paramètres du compte</h1>
-    <p>Profil, préférences d’affichage et langue.</p>
-  </section>
+  <main class="container settings" id="settingsRoot" hidden>
+    <!-- Section 1 : Informations personnelles -->
+    <details class="card" open>
+      <summary class="card__title">Informations personnelles</summary>
+      <div class="card__content">
+        <div class="field">
+          <div class="field__label">Nom de compte</div>
+          <div class="field__value" id="displayName">—</div>
+        </div>
 
-  <main class="container">
-    <form id="settingsForm" class="settings">
-      <fieldset>
-        <legend>Profil</legend>
-        <label>Nom
-          <input name="displayName" class="input" placeholder="Ton nom" />
-        </label>
-        <label>Email
-          <input name="email" type="email" class="input" placeholder="email@example.com" />
-        </label>
-      </fieldset>
+        <div class="field">
+          <div class="field__label">Email</div>
+          <div class="field__value" id="email">—</div>
+        </div>
 
-      <fieldset>
-        <legend>Préférences</legend>
-        <label>Thème
-          <select name="theme" class="select">
-            <option value="system">Système</option>
-            <option value="light">Clair</option>
-            <option value="dark">Sombre</option>
-          </select>
-        </label>
-        <label>Langue
-          <select name="lang" class="select">
-            <option value="fr">Français</option>
-            <option value="es">Español</option>
-          </select>
-        </label>
-        <label>Unités
-          <select name="units" class="select">
-            <option value="metric">Métrique</option>
-            <option value="imperial">Impérial</option>
-          </select>
-        </label>
-      </fieldset>
+        <div class="field">
+          <div class="field__label">Téléphone</div>
+          <div class="field__value">
+            <span id="phone">—</span>
+            <button class="icon-btn" id="editPhoneBtn" title="Modifier le téléphone"
+              aria-label="Modifier le téléphone">✏️</button>
+          </div>
+        </div>
 
-      <menu class="settings__actions">
-        <button type="reset" class="btn btn--ghost">Réinitialiser</button>
-        <button type="submit" class="btn">Enregistrer</button>
-      </menu>
+        <div class="field">
+          <div class="field__label">Rôle</div>
+          <div class="field__value" id="role">—</div>
+        </div>
 
-      <details class="danger">
-        <summary>Zone dangereuse</summary>
-        <button id="exportSettings" type="button" class="btn btn--warn">Exporter mes données</button>
-        <button id="deleteAccount" type="button" class="btn btn--danger">Supprimer mon compte</button>
-      </details>
-    </form>
+      
+        <div class="field">
+          <div class="field__label">Niveau</div>
+          <div class="field__value">
+            <span id="level">—</span>
+            <button class="icon-btn" id="editLevelBtn" title="Modifier le niveau"
+              aria-label="Modifier le niveau">✏️</button>
+          </div>
+        </div>
+     
+
+
+        <div class="field field--avatar">
+          <div class="field__label">Avatar</div>
+          <div class="field__value">
+            <img id="avatarImg" class="avatar" alt="Avatar utilisateur" src="" />
+            <button class="icon-btn" id="editAvatarBtn" title="Modifier l’avatar"
+              aria-label="Modifier l’avatar">✏️</button>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- Section 2 : Compte -->
+    <details class="card">
+      <summary class="card__title">Compte</summary>
+      <div class="card__content">
+        <div class="actions">
+          <button class="btn outline" id="logoutBtn">Déconnexion</button>
+          <button class="btn danger" id="deleteBtn">Supprimer le compte</button>
+        </div>
+        <p class="hint">La suppression est définitive. Une confirmation est requise.</p>
+      </div>
+    </details>
   </main>
 
   <footer class="app-footer">
-    <p>© <span id="year"></span> ZoneDeGrimpe</p>
+    <span>&copy; <span id="year"></span> ZoneDeGrimpe</span>
   </footer>
 
   <script type="module" src="./js/parametres.js"></script>
 </body>
+
 </html>
