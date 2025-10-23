@@ -50,43 +50,43 @@ async function fetchJSON(url, opts = {}) {
 const MATERIAL_CONFIG = {
   // Catégories avec leurs intervalles d'inspection par défaut (en mois)
   categories: {
-    "Corde": { 
-      inspectionInterval: 6, 
+    "Corde": {
+      inspectionInterval: 6,
       maxUsage: 500,
       description: "Corde dynamique d'escalade"
     },
-    "Dégaines": { 
-      inspectionInterval: 12, 
+    "Dégaines": {
+      inspectionInterval: 12,
       maxUsage: 1000,
       description: "Dégaines sport ou trad"
     },
-    "Casque": { 
-      inspectionInterval: 12, 
+    "Casque": {
+      inspectionInterval: 12,
       maxUsage: null,
       description: "Casque d'escalade"
     },
-    "Baudrier": { 
-      inspectionInterval: 12, 
+    "Baudrier": {
+      inspectionInterval: 12,
       maxUsage: null,
       description: "Baudrier d'escalade"
     },
-    "Chaussons": { 
-      inspectionInterval: 6, 
+    "Chaussons": {
+      inspectionInterval: 6,
       maxUsage: null,
       description: "Chaussons d'escalade"
     },
-    "Mousquetons": { 
-      inspectionInterval: 12, 
+    "Mousquetons": {
+      inspectionInterval: 12,
       maxUsage: 2000,
       description: "Mousquetons à vis ou droits"
     },
-    "Longe": { 
-      inspectionInterval: 6, 
+    "Longe": {
+      inspectionInterval: 6,
       maxUsage: 200,
       description: "Longe de via ferrata ou d'assurage"
     },
-    "Autre": { 
-      inspectionInterval: 6, 
+    "Autre": {
+      inspectionInterval: 6,
       maxUsage: null,
       description: "Autre équipement"
     }
@@ -123,7 +123,7 @@ let editingId = null;
 
 // === Helpers ===
 function escapeHTML(s = "") {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 function addMonths(date, months) {
@@ -153,9 +153,9 @@ function createSmartForm() {
       <label>Catégorie *
         <select name="category" class="select" required>
           <option value="">Choisir une catégorie...</option>
-          ${Object.entries(MATERIAL_CONFIG.categories).map(([key, config]) => 
-            `<option value="${key}" title="${config.description}">${key}</option>`
-          ).join('')}
+          ${Object.entries(MATERIAL_CONFIG.categories).map(([key, config]) =>
+    `<option value="${key}" title="${config.description}">${key}</option>`
+  ).join('')}
         </select>
       </label>
       
@@ -175,9 +175,9 @@ function createSmartForm() {
       
       <label>État actuel
         <select name="state" class="select">
-          ${Object.entries(MATERIAL_CONFIG.states).map(([key, label]) => 
-            `<option value="${key}">${label}</option>`
-          ).join('')}
+          ${Object.entries(MATERIAL_CONFIG.states).map(([key, label]) =>
+    `<option value="${key}">${label}</option>`
+  ).join('')}
         </select>
       </label>
       
@@ -233,7 +233,7 @@ function createSmartForm() {
     </menu>
     <input type="hidden" name="id" />
   `;
-  
+
   if (form) form.innerHTML = formHTML;
   setupFormInteractions();
   setupModalCloseHandlers();
@@ -242,13 +242,13 @@ function createSmartForm() {
 function setupModalCloseHandlers() {
   const closeBtn = form.querySelector('#modalCloseBtn');
   const cancelBtn = form.querySelector('#cancelBtn');
-  
+
   if (closeBtn) {
     closeBtn.addEventListener('click', () => {
       if (modal) modal.close();
     });
   }
-  
+
   if (cancelBtn) {
     cancelBtn.addEventListener('click', () => {
       if (modal) modal.close();
@@ -291,7 +291,7 @@ function setupFormInteractions() {
   function updateUsageHint() {
     const category = categorySelect.value;
     const usage = parseInt(usageInput.value) || 0;
-    
+
     if (!category || !MATERIAL_CONFIG.categories[category]) {
       usageHint.textContent = '';
       return;
@@ -301,7 +301,7 @@ function setupFormInteractions() {
     if (config.maxUsage) {
       const percentage = Math.round((usage / config.maxUsage) * 100);
       let message = `${usage}/${config.maxUsage} utilisations (${percentage}%)`;
-      
+
       if (percentage > 90) {
         message += ' ⚠️ À remplacer';
         usageHint.className = 'usage-hint warning';
@@ -311,7 +311,7 @@ function setupFormInteractions() {
       } else {
         usageHint.className = 'usage-hint';
       }
-      
+
       usageHint.textContent = message;
     } else {
       usageHint.textContent = `${usage} utilisations`;
@@ -322,7 +322,7 @@ function setupFormInteractions() {
   function updateInspectionInfo() {
     const category = categorySelect.value;
     const lastInspection = lastInspectionInput.value;
-    
+
     if (!category || !MATERIAL_CONFIG.categories[category]) {
       inspectionInfo.innerHTML = '<p class="info-text">Sélectionnez une catégorie pour voir les recommandations d\'inspection.</p>';
       return;
@@ -330,14 +330,14 @@ function setupFormInteractions() {
 
     const config = MATERIAL_CONFIG.categories[category];
     let html = `<p class="info-text">Inspection recommandée tous les <strong>${config.inspectionInterval} mois</strong> pour cette catégorie.</p>`;
-    
+
     if (lastInspection) {
       const nextInspection = addMonths(new Date(lastInspection), config.inspectionInterval);
       const today = new Date();
       const daysUntil = Math.ceil((nextInspection - today) / (1000 * 60 * 60 * 24));
-      
+
       html += `<p class="info-text">Prochaine inspection prévue : <strong>${formatDate(nextInspection)}</strong>`;
-      
+
       if (daysUntil < 0) {
         html += ` ⚠️ <span class="warning">En retard de ${Math.abs(daysUntil)} jours</span>`;
       } else if (daysUntil <= 30) {
@@ -345,10 +345,10 @@ function setupFormInteractions() {
       } else {
         html += ` ✅ <span class="ok">Dans ${daysUntil} jours</span>`;
       }
-      
+
       html += '</p>';
     }
-    
+
     inspectionInfo.innerHTML = html;
   }
 
@@ -361,7 +361,7 @@ function setupFormInteractions() {
 function formToPayload(fd) {
   const category = fd.get("category") || "Autre";
   const lastInspection = fd.get("lastInspection");
-  
+
   // Calcul automatique de la prochaine inspection
   let nextInspection = null;
   if (lastInspection && MATERIAL_CONFIG.categories[category]) {
@@ -394,11 +394,11 @@ function formToPayload(fd) {
   // Ajout des informations d'achat si disponibles
   const purchaseDate = fd.get("purchaseDate");
   const price = fd.get("price");
-  
+
   if (purchaseDate) {
     payload.purchase = { date: new Date(purchaseDate).toISOString() };
   }
-  
+
   if (price) {
     payload.specs.price = parseFloat(price);
   }
@@ -408,9 +408,9 @@ function formToPayload(fd) {
 
 function fillFormFromRow(item) {
   form.reset();
-  
+
   if (!item) return;
-  
+
   form.elements.id.value = item._id;
   form.elements.name.value = item?.specs?.name || "";
   form.elements.brand.value = item?.specs?.brand || "";
@@ -419,15 +419,15 @@ function fillFormFromRow(item) {
   form.elements.state.value = item?.lifecycle?.condition || "good";
   form.elements.usageCount.value = item?.lifecycle?.usageCount || 0;
   form.elements.notes.value = item?.lifecycle?.notes || "";
-  
+
   if (item?.purchase?.date) {
     form.elements.purchaseDate.value = formatDate(item.purchase.date);
   }
-  
+
   if (item?.specs?.price) {
     form.elements.price.value = item.specs.price;
   }
-  
+
   if (item?.lifecycle?.lastInspectionAt) {
     form.elements.lastInspection.value = formatDate(item.lifecycle.lastInspectionAt);
   }
@@ -436,7 +436,7 @@ function fillFormFromRow(item) {
   setTimeout(() => {
     const categorySelect = form.querySelector('[name="category"]');
     const lastInspectionInput = form.querySelector('[name="lastInspection"]');
-    
+
     categorySelect.dispatchEvent(new Event('change'));
     lastInspectionInput.dispatchEvent(new Event('change'));
   }, 100);
@@ -453,14 +453,14 @@ function rowToCard(item) {
   const purchaseDate = item?.purchase?.date ? new Date(item.purchase.date).toLocaleDateString() : null;
   const notes = item?.lifecycle?.notes || "";
   const price = item?.specs?.price ? `${item.specs.price}€` : null;
-  
+
   // Calcul de l'état d'inspection
   let inspectionStatus = "";
   if (item?.lifecycle?.nextInspectionAt) {
     const nextInspection = new Date(item.lifecycle.nextInspectionAt);
     const today = new Date();
     const daysUntil = Math.ceil((nextInspection - today) / (1000 * 60 * 60 * 24));
-    
+
     if (daysUntil < 0) {
       inspectionStatus = `<span class="status-warning">⚠️ Inspection en retard</span>`;
     } else if (daysUntil <= 30) {
@@ -563,9 +563,9 @@ async function refresh() {
       btn.addEventListener("click", async () => {
         const item = rows.find(x => String(x._id) === btn.dataset.del);
         const itemName = item?.specs?.name || item?.category || "cet équipement";
-        
+
         if (!confirm(`Êtes-vous sûr de vouloir supprimer "${itemName}" ?`)) return;
-        
+
         try {
           await apiDelete(btn.dataset.del);
           await refresh();
@@ -589,11 +589,11 @@ async function refresh() {
 function openAddGearModal() {
   editingId = null;
   if (title) title.textContent = "Nouvel équipement";
-  
+
   // Reset le formulaire
   if (form) {
     form.reset();
-    
+
     // Réinitialiser les interactions du formulaire
     setTimeout(() => {
       const categorySelect = form.querySelector('[name="category"]');
@@ -602,7 +602,7 @@ function openAddGearModal() {
       }
     }, 50);
   }
-  
+
   // Ouvrir le modal
   if (modal) {
     modal.showModal();
@@ -611,21 +611,16 @@ function openAddGearModal() {
   }
 }
 
-if (addBtn) {
-  addBtn.addEventListener("click", openAddGearModal);
-  console.log("Bouton Ajouter initialisé correctement");
-} else {
-  console.error("Bouton Ajouter non trouvé lors de l'initialisation");
-}
+
 
 if (form) form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  
+
   try {
     const submitBtn = form.querySelector('#gearSubmitBtn');
     submitBtn.disabled = true;
     submitBtn.textContent = "Enregistrement...";
-    
+
     const fd = new FormData(form);
     const payload = formToPayload(fd);
 
@@ -634,10 +629,10 @@ if (form) form.addEventListener("submit", async (e) => {
     } else {
       await apiCreate(payload);
     }
-    
+
     if (modal) modal.close();
     await refresh();
-    
+
   } catch (err) {
     console.error("Erreur lors de l'enregistrement:", err);
     alert(`Erreur : ${err.message}`);
@@ -668,20 +663,20 @@ function initTabs() {
   tabButtons.forEach(button => {
     button.addEventListener('click', () => {
       const targetTab = button.dataset.tab;
-      
+
       // Désactiver tous les onglets
       tabButtons.forEach(btn => btn.classList.remove('active'));
       tabContents.forEach(content => content.classList.remove('active'));
-      
+
       // Activer l'onglet sélectionné
       button.classList.add('active');
       const targetContent = document.getElementById(`tab-${targetTab}`);
       if (targetContent) {
         targetContent.classList.add('active');
       }
-      
+
       // Actions spécifiques selon l'onglet
-      switch(targetTab) {
+      switch (targetTab) {
         case 'inventory':
           refresh();
           break;
@@ -712,14 +707,14 @@ function initMaintenanceTab() {
       const days = parseInt(inspectionDays.value) || 30;
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() + days);
-      
+
       const items = await apiList();
       const needsInspection = items.filter(item => {
         if (!item.lifecycle?.nextInspectionAt) return false;
         const nextInspection = new Date(item.lifecycle.nextInspectionAt);
         return nextInspection <= cutoffDate;
       });
-      
+
       if (needsInspection.length === 0) {
         inspectionsList.innerHTML = '<p class="info-text">✅ Aucune inspection prévue dans cette période</p>';
       } else {
@@ -728,7 +723,7 @@ function initMaintenanceTab() {
           const nextDate = new Date(item.lifecycle.nextInspectionAt).toLocaleDateString();
           const daysUntil = Math.ceil((new Date(item.lifecycle.nextInspectionAt) - new Date()) / (1000 * 60 * 60 * 24));
           const urgency = daysUntil < 0 ? 'urgent' : daysUntil <= 7 ? 'warning' : 'normal';
-          
+
           return `
             <div class="maintenance-item ${urgency}">
               <h4>${escapeHTML(name)}</h4>
@@ -748,13 +743,13 @@ function initMaintenanceTab() {
         const usage = item.lifecycle?.usageCount || 0;
         const category = item.category;
         const config = MATERIAL_CONFIG.categories[category];
-        
+
         if (!config?.maxUsage) return false;
-        
+
         const usageRatio = usage / config.maxUsage;
         return usageRatio >= threshold;
       });
-      
+
       if (toRetire.length === 0) {
         retireList.innerHTML = '<p class="info-text">✅ Aucun matériel à remplacer selon ce seuil</p>';
       } else {
@@ -763,7 +758,7 @@ function initMaintenanceTab() {
           const usage = item.lifecycle?.usageCount || 0;
           const config = MATERIAL_CONFIG.categories[item.category];
           const percentage = Math.round((usage / config.maxUsage) * 100);
-          
+
           return `
             <div class="maintenance-item urgent">
               <h4>${escapeHTML(name)}</h4>
@@ -780,7 +775,7 @@ function initAdviceTab() {
   const getMaterialAdviceBtn = document.getElementById('getMaterialAdviceBtn');
   const getSpotsAdviceBtn = document.getElementById('getSpotsAdviceBtn');
   const getLocationBtn = document.getElementById('getLocationBtn');
-  
+
   if (getLocationBtn) {
     getLocationBtn.addEventListener('click', () => {
       if (navigator.geolocation) {
@@ -805,7 +800,7 @@ function initAdviceTab() {
     getMaterialAdviceBtn.addEventListener('click', async () => {
       const materialAdvice = document.getElementById('materialAdvice');
       materialAdvice.innerHTML = '<p>Analyse en cours...</p>';
-      
+
       try {
         const items = await apiList();
         const analysis = analyzeMaterial(items);
@@ -820,7 +815,7 @@ function initAdviceTab() {
     getSpotsAdviceBtn.addEventListener('click', async () => {
       const spotsAdvice = document.getElementById('spotsAdvice');
       spotsAdvice.innerHTML = '<p>Recherche en cours...</p>';
-      
+
       // Simulation d'une recherche de spots
       setTimeout(() => {
         spotsAdvice.innerHTML = `
@@ -847,18 +842,18 @@ function analyzeMaterial(items) {
   items.forEach(item => {
     const category = item.category || 'Autre';
     categories[category] = (categories[category] || 0) + 1;
-    
+
     if (item.specs?.price) {
       totalValue += item.specs.price;
     }
-    
+
     // Vérification inspection
     if (item.lifecycle?.nextInspectionAt) {
       const nextInspection = new Date(item.lifecycle.nextInspectionAt);
       const daysUntil = Math.ceil((nextInspection - new Date()) / (1000 * 60 * 60 * 24));
       if (daysUntil <= 30) needsInspection++;
     }
-    
+
     // Vérification remplacement
     const usage = item.lifecycle?.usageCount || 0;
     const config = MATERIAL_CONFIG.categories[category];
@@ -868,22 +863,22 @@ function analyzeMaterial(items) {
   });
 
   let html = '<div class="analysis-results">';
-  
+
   html += `<h4>📊 Résumé de votre inventaire</h4>`;
   html += `<p><strong>${items.length}</strong> équipements au total</p>`;
-  
+
   html += '<h4>📦 Répartition par catégorie</h4>';
   html += '<ul>';
   Object.entries(categories).forEach(([cat, count]) => {
     html += `<li>${cat} : ${count} équipement${count > 1 ? 's' : ''}</li>`;
   });
   html += '</ul>';
-  
+
   if (totalValue > 0) {
     html += `<h4>💰 Valeur estimée</h4>`;
     html += `<p><strong>${totalValue.toFixed(2)}€</strong> au total</p>`;
   }
-  
+
   if (needsInspection > 0 || needsReplacement > 0) {
     html += '<h4>⚠️ Actions recommandées</h4>';
     if (needsInspection > 0) {
@@ -895,7 +890,7 @@ function analyzeMaterial(items) {
   } else {
     html += '<p class="success">✅ Votre matériel semble en bon état !</p>';
   }
-  
+
   html += '</div>';
   return html;
 }
@@ -904,7 +899,7 @@ function initStatsTab() {
   const inventoryStats = document.getElementById('inventoryStats');
   const valueStats = document.getElementById('valueStats');
   const conditionStats = document.getElementById('conditionStats');
-  
+
   apiList().then(items => {
     // Stats inventaire
     const categories = {};
@@ -912,7 +907,7 @@ function initStatsTab() {
       const cat = item.category || 'Autre';
       categories[cat] = (categories[cat] || 0) + 1;
     });
-    
+
     let inventoryHTML = `<p><strong>${items.length}</strong> équipements</p>`;
     inventoryHTML += '<div class="stats-breakdown">';
     Object.entries(categories).forEach(([cat, count]) => {
@@ -920,24 +915,24 @@ function initStatsTab() {
     });
     inventoryHTML += '</div>';
     inventoryStats.innerHTML = inventoryHTML;
-    
+
     // Stats valeur
     const totalValue = items.reduce((sum, item) => sum + (item.specs?.price || 0), 0);
     const avgValue = items.length > 0 ? totalValue / items.length : 0;
-    
+
     let valueHTML = `<p><strong>${totalValue.toFixed(2)}€</strong> au total</p>`;
     if (avgValue > 0) {
       valueHTML += `<p>Moyenne: ${avgValue.toFixed(2)}€</p>`;
     }
     valueStats.innerHTML = valueHTML;
-    
+
     // Stats condition
     const conditions = {};
     items.forEach(item => {
       const cond = item.lifecycle?.condition || 'good';
       conditions[cond] = (conditions[cond] || 0) + 1;
     });
-    
+
     let conditionHTML = '<div class="condition-breakdown">';
     Object.entries(conditions).forEach(([cond, count]) => {
       const label = MATERIAL_CONFIG.states[cond] || cond;
@@ -951,7 +946,7 @@ function initStatsTab() {
     });
     conditionHTML += '</div>';
     conditionStats.innerHTML = conditionHTML;
-    
+
   }).catch(err => {
     console.error('Erreur lors du chargement des stats:', err);
     inventoryStats.innerHTML = '<p class="error">Erreur de chargement</p>';
@@ -963,10 +958,17 @@ function initStatsTab() {
 // === Initialisation ===
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Initialisation de la page matériel...");
-  
+
   // Initialiser les éléments UI
   initializeUIElements();
-  
+
+  if (addBtn) {
+    addBtn.addEventListener("click", openAddGearModal);
+    console.log("Bouton Ajouter initialisé correctement");
+  } else {
+    console.error("Bouton Ajouter non trouvé lors de l'initialisation");
+  }
+
   // Vérifier que tous les éléments essentiels sont présents
   const requiredElements = {
     form: form,
@@ -976,11 +978,11 @@ document.addEventListener("DOMContentLoaded", () => {
     search: search,
     tagFilter: tagFilter
   };
-  
+
   const missingElements = Object.entries(requiredElements)
     .filter(([name, element]) => !element)
     .map(([name]) => name);
-  
+
   if (missingElements.length > 0) {
     console.error('Éléments manquants:', missingElements.join(', '));
     if (listEl) {
@@ -991,16 +993,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return;
   }
-  
+
   console.log("Tous les éléments UI sont présents");
-  
+
   // Initialiser les onglets
   initTabs();
-  
+
   // Créer le formulaire intelligent
   createSmartForm();
   console.log("Formulaire intelligent créé");
-  
+
   // Charger les données
   refresh();
   console.log("Chargement initial des données...");
