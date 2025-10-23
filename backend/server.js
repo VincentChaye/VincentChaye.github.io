@@ -48,15 +48,21 @@ function isAllowedOrigin(origin) {
   return false;
 }
 
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      if (isAllowedOrigin(origin)) return cb(null, true);
-      cb(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
-);
+// --- CORS configuration with all methods
+const corsConfig = {
+  origin: (origin, cb) => {
+    if (isAllowedOrigin(origin)) return cb(null, true);
+    cb(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Authorization", "Content-Type", "Accept"],
+  exposedHeaders: ["Content-Type", "Content-Length"],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsConfig));
+app.options("*", cors(corsConfig));
 
 // --- Health endpoints
 app.get("/api/health", (_, res) => res.json({ ok: true }));
@@ -95,23 +101,6 @@ if (hasUri) {
 
   console.warn("MONGODB_URI manquante → mode sans DB (listes vides)");
 }
-
-// --- CORS (unique)
-const corsConfig = {
-  origin: (origin, cb) => {
-    if (isAllowedOrigin(origin)) return cb(null, true);
-    cb(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Authorization", "Content-Type", "Accept"],
-  exposedHeaders: ["Content-Type", "Content-Length"],
-  optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsConfig));
-app.options("*", cors(corsConfig));
-
 
 // --- Listen (0.0.0.0 pour conteneur)
 const port = process.env.PORT || 3000;
