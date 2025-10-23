@@ -1,17 +1,21 @@
-// frontend/js/register.js
+import { API_BASE_URL, API_PATH_PREFIX } from "./config.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("regForm");
   const err = document.getElementById("regErr");
 
   if (!form) {
-    console.error(" Formulaire #regForm introuvable dans la page !");
+    console.error("Formulaire #regForm introuvable dans la page !");
     return;
   }
+
+  const apiUrl = (path) => new URL(`${API_PATH_PREFIX}${path}`, API_BASE_URL).toString();
 
   function getNext() {
     const p = new URLSearchParams(location.search);
     const next = p.get("next");
-    return next && next.startsWith("/") ? decodeURIComponent(next) : "/frontend/materiel.html";
+    // n’autorise que des chemins internes (évite open redirect)
+    return next && next.startsWith("/") ? decodeURIComponent(next) : "./materiel.html";
   }
 
   form.addEventListener("submit", async (e) => {
@@ -25,13 +29,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const level = String(fd.get("level") || "debutant").toLowerCase();
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/register", {
+      const res = await fetch(apiUrl("/auth/register"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({ email, password, displayName, level }),
+        mode: "cors",
+        cache: "no-store",
       });
 
-      const json = await res.json().catch(() => ({}));
+      let json = {};
+      try { json = await res.json(); } catch {}
 
       if (res.status === 409) {
         err.textContent = "Cet email est déjà utilisé. Essayez de vous connecter.";
@@ -39,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       if (res.status === 400) {
-        err.textContent = json?.error || "Vérifiez les champs (email/mot de passe).";
+        err.textContent = json?.error || "Vérifiez les champs (email / mot de passe).";
         err.style.display = "";
         return;
       }
@@ -59,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
       location.replace(getNext());
     } catch (e2) {
       console.error(e2);
-      err.textContent = "Erreur serveur. Réessayez dans un instant.";
+      err.textContent = "Erreur réseau/serveur. Réessayez dans un instant.";
       err.style.display = "";
     }
   });
