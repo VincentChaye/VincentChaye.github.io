@@ -11,4 +11,7 @@ window.APP_CONFIG = {
            (typeof window !== "undefined" && isLocalHost(window.location.hostname) ? "http://localhost:3000" : PROD_API)
 };
 
-export const API_BASE_URL = window.APP_CONFIG.API_URL;
+// Export pour compatibilité avec les modules ES6 si nécessaire
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { API_BASE_URL: window.APP_CONFIG.API_URL };
+}

@@ -1,8 +1,14 @@
 // frontend/js/parametres.js
-import { initCommonUI } from "./ui.js";
-import { API_BASE_URL, API_PATH_PREFIX } from "./config.js";
+// initCommonUI sera disponible globalement via ui.js
 
-initCommonUI();
+// Configuration API
+const API_BASE_URL = window.APP_CONFIG?.API_URL || "http://localhost:3000";
+const API_PATH_PREFIX = "/api";
+
+// Initialiser l'UI commune
+if (typeof initCommonUI === 'function') {
+  initCommonUI();
+}
 
 /* ---------- Session (localStorage.auth) ---------- */
 function getAuth() {

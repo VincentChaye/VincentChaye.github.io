@@ -82,3 +82,8 @@ function applyTheme(mode) {
   document.body.style.backgroundColor = isDark ? "#101418" : "#EBF2FA";
   document.body.style.color = isDark ? "#E8EEF4" : "#0E1A22";
 }
+
+// Export pour les modules ES6
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { initCommonUI, applyTheme };
+}
