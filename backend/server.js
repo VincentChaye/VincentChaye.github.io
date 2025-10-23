@@ -44,7 +44,7 @@ function isAllowedOrigin(origin) {
     ) {
       return true;
     }
-  } catch {}
+  } catch { }
   return false;
 }
 
@@ -73,7 +73,7 @@ if (hasUri) {
 
   // Routes avec DB
   app.use("/api/spots", spotsRouter(db));
-  app.use("/api/users", usersRouter(db)); 
+  app.use("/api/users", usersRouter(db));
   app.use("/api/auth", authRouter(db));
   app.use("/api/user_materiel", userMaterielRouter(db));
   app.use("/api/materiel_specs", materielSpecsRouter(db));
@@ -84,8 +84,8 @@ if (hasUri) {
   console.log("MongoDB mode activé");
 } else {
   // Fallback sans DB
-  app.get("/api/spots", (_, res) =>res.json({ type: "FeatureCollection", features: [] }));
-  app.get("/api/users", (_, res) => res.json({ items: [], total: 0 })); 
+  app.get("/api/spots", (_, res) => res.json({ type: "FeatureCollection", features: [] }));
+  app.get("/api/users", (_, res) => res.json({ items: [], total: 0 }));
   app.get("/api/auth", (_, res) => res.status(401).json({ error: "no_db" }));
   app.get("/api/user_materiel", (_, res) => res.json({ items: [], total: 0 }));
   app.get("/api/materiel_specs", (_, res) => res.json({ items: [], total: 0 }));
@@ -96,6 +96,7 @@ if (hasUri) {
   console.warn("MONGODB_URI manquante → mode sans DB (listes vides)");
 }
 
+// --- CORS (unique)
 const corsConfig = {
   origin: (origin, cb) => {
     if (isAllowedOrigin(origin)) return cb(null, true);
@@ -105,11 +106,10 @@ const corsConfig = {
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Authorization", "Content-Type", "Accept"],
   exposedHeaders: ["Content-Type", "Content-Length"],
-  optionsSuccessStatus: 200, // certains proxy aiment mieux 200 que 204
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsConfig));
-// Répondre explicitement à TOUTES les pré-requêtes
 app.options("*", cors(corsConfig));
 
 

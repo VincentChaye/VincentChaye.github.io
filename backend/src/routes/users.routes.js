@@ -6,6 +6,33 @@ export function usersRouter(db) {
   const r = Router();
   const users = db.collection("users");
 
+
+  // Empêche /users/:id d'attraper /users/me et valide l'ObjectId
+  r.param("id", (req, res, next, id) => {
+    if (id === "me") return next("route");
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: "bad_id" });
+    return next();
+  });
+
+  // --- GET /api/users/me (protégé) ---
+  r.get("/me", requireAuth, async (req, res) => {
+    try {
+      const uid = req.auth?.uid;
+      if (!ObjectId.isValid(uid)) return res.status(401).json({ error: "unauthorized" });
+
+      const user = await users.findOne({ _id: new ObjectId(uid) }, { projection: SAFE_PROJECTION });
+      if (!user) return res.status(404).json({ error: "not_found" });
+
+      if (!user.profile) user.profile = {};
+      if (!user.profile.level) user.profile.level = "debutant";
+      return res.json(user);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ error: "server_error" });
+    }
+  });
+
+
   // Indexes
   users.createIndex({ email: 1 }, { unique: true }).catch(() => { });
   users.createIndex({ displayName: "text", email: "text" }).catch(() => { });
@@ -223,7 +250,10 @@ export function usersRouter(db) {
   // --- PATCH /api/users/me ---
   r.patch("/me", requireAuth, async (req, res) => {
     try {
-      const uid = new ObjectId(req.auth?.uid);
+      const uidStr = req.auth?.uid;
+      if (!ObjectId.isValid(uidStr)) return res.status(401).json({ error: "unauthorized" });
+      const uid = new ObjectId(uidStr);
+
       const body = req.body || {};
       const $set = {};
 
@@ -325,7 +355,7 @@ export function usersRouter(db) {
     }
   });
 
-  
+
 
   return r;
 }
