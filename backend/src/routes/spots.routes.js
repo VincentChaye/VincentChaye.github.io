@@ -9,11 +9,20 @@ export function spotsRouter(db) {
   // Index géospatial requis pour $near / $geoWithin
   // L'index 2dsphere est géré dans db.js pour éviter les conflits
 
-  // Projection minimale pour l'affichage carte (liste de spots)
+  // Projection enrichie pour l'affichage carte avec toutes les infos nécessaires
   const MAP_PROJECTION = {
   _id: 1,       // identifiant pour faire un GET /api/spots/:id au clic
   name: 1,      // titre du marker / hover
-  location: 1   // coordonnées GeoJSON [lng, lat]
+  location: 1,  // coordonnées GeoJSON [lng, lat]
+  type: 1,      // type de grimpe (crag, boulder, indoor)
+  soustype: 1,  // sous-type détaillé
+  niveau_min: 1, // cotation minimale
+  niveau_max: 1, // cotation maximale
+  id_voix: 1,   // liste des voies
+  orientation: 1, // exposition (N, S, E, O, etc.)
+  url: 1,       // lien vers fiche externe
+  info_complementaires: 1, // informations additionnelles
+  description: 1 // description du spot
 };
 
   // --- Créer un spot ---
