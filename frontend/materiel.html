@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,6 +8,7 @@
   <link rel="icon" href="./assets/ZoneDeGrimpeIcon.png" />
   <link rel="stylesheet" href="./style/style.css" />
 </head>
+
 <body class="theme">
   <header class="app-header">
     <a class="brand" href="./">
@@ -35,10 +37,14 @@
       <input id="gearSearch" class="input" placeholder="Rechercher…" />
       <select id="gearTagFilter" class="select">
         <option value="">Tous les tags</option>
-        <option value="corde">Corde</option>
-        <option value="degaine">Dégaines</option>
-        <option value="casque">Casque</option>
-        <option value="baudrier">Baudrier</option>
+        <label>Catégorie
+          <select name="category" class="select">
+            <option value="corde">Corde</option>
+            <option value="degaine">Dégaines</option>
+            <option value="casque">Casque</option>
+            <option value="baudrier">Baudrier</option>
+          </select>
+        </label>
       </select>
       <button id="addGearBtn" class="btn">Ajouter</button>
     </div>
@@ -91,4 +97,5 @@
 
   <script type="module" src="./js/materiel.js"></script>
 </body>
+
 </html>

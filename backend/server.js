@@ -4,7 +4,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { connectToDb } from "./src/db.js";
 import { spotsRouter } from "./src/routes/spots.routes.js";
-import { usersRouter } from "./src/routes/users.routes.js"; 
+import { usersRouter } from "./src/routes/users.routes.js";
+import { authRouter } from "./src/routes/auth.routes.js";
 import { userMaterielRouter } from "./src/routes/userMateriel.routes.js";
 import { materielSpecsRouter } from "./src/routes/materielSpecs.routes.js";
 import { analyticsRouter } from "./src/routes/analytics.routes.js";
@@ -73,6 +74,7 @@ if (hasUri) {
   // Routes avec DB
   app.use("/api/spots", spotsRouter(db));
   app.use("/api/users", usersRouter(db)); 
+  app.use("/api/auth", authRouter(db));
   app.use("/api/user_materiel", userMaterielRouter(db));
   app.use("/api/materiel_specs", materielSpecsRouter(db));
   app.use("/api/analytics", analyticsRouter(db));
@@ -84,6 +86,7 @@ if (hasUri) {
   // Fallback sans DB
   app.get("/api/spots", (_, res) =>res.json({ type: "FeatureCollection", features: [] }));
   app.get("/api/users", (_, res) => res.json({ items: [], total: 0 })); 
+  app.get("/api/auth", (_, res) => res.status(401).json({ error: "no_db" }));
   app.get("/api/user_materiel", (_, res) => res.json({ items: [], total: 0 }));
   app.get("/api/materiel_specs", (_, res) => res.json({ items: [], total: 0 }));
   app.get("/api/analytics", (_, res) => res.json({ items: [] }));

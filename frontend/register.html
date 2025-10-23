@@ -1,0 +1,38 @@
+<!-- register.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Créer un compte — ZoneDeGrimpe</title>
+  <link rel="stylesheet" href="./style/style.css" />
+</head>
+<body class="theme theme page-auth">
+  <header class="app-header">
+    <a class="brand" href="./">
+      <img src="./assets/ZoneDeGrimpeIcon.png" class="brand__icon" />
+      <span class="brand__title">ZoneDeGrimpe</span>
+    </a>
+  </header>
+
+  <section class="card">
+    <h2>Créer un compte</h2>
+    <form id="regForm" class="form">
+      <label>Nom affiché
+        <input type="text" name="displayName" placeholder="Votre nom" />
+      </label>
+      <label>Email
+        <input type="email" name="email" required />
+      </label>
+      <label>Mot de passe
+        <input type="password" name="password" required minlength="6" />
+      </label>
+      <button class="btn" type="submit">Créer le compte</button>
+    </form>
+    <p class="mt-12">Déjà inscrit ? <a href="./login.html">Se connecter</a></p>
+    <p id="regErr" class="error" style="display:none"></p>
+  </section>
+
+  <script type="module" src="./js/register.js"></script>
+</body>
+</html>

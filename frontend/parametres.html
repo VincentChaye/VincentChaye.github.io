@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,7 +8,8 @@
   <link rel="icon" href="./assets/ZoneDeGrimpeIcon.png" />
   <link rel="stylesheet" href="./style/style.css" />
 </head>
-<body class="theme">
+
+<body class="theme theme page-auth">
   <header class="app-header">
     <a class="brand" href="./">
       <img src="./assets/ZoneDeGrimpeIcon.png" alt="ZoneDeGrimpe" class="brand__icon" />
@@ -25,63 +27,61 @@
     </nav>
   </header>
 
-  <section class="banner banner--page">
-    <h1>Paramètres du compte</h1>
-    <p>Profil, préférences d’affichage et langue.</p>
+
+  <!-- Vue NON connecté -->
+  <section id="authGate" class="card" style="display:none">
+    <h2>Paramètres</h2>
+    <p>Vous devez être connecté pour accéder à vos paramètres.</p>
+    <div class="row gap-12">
+      <a class="btn" href="./login.html">Se connecter</a>
+      <a class="btn btn--ghost" href="./register.html">Créer un compte</a>
+    </div>
   </section>
 
-  <main class="container">
-    <form id="settingsForm" class="settings">
-      <fieldset>
-        <legend>Profil</legend>
-        <label>Nom
-          <input name="displayName" class="input" placeholder="Ton nom" />
-        </label>
-        <label>Email
-          <input name="email" type="email" class="input" placeholder="email@example.com" />
-        </label>
-      </fieldset>
+  <!-- Vue connecté -->
+  <section id="accountView" class="card" style="display:none">
+    <h2>Mon compte</h2>
+    <div class="grid">
+      <div><strong>Nom :</strong> <span id="vDisplayName">—</span></div>
+      <div><strong>Email :</strong> <span id="vEmail">—</span></div>
+      <div><strong>Téléphone :</strong> <span id="vPhone">—</span></div>
+      <div><strong>Statut :</strong> <span id="vStatus">—</span></div>
+      <div><strong>Vérifié :</strong> <span id="vVerified">—</span></div>
+      <div><strong>Rôles :</strong> <span id="vRoles">—</span></div>
+    </div>
 
-      <fieldset>
-        <legend>Préférences</legend>
-        <label>Thème
-          <select name="theme" class="select">
-            <option value="system">Système</option>
-            <option value="light">Clair</option>
-            <option value="dark">Sombre</option>
-          </select>
-        </label>
-        <label>Langue
-          <select name="lang" class="select">
-            <option value="fr">Français</option>
-            <option value="es">Español</option>
-          </select>
-        </label>
-        <label>Unités
-          <select name="units" class="select">
-            <option value="metric">Métrique</option>
-            <option value="imperial">Impérial</option>
-          </select>
-        </label>
-      </fieldset>
+    <div class="row gap-12 mt-16">
+      <button id="btnLogout" class="btn btn--danger">Se déconnecter</button>
+    </div>
+    <form id="profileForm" class="form mt-16" style="max-width:520px">
+      <h3>Modifier mon profil</h3>
 
-      <menu class="settings__actions">
-        <button type="reset" class="btn btn--ghost">Réinitialiser</button>
-        <button type="submit" class="btn">Enregistrer</button>
-      </menu>
+      <label>Nom affiché
+        <input type="text" id="fDisplayName" name="displayName" required />
+      </label>
 
-      <details class="danger">
-        <summary>Zone dangereuse</summary>
-        <button id="exportSettings" type="button" class="btn btn--warn">Exporter mes données</button>
-        <button id="deleteAccount" type="button" class="btn btn--danger">Supprimer mon compte</button>
-      </details>
+      <label>Avatar URL (optionnel)
+        <input type="url" id="fAvatarUrl" name="avatarUrl" placeholder="https://..." />
+      </label>
+
+      <label>Téléphone (optionnel)
+        <input type="tel" id="fPhone" name="phone" placeholder="+33 6 12 34 56 78" />
+      </label>
+
+      <div class="row items-center gap-12 mt-8">
+        <img id="avatarPreview" alt="Aperçu avatar"
+          style="width:56px;height:56px;border-radius:50%;object-fit:cover;display:none" />
+        <span id="saveMsg" class="muted" style="display:none">Sauvegardé </span>
+      </div>
+
+      <div class="row gap-12 mt-12">
+        <button class="btn" type="submit">Enregistrer</button>
+      </div>
     </form>
-  </main>
 
-  <footer class="app-footer">
-    <p>© <span id="year"></span> ZoneDeGrimpe</p>
-  </footer>
+  </section>
 
   <script type="module" src="./js/parametres.js"></script>
 </body>
+
 </html>
