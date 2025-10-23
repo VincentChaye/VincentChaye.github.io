@@ -402,12 +402,24 @@ window.submitSpotEdit = async function(spotId) {
       body: JSON.stringify(updates)
     });
     
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Erreur lors de la modification');
+    // Récupérer le texte brut de la réponse
+    const responseText = await response.text();
+    
+    // Parser le JSON seulement si la réponse n'est pas vide
+    let result = null;
+    if (responseText) {
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Erreur de parsing JSON:', parseError, 'Réponse:', responseText);
+        throw new Error('Réponse invalide du serveur');
+      }
     }
     
-    const result = await response.json();
+    if (!response.ok) {
+      const errorMsg = result?.error || result?.detail || 'Erreur lors de la modification';
+      throw new Error(errorMsg);
+    }
     
     // Mettre à jour le spot dans allSpots
     const spotIndex = allSpots.findIndex(s => s.id === spotId);

@@ -147,12 +147,16 @@ async function tryFetch(url) {
 
   // Certains proxies renvoient 204/empty → gérons-le proprement
   const txt = await r.text();
-  if (!txt) return null;
+  if (!txt || txt.trim() === '') {
+    console.warn('[api] Empty response from:', url);
+    return null;
+  }
 
   try {
     return JSON.parse(txt);
   } catch (parseErr) {
-    throw new Error(`[json_parse_error] ${String(parseErr)} — preview: ${txt.slice(0, 200)}`);
+    console.error('[api] JSON parse error:', parseErr, 'URL:', url, 'Response preview:', txt.slice(0, 200));
+    throw new Error(`[json_parse_error] Réponse invalide du serveur. Preview: ${txt.slice(0, 100)}`);
   }
 }
 

@@ -207,7 +207,7 @@ export function spotsRouter(db) {
   // --- Mettre à jour un spot (PATCH) ---
   r.patch("/:id", async (req, res) => {
     if (!ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ error: "bad_id" });
+      return res.status(400).json({ error: "bad_id", detail: "ID invalide" });
     }
     
     try {
@@ -230,16 +230,19 @@ export function spotsRouter(db) {
       );
       
       if (!result) {
-        return res.status(404).json({ error: "not_found" });
+        return res.status(404).json({ error: "not_found", detail: "Spot introuvable" });
       }
       
-      res.json({ ok: true, spot: result });
+      return res.status(200).json({ ok: true, spot: result });
     } catch (e) {
       if (e.name === 'ZodError') {
-        return res.status(400).json({ error: "invalid_payload", detail: String(e) });
+        return res.status(400).json({ 
+          error: "invalid_payload", 
+          detail: e.errors?.map(err => `${err.path.join('.')}: ${err.message}`).join(', ') || String(e)
+        });
       }
-      console.error(e);
-      res.status(500).json({ error: "server_error" });
+      console.error('[PATCH /spots/:id] Error:', e);
+      return res.status(500).json({ error: "server_error", detail: "Erreur interne du serveur" });
     }
   });
 
