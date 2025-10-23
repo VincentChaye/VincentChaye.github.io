@@ -1,4 +1,6 @@
 // login.js
+const API_BASE = (window.APP_CONFIG?.API_URL || "http://localhost:3000") + "/api";
+
 const form = document.getElementById("loginForm");
 const err = document.getElementById("loginErr");
 
@@ -11,7 +13,7 @@ form.addEventListener("submit", async (e) => {
   const password = fd.get("password");
 
   try {
-    const res = await fetch("http://localhost:3000/api/auth/login", {
+    const res = await fetch(`${API_BASE}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
