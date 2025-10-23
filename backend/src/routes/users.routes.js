@@ -7,16 +7,21 @@ export function usersRouter(db) {
   const users = db.collection("users");
 
   // Indexes
-  // - Unicité email (si doublons existants -> catch silencieux)
-  // - Recherche textuelle sur displayName + email
   users.createIndex({ email: 1 }, { unique: true }).catch(() => { });
   users.createIndex({ displayName: "text", email: "text" }).catch(() => { });
+
+  // ---- Niveaux autorisés
+  const LEVELS = ["debutant", "intermediaire", "avance"];
+  function normalizeLevel(v) {
+    if (v == null) return null;
+    const s = String(v).toLowerCase().trim();
+    return LEVELS.includes(s) ? s : null;
+  }
 
   // Projection des champs sensibles
   const SAFE_PROJECTION = {
     passwordHash: 0,
-    // NOTE: on masque security car contient des dates internes; enlève-le si tu veux les voir
-    // security: 0,
+    // security: 0, // garde si tu veux masquer
   };
 
   // --- GET /api/users/me (protégé) ---
@@ -25,7 +30,12 @@ export function usersRouter(db) {
       const uid = req.auth?.uid;
       const user = await users.findOne({ _id: new ObjectId(uid) }, { projection: SAFE_PROJECTION });
       if (!user) return res.status(404).json({ error: "not_found" });
-      return res.json({ user });
+
+      // Valeur par défaut non destructive à l'affichage
+      if (!user.profile) user.profile = {};
+      if (!user.profile.level) user.profile.level = "debutant";
+
+      return res.json(user); // <-- renvoie l'objet user directement
     } catch (e) {
       console.error(e);
       return res.status(500).json({ error: "server_error" });
@@ -34,7 +44,6 @@ export function usersRouter(db) {
 
   // ----------------------
   // Validation minimale payload côté route
-  // (alignée sur le validator: displayName, email, roles[], etc.)
   // ----------------------
   function sanitizePartialUpdate(body = {}) {
     const set = {};
@@ -102,20 +111,14 @@ export function usersRouter(db) {
       set.profile = body.profile;
     }
 
-    // ⚠️ NE PAS accepter createdAt/updatedAt au niveau racine (interdit par validator)
-    // ⚠️ NE PAS accepter 'name' (pas dans le validator)
-    // ⚠️ NE PAS accepter 'role' (string) -> utiliser 'roles' (array)
     return set;
   }
 
-  // --- Créer un utilisateur (optionnel) ---
-  // Conseil: préférez /api/auth/register. Si vous gardez cette route:
-  // - elle DOIT respecter le validator (passwordHash et security.createdAt requis).
+  // --- (facultatif) POST /api/users ---
   r.post("/", async (req, res) => {
     try {
       const { email, displayName, roles, status, emailVerified, avatarUrl, phone, preferences, profile } = req.body || {};
 
-      // Champs requis par le validator:
       const emailNorm = String(email || "").trim().toLowerCase();
       if (!emailNorm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNorm)) {
         return res.status(400).json({ error: "invalid_payload", detail: "email required" });
@@ -125,14 +128,11 @@ export function usersRouter(db) {
         return res.status(400).json({ error: "invalid_payload", detail: "displayName required" });
       }
 
-      // Cette route n’a pas de mdp -> on crée un compte “sans mot de passe”
-      // conforme au validator: passwordHash string REQUIS => on met une sentinelle hashée vide
-      // (meilleur: refuser la création ici et forcer /auth/register)
-      const passwordHash = "pending_" + cryptoRandomString(); // chaîne non vide
+      const passwordHash = "pending_" + cryptoRandomString();
 
       const doc = {
         email: emailNorm,
-        passwordHash,                 // string requis
+        passwordHash,
         displayName: display,
         avatarUrl: avatarUrl === undefined ? null : avatarUrl,
         phone: phone === undefined ? null : phone,
@@ -140,7 +140,7 @@ export function usersRouter(db) {
         status: ["active", "banned", "pending"].includes(status) ? status : "active",
         emailVerified: !!emailVerified,
         preferences: preferences && typeof preferences === "object" ? preferences : {},
-        profile: profile && typeof profile === "object" ? profile : {},
+        profile: profile && typeof profile === "object" ? profile : { level: "debutant" },
         security: {
           createdAt: new Date(),
           updatedAt: null,
@@ -159,8 +159,7 @@ export function usersRouter(db) {
     }
   });
 
-  // --- Lister les utilisateurs (search + pagination) ---
-  // GET /api/users?search=&limit=&skip=
+  // --- GET /api/users (liste) ---
   r.get("/", async (req, res) => {
     try {
       const { search = "", limit = 20, skip = 0 } = req.query;
@@ -190,7 +189,6 @@ export function usersRouter(db) {
           users.countDocuments(filter),
         ]);
       } catch {
-        // Fallback regex sur displayName/email si $text indispo
         const rx = q ? { $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } : null;
         filter = q ? { $or: [{ displayName: rx }, { email: rx }] } : {};
         [items, total] = await Promise.all([
@@ -206,7 +204,7 @@ export function usersRouter(db) {
     }
   });
 
-  // --- Lire un utilisateur ---
+  // --- GET /api/users/:id ---
   r.get("/:id", async (req, res) => {
     try {
       const { id } = req.params;
@@ -222,7 +220,7 @@ export function usersRouter(db) {
     }
   });
 
-  // PATCH /api/users/me — mettre à jour son propre profil
+  // --- PATCH /api/users/me ---
   r.patch("/me", requireAuth, async (req, res) => {
     try {
       const uid = new ObjectId(req.auth?.uid);
@@ -243,7 +241,6 @@ export function usersRouter(db) {
         $set.avatarUrl = body.avatarUrl === "" ? null : body.avatarUrl;
       }
 
-      // 👇 Ajout du champ téléphone
       if (body.phone !== undefined) {
         if (body.phone !== null && typeof body.phone !== "string") {
           return res.status(400).json({ error: "invalid_payload", detail: "phone must be string or null" });
@@ -251,25 +248,40 @@ export function usersRouter(db) {
         $set.phone = body.phone === "" ? null : body.phone;
       }
 
-      if (!Object.keys($set).length) {
-        const user = await users.findOne({ _id: uid }, { projection: SAFE_PROJECTION });
-        return res.json({ ok: true, user });
+      // ---- Ajout du niveau
+      if (body.level !== undefined) {
+        const lvl = normalizeLevel(body.level);
+        if (!lvl) {
+          return res.status(400).json({ error: "invalid_level", allowed: LEVELS });
+        }
+        $set["profile.level"] = lvl;
       }
-      $set["security.updatedAt"] = new Date(); // validator-friendly
+
+      if (!Object.keys($set).length) {
+        const user0 = await users.findOne({ _id: uid }, { projection: SAFE_PROJECTION });
+        if (!user0) return res.status(404).json({ error: "not_found" });
+        // défaut d'affichage
+        if (!user0.profile) user0.profile = {};
+        if (!user0.profile.level) user0.profile.level = "debutant";
+        return res.json(user0);
+      }
+
+      $set["security.updatedAt"] = new Date();
 
       const result = await users.updateOne({ _id: uid }, { $set });
       if (result.matchedCount === 0) return res.status(404).json({ error: "not_found" });
 
       const user = await users.findOne({ _id: uid }, { projection: SAFE_PROJECTION });
-      return res.json({ ok: true, user });
+      if (!user.profile) user.profile = {};
+      if (!user.profile.level) user.profile.level = "debutant";
+      return res.json(user); // <-- renvoie l'objet user directement
     } catch (e) {
       console.error(e);
       return res.status(500).json({ error: "server_error" });
     }
   });
 
-
-  // --- Mettre à jour partiellement un utilisateur ---
+  // --- PATCH /api/users/:id ---
   r.patch("/:id", async (req, res) => {
     try {
       const { id } = req.params;
@@ -282,7 +294,6 @@ export function usersRouter(db) {
         return res.status(400).json({ error: "invalid_payload", detail: "empty_update" });
       }
 
-      // maj date dans security (validator-friendly)
       const result = await users.updateOne(
         { _id: new ObjectId(id) },
         { $set: { ...updateSet, "security.updatedAt": new Date() } }
@@ -299,7 +310,7 @@ export function usersRouter(db) {
     }
   });
 
-  // --- Supprimer un utilisateur ---
+  // --- DELETE /api/users/:id ---
   r.delete("/:id", async (req, res) => {
     try {
       const { id } = req.params;
@@ -314,10 +325,11 @@ export function usersRouter(db) {
     }
   });
 
+  
+
   return r;
 }
 
-// petit util pour générer une string non vide si tu gardes POST /
 function cryptoRandomString() {
   return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
 }
