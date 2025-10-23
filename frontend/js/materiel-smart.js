@@ -586,21 +586,37 @@ async function refresh() {
 }
 
 // === Event listeners ===
-if (addBtn) addBtn.addEventListener("click", () => {
+function openAddGearModal() {
   editingId = null;
   if (title) title.textContent = "Nouvel équipement";
-  form.reset();
   
-  // Réinitialiser les interactions du formulaire
-  setTimeout(() => {
-    const categorySelect = form.querySelector('[name="category"]');
-    if (categorySelect) {
-      categorySelect.dispatchEvent(new Event('change'));
-    }
-  }, 100);
+  // Reset le formulaire
+  if (form) {
+    form.reset();
+    
+    // Réinitialiser les interactions du formulaire
+    setTimeout(() => {
+      const categorySelect = form.querySelector('[name="category"]');
+      if (categorySelect) {
+        categorySelect.dispatchEvent(new Event('change'));
+      }
+    }, 50);
+  }
   
-  if (modal) modal.showModal();
-});
+  // Ouvrir le modal
+  if (modal) {
+    modal.showModal();
+  } else {
+    console.error("Modal non trouvé");
+  }
+}
+
+if (addBtn) {
+  addBtn.addEventListener("click", openAddGearModal);
+  console.log("Bouton Ajouter initialisé correctement");
+} else {
+  console.error("Bouton Ajouter non trouvé lors de l'initialisation");
+}
 
 if (form) form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -946,15 +962,48 @@ function initStatsTab() {
 
 // === Initialisation ===
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("Initialisation de la page matériel...");
+  
+  // Initialiser les éléments UI
   initializeUIElements();
+  
+  // Vérifier que tous les éléments essentiels sont présents
+  const requiredElements = {
+    form: form,
+    listEl: listEl,
+    addBtn: addBtn,
+    modal: modal,
+    search: search,
+    tagFilter: tagFilter
+  };
+  
+  const missingElements = Object.entries(requiredElements)
+    .filter(([name, element]) => !element)
+    .map(([name]) => name);
+  
+  if (missingElements.length > 0) {
+    console.error('Éléments manquants:', missingElements.join(', '));
+    if (listEl) {
+      listEl.innerHTML = `<div class="error-state">
+        <p>❌ Erreur d'initialisation</p>
+        <p>Éléments manquants: ${missingElements.join(', ')}</p>
+      </div>`;
+    }
+    return;
+  }
+  
+  console.log("Tous les éléments UI sont présents");
+  
+  // Initialiser les onglets
   initTabs();
   
-  if (form && listEl && addBtn && modal && search && tagFilter) {
-    createSmartForm();
-    refresh();
-  } else {
-    console.error('Required DOM elements not found');
-  }
+  // Créer le formulaire intelligent
+  createSmartForm();
+  console.log("Formulaire intelligent créé");
+  
+  // Charger les données
+  refresh();
+  console.log("Chargement initial des données...");
 });
 
 // Export pour les tests
