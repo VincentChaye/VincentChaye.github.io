@@ -321,6 +321,19 @@ p, input, select, textarea, .card p, label, .footer { font-family: var(--font-bo
 
 .filter-group input[type="range"]{
   width:100%;
+  cursor: pointer;
+  accent-color: var(--c1);
+}
+
+.filter-group label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#distanceValue {
+  font-weight: 700;
+  color: var(--c1);
 }
 
 /* --- Bottom Sheet au-dessus de la carte --- */

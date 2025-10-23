@@ -146,6 +146,9 @@ function requestLocation() {
 map.on("locationfound", (e) => {
   const latlng = e.latlng;
   const zoomClose = 15; 
+  
+  // Stocke la position de l'utilisateur pour le filtre de distance
+  userPosition = latlng;
 
   if (!userMarker) {
     userMarker = L.circleMarker(latlng, {
@@ -172,6 +175,11 @@ map.on("locationfound", (e) => {
 
   map.setView(latlng, zoomClose, { animate: true });
   userCentered = true; //signale qu'on a centré sur l'user
+  
+  // Refiltre les spots avec la nouvelle position
+  if (allSpots.length > 0) {
+    filterSpots();
+  }
 });
 
 map.on("locationerror", (err) => {
@@ -234,10 +242,12 @@ requestLocation();
 /* ---------- Variables globales pour filtrage et recherche ---------- */
 let allSpots = [];
 let allMarkers = [];
+let userPosition = null; // Position de l'utilisateur pour calculer les distances
 let currentFilters = {
   type: '',
   niveauMin: '',
-  searchQuery: ''
+  searchQuery: '',
+  distance: 500 // Distance max en km (500 = toutes les distances)
 };
 
 /* ---------- Fonction de partage ---------- */
@@ -261,6 +271,19 @@ window.shareSpot = function(spotId) {
     });
   }
 };
+
+/* ---------- Calcul de distance entre deux points ---------- */
+function calculateDistance(lat1, lng1, lat2, lng2) {
+  // Formule de Haversine pour calculer la distance en km
+  const R = 6371; // Rayon de la Terre en km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 /* ---------- Filtrage des spots ---------- */
 function filterSpots() {
@@ -289,10 +312,24 @@ function filterSpots() {
     );
   }
   
+  // Filtre par distance (seulement si position utilisateur disponible et distance < 500km)
+  if (userPosition && currentFilters.distance < 500) {
+    filtered = filtered.filter(s => {
+      const distance = calculateDistance(
+        userPosition.lat,
+        userPosition.lng,
+        s.lat,
+        s.lng
+      );
+      return distance <= currentFilters.distance;
+    });
+  }
+  // Si distance === 500 (au maximum), on affiche tous les spots (pas de filtre)
+  
   updateMapMarkers(filtered);
   
   // Affiche/cache le bouton reset
-  const hasActiveFilters = currentFilters.type || currentFilters.niveauMin || currentFilters.searchQuery;
+  const hasActiveFilters = currentFilters.type || currentFilters.niveauMin || currentFilters.searchQuery || (currentFilters.distance < 500 && userPosition);
   document.getElementById('resetFilters').style.display = hasActiveFilters ? 'block' : 'none';
 }
 
@@ -408,11 +445,35 @@ toggleFilters?.addEventListener('click', () => {
 });
 
 resetFilters?.addEventListener('click', () => {
-  currentFilters = { type: '', niveauMin: '', searchQuery: '' };
+  currentFilters = { type: '', niveauMin: '', searchQuery: '', distance: 500 };
   filterType.value = '';
   filterNiveauMin.value = '';
   searchInput.value = '';
   searchResults.style.display = 'none';
+  const filterDistance = document.getElementById('filterDistance');
+  const distanceValue = document.getElementById('distanceValue');
+  if (filterDistance) {
+    filterDistance.value = 500;
+    distanceValue.textContent = 'Toutes';
+  }
+  filterSpots();
+});
+
+/* ---------- Gestion du filtre de distance ---------- */
+const filterDistance = document.getElementById('filterDistance');
+const distanceValue = document.getElementById('distanceValue');
+
+filterDistance?.addEventListener('input', (e) => {
+  const distance = parseInt(e.target.value, 10);
+  currentFilters.distance = distance;
+  
+  // Affichage de la valeur
+  if (distance >= 500) {
+    distanceValue.textContent = 'Toutes';
+  } else {
+    distanceValue.textContent = `${distance} km`;
+  }
+  
   filterSpots();
 });
 
