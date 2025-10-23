@@ -7,7 +7,7 @@ export function spotsRouter(db) {
   const spots = db.collection("climbing_spot");
 
   // Index géospatial requis pour $near / $geoWithin
-  spots.createIndex({ location: "2dsphere" }).catch(() => {});
+  // L'index 2dsphere est géré dans db.js pour éviter les conflits
 
   // Projection minimale pour l'affichage carte (liste de spots)
   const MAP_PROJECTION = {

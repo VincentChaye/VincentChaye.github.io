@@ -16,10 +16,19 @@ export async function connectToDb(uri, dbName) {
     await client.connect();
     db = client.db(dbName);
 
-    // Index géospatial (2dsphere)
+    // Index géospatial (2dsphere) - on utilise 'location' comme champ standard
     const collection = db.collection("climbing_spot");
-    await collection.createIndex({ geometry: "2dsphere" });
-    console.log(`Connecté à MongoDB (${dbName}), index 2dsphere OK`);
+    
+    // Supprimer les anciens index conflictuels
+    try {
+      await collection.dropIndex({ geometry: "2dsphere" });
+    } catch (e) {
+      // Index n'existe pas, c'est OK
+    }
+    
+    // Créer l'index sur le champ 'location'
+    await collection.createIndex({ location: "2dsphere" });
+    console.log(`Connecté à MongoDB (${dbName}), index 2dsphere sur 'location' OK`);
 
     return { client, db };
   } catch (error) {

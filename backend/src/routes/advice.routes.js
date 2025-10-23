@@ -76,7 +76,7 @@ export function adviceRouter(db) {
   const userGear = db.collection("User_Materiel");
 
   // Index safe (si déjà créés, catch no-op)
-  spots.createIndex({ location: "2dsphere" }).catch(() => {});
+  // L'index 2dsphere est géré dans db.js pour éviter les conflits
   spots.createIndex({ name: "text", "properties.tags": "text" }).catch(() => {});
   spots.createIndex({ "properties.orientation": 1 }).catch(() => {});
   spots.createIndex({ "properties.grade_mean_num": 1 }).catch(() => {});
