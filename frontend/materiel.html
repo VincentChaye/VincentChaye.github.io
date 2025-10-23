@@ -174,73 +174,10 @@
     </div>
   </main>
 
-  <!-- Modal formulaire -->
+  <!-- Modal formulaire (contenu généré par JavaScript) -->
   <dialog id="gearModal" class="modal">
     <form id="gearForm" method="dialog" class="modal__content">
-      <h2 id="gearFormTitle">Équipement</h2>
-
-      <label>Nom
-        <input name="name" required class="input" />
-      </label>
-      <label>Marque
-        <input name="brand" class="input" />
-      </label>
-      <label>Modèle
-        <input name="model" class="input" />
-      </label>
-      <label>Catégorie
-        <select name="category" class="select" required>
-          <option value="">Choisir...</option>
-          <option value="Corde">Corde</option>
-          <option value="Dégaines">Dégaines</option>
-          <option value="Casque">Casque</option>
-          <option value="Baudrier">Baudrier</option>
-          <option value="Chaussons">Chaussons</option>
-          <option value="Mousquetons">Mousquetons</option>
-          <option value="Longe">Longe</option>
-          <option value="Autre">Autre</option>
-        </select>
-      </label>
-      <label>État
-        <select name="state" class="select">
-          <option value="new">Neuf</option>
-          <option value="good">Bon</option>
-          <option value="worn">Usé</option>
-          <option value="retire-soon">À retirer bientôt</option>
-          <option value="retired">Retiré</option>
-        </select>
-      </label>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-        <label>Date d'achat
-          <input type="date" name="purchaseDate" class="input" />
-        </label>
-        <label>Prix (€)
-          <input type="number" name="price" class="input" step="0.01" min="0" placeholder="0.00" />
-        </label>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-        <label>Dernière inspection
-          <input type="date" name="lastInspection" class="input" />
-        </label>
-        <label>Prochaine inspection
-          <input type="date" name="nextInspection" class="input" />
-        </label>
-      </div>
-      <label>Nombre d'utilisations
-        <input type="number" name="usageCount" class="input" min="0" placeholder="0" />
-      </label>
-      <label>Tags (séparés par des virgules)
-        <input name="tags" class="input" placeholder="sport, trad, multipitch" />
-      </label>
-      <label>Notes
-        <textarea name="notes" class="input" rows="3" placeholder="Observations, défauts, historique..."></textarea>
-      </label>
-
-      <menu class="modal__actions">
-        <button value="cancel" class="btn btn--ghost" type="reset">Annuler</button>
-        <button value="submit" class="btn" id="gearSubmitBtn">Enregistrer</button>
-      </menu>
-      <input type="hidden" name="id" />
+      <!-- Le contenu du formulaire sera généré dynamiquement -->
     </form>
   </dialog>
 
@@ -249,7 +186,7 @@
   </footer>
 
   <script src="./config.js"></script>
-  <script type="module" src="./js/materiel-enhanced.js"></script>
+  <script type="module" src="./js/materiel-smart.js"></script>
 </body>
 
 </html>
