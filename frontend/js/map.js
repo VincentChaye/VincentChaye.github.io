@@ -236,8 +236,6 @@ let allSpots = [];
 let allMarkers = [];
 let currentFilters = {
   type: '',
-  orientation: '',
-  distance: 50,
   niveauMin: '',
   searchQuery: ''
 };
@@ -273,20 +271,6 @@ function filterSpots() {
     filtered = filtered.filter(s => s.type === currentFilters.type);
   }
   
-  // Filtre par orientation
-  if (currentFilters.orientation) {
-    filtered = filtered.filter(s => s.orientation && s.orientation.includes(currentFilters.orientation));
-  }
-  
-  // Filtre par distance (si l'utilisateur est localisé)
-  if (userMarker && currentFilters.distance) {
-    const userPos = userMarker.getLatLng();
-    filtered = filtered.filter(s => {
-      const dist = calculateDistance(userPos.lat, userPos.lng, s.lat, s.lng);
-      return dist <= currentFilters.distance;
-    });
-  }
-  
   // Filtre par niveau minimum
   if (currentFilters.niveauMin) {
     const minGrade = parseInt(currentFilters.niveauMin, 10);
@@ -308,8 +292,7 @@ function filterSpots() {
   updateMapMarkers(filtered);
   
   // Affiche/cache le bouton reset
-  const hasActiveFilters = currentFilters.type || currentFilters.orientation || 
-                          currentFilters.niveauMin || currentFilters.searchQuery;
+  const hasActiveFilters = currentFilters.type || currentFilters.niveauMin || currentFilters.searchQuery;
   document.getElementById('resetFilters').style.display = hasActiveFilters ? 'block' : 'none';
 }
 
@@ -325,18 +308,6 @@ function updateMapMarkers(spotsToShow) {
   });
   
   console.log(`[map] Affichage de ${spotsToShow.length} / ${allSpots.length} spots`);
-}
-
-/* ---------- Calcul de distance (Haversine) ---------- */
-function calculateDistance(lat1, lng1, lat2, lng2) {
-  const R = 6371; // Rayon de la Terre en km
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLng/2) * Math.sin(dLng/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
 }
 
 /* ---------- Recherche ---------- */
@@ -416,27 +387,13 @@ document.addEventListener('click', (e) => {
 
 /* ---------- Gestion des filtres ---------- */
 const filterType = document.getElementById('filterType');
-const filterOrientation = document.getElementById('filterOrientation');
-const filterDistance = document.getElementById('filterDistance');
 const filterNiveauMin = document.getElementById('filterNiveauMin');
-const distanceLabel = document.getElementById('distanceLabel');
 const toggleFilters = document.getElementById('toggleFilters');
 const advancedFilters = document.getElementById('advancedFilters');
 const resetFilters = document.getElementById('resetFilters');
 
 filterType?.addEventListener('change', (e) => {
   currentFilters.type = e.target.value;
-  filterSpots();
-});
-
-filterOrientation?.addEventListener('change', (e) => {
-  currentFilters.orientation = e.target.value;
-  filterSpots();
-});
-
-filterDistance?.addEventListener('input', (e) => {
-  currentFilters.distance = parseInt(e.target.value, 10);
-  distanceLabel.textContent = `${currentFilters.distance} km`;
   filterSpots();
 });
 
@@ -451,13 +408,10 @@ toggleFilters?.addEventListener('click', () => {
 });
 
 resetFilters?.addEventListener('click', () => {
-  currentFilters = { type: '', orientation: '', distance: 50, niveauMin: '', searchQuery: '' };
+  currentFilters = { type: '', niveauMin: '', searchQuery: '' };
   filterType.value = '';
-  filterOrientation.value = '';
-  filterDistance.value = 50;
   filterNiveauMin.value = '';
   searchInput.value = '';
-  distanceLabel.textContent = '50 km';
   searchResults.style.display = 'none';
   filterSpots();
 });
