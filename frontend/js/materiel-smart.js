@@ -139,6 +139,7 @@ function formatDate(date) {
 // === Formulaire intelligent ===
 function createSmartForm() {
   const formHTML = `
+    <button type="button" class="modal__close" id="modalCloseBtn" aria-label="Fermer">×</button>
     <h2 id="gearFormTitle">Équipement</h2>
     
     <!-- Informations de base -->
@@ -227,14 +228,32 @@ function createSmartForm() {
     </div>
 
     <menu class="modal__actions">
-      <button value="cancel" class="btn btn--ghost" type="reset">Annuler</button>
-      <button value="submit" class="btn" id="gearSubmitBtn">Enregistrer</button>
+      <button type="button" class="btn btn--ghost" id="cancelBtn">Annuler</button>
+      <button type="submit" class="btn" id="gearSubmitBtn">Enregistrer</button>
     </menu>
     <input type="hidden" name="id" />
   `;
   
   if (form) form.innerHTML = formHTML;
   setupFormInteractions();
+  setupModalCloseHandlers();
+}
+
+function setupModalCloseHandlers() {
+  const closeBtn = form.querySelector('#modalCloseBtn');
+  const cancelBtn = form.querySelector('#cancelBtn');
+  
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      if (modal) modal.close();
+    });
+  }
+  
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      if (modal) modal.close();
+    });
+  }
 }
 
 function setupFormInteractions() {

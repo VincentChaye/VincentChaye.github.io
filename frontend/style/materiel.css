@@ -1,5 +1,44 @@
 /* Styles spécifiques à la page matériel */
 
+/* === Modal close button === */
+.modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  background: transparent;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--text-muted, #6c757d);
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.modal__close:hover {
+  background: var(--c3, #e9ecef);
+  color: var(--text-color, #333);
+}
+
+.modal__close:active {
+  transform: scale(0.95);
+}
+
+[data-theme="dark"] .modal__close {
+  color: #aaa;
+}
+
+[data-theme="dark"] .modal__close:hover {
+  background: #333;
+  color: #fff;
+}
+
 /* === Formulaire intelligent === */
 .form-section {
   margin-bottom: 1.5rem;
