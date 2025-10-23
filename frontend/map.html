@@ -48,28 +48,12 @@
         <option value="indoor">🏢 Salle</option>
       </select>
       
-      <select id="filterOrientation" class="filter-select" aria-label="Filtrer par orientation">
-        <option value="">Toutes orientations</option>
-        <option value="N">Nord</option>
-        <option value="S">Sud</option>
-        <option value="E">Est</option>
-        <option value="W">Ouest</option>
-        <option value="NE">Nord-Est</option>
-        <option value="NW">Nord-Ouest</option>
-        <option value="SE">Sud-Est</option>
-        <option value="SW">Sud-Ouest</option>
-      </select>
-      
       <button id="toggleFilters" class="btn btn--ghost btn--compact" title="Plus de filtres">⚙️</button>
       <button id="resetFilters" class="btn btn--ghost btn--compact" title="Réinitialiser les filtres" style="display:none;">🔄</button>
     </div>
 
     <!-- Panneau de filtres avancés (masqué par défaut) -->
     <div class="advanced-filters" id="advancedFilters" style="display:none;">
-      <div class="filter-group">
-        <label for="filterDistance">Distance max: <span id="distanceLabel">50 km</span></label>
-        <input type="range" id="filterDistance" min="1" max="200" value="50" step="5">
-      </div>
       <div class="filter-group">
         <label for="filterNiveauMin">Niveau min:</label>
         <select id="filterNiveauMin" class="filter-select">
