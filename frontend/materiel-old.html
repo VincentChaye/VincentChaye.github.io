@@ -192,52 +192,21 @@
       <label>Modèle
         <input name="model" class="input" />
       </label>
-      <label>Catégorie
-        <select name="category" class="select" required>
-          <option value="">Choisir...</option>
-          <option value="Corde">Corde</option>
-          <option value="Dégaines">Dégaines</option>
-          <option value="Casque">Casque</option>
-          <option value="Baudrier">Baudrier</option>
-          <option value="Chaussons">Chaussons</option>
-          <option value="Mousquetons">Mousquetons</option>
-          <option value="Longe">Longe</option>
-          <option value="Autre">Autre</option>
-        </select>
-      </label>
       <label>État
         <select name="state" class="select">
-          <option value="new">Neuf</option>
-          <option value="good">Bon</option>
-          <option value="worn">Usé</option>
-          <option value="retire-soon">À retirer bientôt</option>
-          <option value="retired">Retiré</option>
+          <option value="neuf">Neuf</option>
+          <option value="bon">Bon</option>
+          <option value="usé">Usé</option>
         </select>
       </label>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-        <label>Date d'achat
-          <input type="date" name="purchaseDate" class="input" />
-        </label>
-        <label>Prix (€)
-          <input type="number" name="price" class="input" step="0.01" min="0" placeholder="0.00" />
-        </label>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-        <label>Dernière inspection
-          <input type="date" name="lastInspection" class="input" />
-        </label>
-        <label>Prochaine inspection
-          <input type="date" name="nextInspection" class="input" />
-        </label>
-      </div>
-      <label>Nombre d'utilisations
-        <input type="number" name="usageCount" class="input" min="0" placeholder="0" />
+      <label>Date d’achat
+        <input type="date" name="purchaseDate" class="input" />
       </label>
       <label>Tags (séparés par des virgules)
-        <input name="tags" class="input" placeholder="sport, trad, multipitch" />
+        <input name="tags" class="input" placeholder="corde, degaine" />
       </label>
       <label>Notes
-        <textarea name="notes" class="input" rows="3" placeholder="Observations, défauts, historique..."></textarea>
+        <textarea name="notes" class="input" rows="3"></textarea>
       </label>
 
       <menu class="modal__actions">
@@ -252,7 +221,7 @@
     <p>© <span id="year"></span> ZoneDeGrimpe</p>
   </footer>
 
-  <script type="module" src="./js/materiel-enhanced.js"></script>
+  <script type="module" src="./js/materiel.js"></script>
 </body>
 
 </html>
