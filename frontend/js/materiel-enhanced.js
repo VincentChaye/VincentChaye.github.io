@@ -40,9 +40,13 @@ async function fetchJSON(url, opts = {}) {
   const { token } = getAuth();
   const headers = { "Content-Type": "application/json", ...(opts.headers || {}) };
   if (token) headers.Authorization = `Bearer ${token}`;
+  
+  console.log("Requête:", { url, method: opts.method, body: opts.body }); // Debug
+  
   const res = await fetch(url, { ...opts, headers });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
+    console.error("Erreur API:", { status: res.status, text }); // Debug
     throw new Error(`HTTP ${res.status} – ${text || res.statusText}`);
   }
   return res.status === 204 ? null : res.json();
@@ -88,7 +92,6 @@ const spotsAdvice = document.getElementById("spotsAdvice");
 // Statistiques
 const inventoryStats = document.getElementById("inventoryStats");
 const valueStats = document.getElementById("valueStats");
-const ageStats = document.getElementById("ageStats");
 const conditionStats = document.getElementById("conditionStats");
 
 let rows = [];
@@ -555,7 +558,6 @@ async function loadStats() {
     const categories = {};
     let totalValue = 0;
     const conditions = { new: 0, good: 0, worn: 0, "retire-soon": 0, retired: 0 };
-    const ages = [];
     
     data.forEach(item => {
       // Catégories
@@ -569,13 +571,6 @@ async function loadStats() {
       // États
       const cond = item.lifecycle?.condition || "good";
       conditions[cond] = (conditions[cond] || 0) + 1;
-      
-      // Âges
-      if (item.purchase?.date) {
-        const purchaseDate = new Date(item.purchase.date);
-        const ageMonths = Math.floor((Date.now() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24 * 30));
-        ages.push(ageMonths);
-      }
     });
 
     // Inventaire
@@ -592,13 +587,6 @@ async function loadStats() {
     valueStats.innerHTML = `
       <div class="stat-value">${totalValue.toFixed(0)}€</div>
       <div class="stat-label">Valeur totale estimée</div>
-    `;
-
-    // Âge
-    const avgAge = ages.length > 0 ? Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : 0;
-    ageStats.innerHTML = `
-      <div class="stat-value">${avgAge}</div>
-      <div class="stat-label">Âge moyen (mois)</div>
     `;
 
     // États
@@ -631,6 +619,8 @@ form.addEventListener("submit", async (e) => {
     const fd = new FormData(form);
     const payload = formToPayload(fd);
 
+    console.log("Payload envoyé:", payload); // Debug
+
     if (editingId) {
       await apiPatch(editingId, payload);
     } else {
@@ -639,6 +629,7 @@ form.addEventListener("submit", async (e) => {
     modal.close();
     await refresh();
   } catch (err) {
+    console.error("Erreur formulaire:", err);
     alert(err.message || String(err));
   }
 });
