@@ -1,7 +1,7 @@
 /**
  * Gestion du thème clair/foncé + burger + UI commune
  */
-export function initCommonUI() {
+function initCommonUI() {
   const y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
 
