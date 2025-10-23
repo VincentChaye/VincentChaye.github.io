@@ -90,3 +90,23 @@ export { initCommonUI, applyTheme };
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { initCommonUI, applyTheme };
 }
+
+// Expose globally for non-module scripts
+if (typeof window !== 'undefined') {
+  window.initCommonUI = initCommonUI;
+  window.applyTheme = applyTheme;
+}
+
+// Auto-initialize if not in module context
+if (typeof document !== 'undefined' && document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Only auto-init if initCommonUI hasn't been called yet
+    if (!document.body.hasAttribute('data-ui-initialized')) {
+      initCommonUI();
+      document.body.setAttribute('data-ui-initialized', 'true');
+    }
+  });
+} else if (typeof document !== 'undefined' && !document.body.hasAttribute('data-ui-initialized')) {
+  initCommonUI();
+  document.body.setAttribute('data-ui-initialized', 'true');
+}

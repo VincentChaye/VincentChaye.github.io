@@ -106,8 +106,9 @@ const MATERIAL_CONFIG = {
 let listEl, addBtn, modal, form, title, search, tagFilter;
 
 function initializeUIElements() {
-  if (typeof initCommonUI === 'function') {
+  if (typeof initCommonUI === 'function' && !document.body.hasAttribute('data-ui-initialized')) {
     initCommonUI();
+    document.body.setAttribute('data-ui-initialized', 'true');
   }
   listEl = document.getElementById("gearList");
   addBtn = document.getElementById("addGearBtn");

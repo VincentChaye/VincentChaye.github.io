@@ -5,9 +5,10 @@
 const API_BASE_URL = window.APP_CONFIG?.API_URL || "http://localhost:3000";
 const API_PATH_PREFIX = "/api";
 
-// Initialiser l'UI commune
-if (typeof initCommonUI === 'function') {
+// Initialiser l'UI commune (ui.js s'auto-initialise maintenant)
+if (typeof initCommonUI === 'function' && !document.body.hasAttribute('data-ui-initialized')) {
   initCommonUI();
+  document.body.setAttribute('data-ui-initialized', 'true');
 }
 
 /* ---------- Session (localStorage.auth) ---------- */
