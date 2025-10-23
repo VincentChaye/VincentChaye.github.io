@@ -1,5 +1,4 @@
 // frontend/js/register.js
-
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("regForm");
   const err = document.getElementById("regErr");
@@ -12,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function getNext() {
     const p = new URLSearchParams(location.search);
     const next = p.get("next");
-    // Sécurise: doit être un chemin absolu de ton site
     return next && next.startsWith("/") ? decodeURIComponent(next) : "/frontend/materiel.html";
   }
 
@@ -24,12 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = String(fd.get("email") || "").trim().toLowerCase();
     const password = String(fd.get("password") || "");
     const displayName = String(fd.get("displayName") || "").trim();
+    const level = String(fd.get("level") || "debutant").toLowerCase();
 
     try {
       const res = await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, displayName }),
+        body: JSON.stringify({ email, password, displayName, level }),
       });
 
       const json = await res.json().catch(() => ({}));
@@ -50,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      //  Unifier avec login.js : { token, user } dans localStorage.auth
       if (!json?.token || !json?.user?._id) {
         err.textContent = "Réponse d'inscription invalide (token ou user manquant).";
         err.style.display = "";
@@ -58,8 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       localStorage.setItem("auth", JSON.stringify({ token: json.token, user: json.user }));
-
-      //  Redirige vers la page d'origine (ou vers le matériel par défaut)
       location.replace(getNext());
     } catch (e2) {
       console.error(e2);

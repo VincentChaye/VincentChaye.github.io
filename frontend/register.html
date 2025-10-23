@@ -1,12 +1,14 @@
 <!-- register.html -->
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Créer un compte — ZoneDeGrimpe</title>
   <link rel="stylesheet" href="./style/style.css" />
 </head>
+
 <body class="theme theme page-auth">
   <header class="app-header">
     <a class="brand" href="./">
@@ -17,6 +19,7 @@
 
   <section class="card">
     <h2>Créer un compte</h2>
+    <!-- register.html (section formulaire) -->
     <form id="regForm" class="form">
       <label>Nom affiché
         <input type="text" name="displayName" placeholder="Votre nom" />
@@ -27,12 +30,21 @@
       <label>Mot de passe
         <input type="password" name="password" required minlength="6" />
       </label>
+      <label>Niveau
+        <select name="level" id="levelSelect">
+          <option value="debutant">Débutant</option>
+          <option value="intermediaire">Intermédiaire</option>
+          <option value="avance">Avancé</option>
+        </select>
+      </label>
       <button class="btn" type="submit">Créer le compte</button>
     </form>
+
     <p class="mt-12">Déjà inscrit ? <a href="./login.html">Se connecter</a></p>
     <p id="regErr" class="error" style="display:none"></p>
   </section>
 
   <script type="module" src="./js/register.js"></script>
 </body>
+
 </html>

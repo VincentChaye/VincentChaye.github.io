@@ -7,9 +7,11 @@
   <title>ZoneDeGrimpe — Paramètres</title>
   <link rel="icon" href="./assets/ZoneDeGrimpeIcon.png" />
   <link rel="stylesheet" href="./style/style.css" />
+  <!-- CSS spécifique et sûr pour Paramètres -->
+  <link rel="stylesheet" href="./style/parametres.css" />
 </head>
 
-<body class="theme theme page-auth">
+<body class="theme">
   <header class="app-header">
     <a class="brand" href="./">
       <img src="./assets/ZoneDeGrimpeIcon.png" alt="ZoneDeGrimpe" class="brand__icon" />
@@ -21,65 +23,78 @@
     <nav id="nav" class="nav">
       <a href="./index.html">Accueil</a>
       <a href="./materiel.html">Matériel</a>
-      <a href="./map.html">Carte</a>
-      <a class="active" href="./parametres.html">Paramètres</a>
-      <button id="themeToggle" class="btn btn--ghost" type="button">Thème</button>
+      <a class="is-active" href="./parametres.html">Paramètres</a>
     </nav>
   </header>
 
+  <main class="container settings" id="settingsRoot" hidden>
+    <!-- Section 1 : Informations personnelles -->
+    <details class="card" open>
+      <summary class="card__title">Informations personnelles</summary>
+      <div class="card__content">
+        <div class="field">
+          <div class="field__label">Nom de compte</div>
+          <div class="field__value" id="displayName">—</div>
+        </div>
 
-  <!-- Vue NON connecté -->
-  <section id="authGate" class="card" style="display:none">
-    <h2>Paramètres</h2>
-    <p>Vous devez être connecté pour accéder à vos paramètres.</p>
-    <div class="row gap-12">
-      <a class="btn" href="./login.html">Se connecter</a>
-      <a class="btn btn--ghost" href="./register.html">Créer un compte</a>
-    </div>
-  </section>
+        <div class="field">
+          <div class="field__label">Email</div>
+          <div class="field__value" id="email">—</div>
+        </div>
 
-  <!-- Vue connecté -->
-  <section id="accountView" class="card" style="display:none">
-    <h2>Mon compte</h2>
-    <div class="grid">
-      <div><strong>Nom :</strong> <span id="vDisplayName">—</span></div>
-      <div><strong>Email :</strong> <span id="vEmail">—</span></div>
-      <div><strong>Téléphone :</strong> <span id="vPhone">—</span></div>
-      <div><strong>Statut :</strong> <span id="vStatus">—</span></div>
-      <div><strong>Vérifié :</strong> <span id="vVerified">—</span></div>
-      <div><strong>Rôles :</strong> <span id="vRoles">—</span></div>
-    </div>
+        <div class="field">
+          <div class="field__label">Téléphone</div>
+          <div class="field__value">
+            <span id="phone">—</span>
+            <button class="icon-btn" id="editPhoneBtn" title="Modifier le téléphone"
+              aria-label="Modifier le téléphone">✏️</button>
+          </div>
+        </div>
 
-    <div class="row gap-12 mt-16">
-      <button id="btnLogout" class="btn btn--danger">Se déconnecter</button>
-    </div>
-    <form id="profileForm" class="form mt-16" style="max-width:520px">
-      <h3>Modifier mon profil</h3>
+        <div class="field">
+          <div class="field__label">Rôle</div>
+          <div class="field__value" id="role">—</div>
+        </div>
 
-      <label>Nom affiché
-        <input type="text" id="fDisplayName" name="displayName" required />
-      </label>
+      
+        <div class="field">
+          <div class="field__label">Niveau</div>
+          <div class="field__value">
+            <span id="level">—</span>
+            <button class="icon-btn" id="editLevelBtn" title="Modifier le niveau"
+              aria-label="Modifier le niveau">✏️</button>
+          </div>
+        </div>
+     
 
-      <label>Avatar URL (optionnel)
-        <input type="url" id="fAvatarUrl" name="avatarUrl" placeholder="https://..." />
-      </label>
 
-      <label>Téléphone (optionnel)
-        <input type="tel" id="fPhone" name="phone" placeholder="+33 6 12 34 56 78" />
-      </label>
-
-      <div class="row items-center gap-12 mt-8">
-        <img id="avatarPreview" alt="Aperçu avatar"
-          style="width:56px;height:56px;border-radius:50%;object-fit:cover;display:none" />
-        <span id="saveMsg" class="muted" style="display:none">Sauvegardé </span>
+        <div class="field field--avatar">
+          <div class="field__label">Avatar</div>
+          <div class="field__value">
+            <img id="avatarImg" class="avatar" alt="Avatar utilisateur" src="" />
+            <button class="icon-btn" id="editAvatarBtn" title="Modifier l’avatar"
+              aria-label="Modifier l’avatar">✏️</button>
+          </div>
+        </div>
       </div>
+    </details>
 
-      <div class="row gap-12 mt-12">
-        <button class="btn" type="submit">Enregistrer</button>
+    <!-- Section 2 : Compte -->
+    <details class="card">
+      <summary class="card__title">Compte</summary>
+      <div class="card__content">
+        <div class="actions">
+          <button class="btn outline" id="logoutBtn">Déconnexion</button>
+          <button class="btn danger" id="deleteBtn">Supprimer le compte</button>
+        </div>
+        <p class="hint">La suppression est définitive. Une confirmation est requise.</p>
       </div>
-    </form>
+    </details>
+  </main>
 
-  </section>
+  <footer class="app-footer">
+    <span>&copy; <span id="year"></span> ZoneDeGrimpe</span>
+  </footer>
 
   <script type="module" src="./js/parametres.js"></script>
 </body>

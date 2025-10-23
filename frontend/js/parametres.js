@@ -1,198 +1,193 @@
+// frontend/js/parametres.js
 import { initCommonUI } from "./ui.js";
+import { API_BASE_URL, API_PATH_PREFIX } from "./config.js";
+
 initCommonUI();
 
-/* ====== Sélecteurs ====== */
-const authGate = document.getElementById("authGate");
-const accountView = document.getElementById("accountView");
-
-const vDisplayName = document.getElementById("vDisplayName");
-const vEmail = document.getElementById("vEmail");
-const vPhone = document.getElementById("vPhone");
-const vStatus = document.getElementById("vStatus");
-const vVerified = document.getElementById("vVerified");
-const vRoles = document.getElementById("vRoles");
-
-const btnLogout = document.getElementById("btnLogout");
-const form = document.getElementById("profileForm");
-const fDisplayName = document.getElementById("fDisplayName");
-const fAvatarUrl = document.getElementById("fAvatarUrl");
-const fPhone = document.getElementById("fPhone");
-const avatarPreview = document.getElementById("avatarPreview");
-const saveMsg = document.getElementById("saveMsg");
-
-/* ====== Config API ====== */
-const API_BASE = "http://localhost:3000/api";
-
-/* ====== Storage unifié ====== */
-const AUTH_KEY = "auth";
-
+/* ---------- Session (localStorage.auth) ---------- */
 function getAuth() {
-  try { return JSON.parse(localStorage.getItem(AUTH_KEY)); } catch { return null; }
+  try { return JSON.parse(localStorage.getItem("auth") || "null"); } catch { return null; }
 }
-function setAuth(a) {
-  localStorage.setItem(AUTH_KEY, JSON.stringify(a));
+function setAuth(val) {
+  try { if (!val) localStorage.removeItem("auth"); else localStorage.setItem("auth", JSON.stringify(val)); } catch {}
 }
-function clearAuth() {
-  localStorage.removeItem(AUTH_KEY);
+function getToken() { return getAuth()?.token || ""; }
+function apiUrl(path, params) {
+  const url = new URL(`${API_PATH_PREFIX}${path}`, API_BASE_URL);
+  if (params) for (const [k,v] of Object.entries(params)) {
+    if (v !== undefined && v !== null) url.searchParams.set(k, String(v));
+  }
+  return url.toString();
 }
-
-/* ====== UI state ====== */
-function show(el) { el && (el.style.display = ""); }
-function hide(el) { el && (el.style.display = "none"); }
-
-/* Remplit la vue avec un user (objet issu du backend) */
-function fillUser(u) {
-  vDisplayName.textContent = u.displayName || "—";
-  vEmail.textContent = u.email || "—";
-  vPhone.textContent = u.phone || "—";
-  vStatus.textContent = u.status || "—";
-  vVerified.textContent = u.emailVerified ? "Oui" : "Non";
-  vRoles.textContent = Array.isArray(u.roles) ? u.roles.join(", ") : (u.roles || "—");
-
-  fDisplayName.value = u.displayName || "";
-  fAvatarUrl.value = u.avatarUrl || "";
-  fPhone.value = u.phone || "";
-
-  if (u.avatarUrl) {
-    avatarPreview.src = u.avatarUrl;
-    avatarPreview.style.display = "inline-block";
-  } else {
-    avatarPreview.removeAttribute("src");
-    avatarPreview.style.display = "none";
+async function handleHttp(res) {
+  if (!res.ok) {
+    let msg = res.statusText;
+    try { const j = await res.json(); msg = j?.error || j?.message || msg; } catch {}
+    throw new Error(msg || `HTTP ${res.status}`);
   }
 }
 
-/* ====== Appel backend protégé ====== */
-async function fetchMe() {
-  const auth = getAuth();
-  if (!auth?.token) return null;
+/* ---------- Niveau: labels ---------- */
+const LEVEL_LABELS = {
+  debutant: "Débutant",
+  intermediaire: "Intermédiaire",
+  avance: "Avancé",
+};
+function levelToLabel(v) { return LEVEL_LABELS[String(v || "").toLowerCase()] || "—"; }
 
-  const res = await fetch(`${API_BASE}/users/me`, {
-    headers: { Authorization: `Bearer ${auth.token}` }
-  });
+/* ---------- DOM ---------- */
+const root = document.getElementById("settingsRoot");
+const el = {
+  displayName: document.getElementById("displayName"),
+  email: document.getElementById("email"),
+  phone: document.getElementById("phone"),
+  role: document.getElementById("role"),
+  level: document.getElementById("level"),
+  avatarImg: document.getElementById("avatarImg"),
+  editPhoneBtn: document.getElementById("editPhoneBtn"),
+  editAvatarBtn: document.getElementById("editAvatarBtn"),
+  editLevelBtn: document.getElementById("editLevelBtn"),
+  logoutBtn: document.getElementById("logoutBtn"),
+  deleteBtn: document.getElementById("deleteBtn"),
+};
 
-  if (res.status === 401) return null;
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+main().catch(err => {
+  console.error(err);
+  alert("Impossible de charger vos paramètres. Veuillez vous reconnecter.");
+  location.href = "./login.html?next=" + encodeURIComponent(location.pathname);
+});
 
-  const json = await res.json();
-  return json?.user || null;
-}
-
-async function patchMe(payload) {
-  const auth = getAuth();
-  if (!auth?.token) throw new Error("no_token");
-
-  const res = await fetch(`${API_BASE}/users/me`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${auth.token}`
-    },
-    body: JSON.stringify(payload)
-  });
-
-  if (res.status === 401) return null;
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-  const json = await res.json();
-  return json?.user || null;
-}
-
-/* ====== Flux principal ====== */
-async function boot() {
-  const auth = getAuth();
-
-  // Pas d’auth → gate
-  if (!auth?.token) {
-    show(authGate);
-    hide(accountView);
+async function main() {
+  const token = getToken();
+  if (!token) {
+    location.href = "./login.html?next=" + encodeURIComponent(location.pathname);
     return;
   }
 
-  try {
-    const user = await fetchMe();
-    if (!user) {
-      // Token invalide/expiré → on reset l’auth et on montre le gate
-      clearAuth();
-      show(authGate);
-      hide(accountView);
-      return;
-    }
+  const me = await fetchMe();
+  fill(me);
+  root.hidden = false;
 
-    // Maj storage: on garde token, on remplace user par la version fraiche du backend
-    setAuth({ token: auth.token, user });
+  el.editPhoneBtn.addEventListener("click", onEditPhone);
+  el.editAvatarBtn.addEventListener("click", onEditAvatar);
+  el.editLevelBtn.addEventListener("click", onEditLevel);
+  el.logoutBtn.addEventListener("click", onLogout);
+  el.deleteBtn.addEventListener("click", onDeleteAccount);
+}
 
-    hide(authGate);
-    show(accountView);
-    fillUser(user);
+function fill(me) {
+  el.displayName.textContent = me.displayName || "—";
+  el.email.textContent = me.email || "—";
+  el.phone.textContent = me.phone || "—";
+  el.role.textContent = Array.isArray(me.roles) ? me.roles.join(", ") : (me.roles || "—");
+  el.level.textContent = levelToLabel(me.profile?.level);
+  el.avatarImg.src = me.avatarUrl || "./assets/avatar-default.jpg";
 
-  } catch (e) {
-    console.error("Erreur lors du chargement du profil:", e);
-    // Sécurité: on affiche quand même le gate si le backend échoue
-    show(authGate);
-    hide(accountView);
+  const a = getAuth();
+  if (a?.user) {
+    a.user = { ...a.user, ...me };
+    setAuth(a);
   }
 }
 
-/* ====== Events ====== */
-btnLogout?.addEventListener("click", () => {
-  clearAuth();
-  show(authGate);
-  hide(accountView);
-});
-
-form?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const payload = {
-    displayName: fDisplayName.value.trim(),
-    avatarUrl: fAvatarUrl.value.trim() || null,
-    phone: fPhone.value.trim() || null,
-  };
-
-  try {
-    const updatedUser = await patchMe(payload);
-    if (!updatedUser) {
-      // probable 401
-      clearAuth();
-      show(authGate);
-      hide(accountView);
-      return;
-    }
-    const auth = getAuth();
-    setAuth({ token: auth.token, user: updatedUser });
-
-    fillUser(updatedUser);
-    flashSaved();
-  } catch (e2) {
-    console.error("Erreur de sauvegarde profil:", e2);
-    flashSaved("Erreur de sauvegarde");
-  }
-});
-
-/* Prévisualisation avatar en live */
-let avatarDebounce;
-fAvatarUrl?.addEventListener("input", () => {
-  clearTimeout(avatarDebounce);
-  avatarDebounce = setTimeout(() => {
-    const url = fAvatarUrl.value.trim();
-    if (url) {
-      avatarPreview.src = url;
-      avatarPreview.style.display = "inline-block";
-    } else {
-      avatarPreview.removeAttribute("src");
-      avatarPreview.style.display = "none";
-    }
-  }, 200);
-});
-
-/* ====== UX ====== */
-function flashSaved(msg = "Sauvegardé ✓") {
-  if (!saveMsg) return;
-  saveMsg.style.display = "inline";
-  saveMsg.textContent = msg;
-  setTimeout(() => { saveMsg.style.display = "none"; }, 1500);
+async function fetchMe() {
+  const headers = { "Authorization": `Bearer ${getToken()}` };
+  const r = await fetch(apiUrl("/users/me"), { headers, cache: "no-store", mode: "cors" });
+  await handleHttp(r);
+  return r.json(); // <-- attend un user direct (back ajusté)
 }
 
-/* ====== Start ====== */
-boot();
+/* ---------- Actions ---------- */
+async function onEditPhone() {
+  const current = el.phone.textContent.trim();
+  const value = prompt("Nouveau numéro de téléphone :", current === "—" ? "" : current);
+  if (value == null) return;
+
+  const r = await fetch(apiUrl("/users/me"), {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${getToken()}`
+    },
+    body: JSON.stringify({ phone: value.trim() || null }),
+  });
+  await handleHttp(r);
+  fill(await r.json());
+}
+
+async function onEditAvatar() {
+  const current = el.avatarImg.src;
+  const value = prompt("URL de l’avatar (image publique) :", current || "");
+  if (value == null) return;
+
+  const r = await fetch(apiUrl("/users/me"), {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${getToken()}`
+    },
+    body: JSON.stringify({ avatarUrl: value.trim() || null }),
+  });
+  await handleHttp(r);
+  fill(await r.json());
+}
+
+async function onEditLevel() {
+  const choices = ["debutant", "intermediaire", "avance"];
+  const current = (getAuth()?.user?.profile?.level) || "debutant";
+  const msg =
+    "Choisis un niveau:\n" +
+    "- debutant\n" +
+    "- intermediaire\n" +
+    "- avance\n\n" +
+    `Niveau actuel: ${current}`;
+  const value = prompt(msg, current);
+  if (value == null) return;
+
+  const lvl = String(value).toLowerCase().trim();
+  if (!choices.includes(lvl)) {
+    alert("Niveau invalide. Valeurs autorisées: debutant, intermediaire, avance");
+    return;
+  }
+
+  const r = await fetch(apiUrl("/users/me"), {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${getToken()}`
+    },
+    body: JSON.stringify({ level: lvl }),
+  });
+  await handleHttp(r);
+  fill(await r.json());
+}
+
+async function onLogout() {
+  try {
+    await fetch(apiUrl("/auth/logout"), { method: "POST", headers: { "Authorization": `Bearer ${getToken()}` } });
+  } catch {}
+  setAuth(null);
+  location.href = "./login.html";
+}
+
+async function onDeleteAccount() {
+  const ok = confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est définitive.");
+  if (!ok) return;
+
+  const uid = getAuth()?.user?._id;
+  if (!uid) {
+    alert("Session invalide.");
+    return;
+  }
+
+  const r = await fetch(apiUrl(`/users/${uid}`), {
+    method: "DELETE",
+    headers: { "Authorization": `Bearer ${getToken()}` }
+  });
+  await handleHttp(r);
+
+  setAuth(null);
+  alert("Votre compte a été supprimé.");
+  location.href = "./register.html";
+}
+
