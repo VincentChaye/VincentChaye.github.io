@@ -422,6 +422,83 @@ p, input, select, textarea, .card p, label, .footer { font-family: var(--font-bo
   text-align: center;
 }
 
+/* --- Styles pour le formulaire d'édition --- */
+.spot-edit-form{
+  padding: 1rem;
+}
+
+.spot-edit-form .form-group{
+  margin-bottom: 1rem;
+}
+
+.spot-edit-form label{
+  display: block;
+  margin-bottom: .5rem;
+  font-weight: 600;
+  color: var(--text);
+  font-size: .9rem;
+}
+
+.spot-edit-form input[type="text"],
+.spot-edit-form select{
+  width: 100%;
+  padding: .75rem;
+  border: 1px solid #d0dae4;
+  border-radius: .5rem;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color .2s ease;
+}
+
+.spot-edit-form input[type="text"]:focus,
+.spot-edit-form select:focus{
+  outline: none;
+  border-color: var(--c1);
+  box-shadow: 0 0 0 3px rgba(6, 102, 140, 0.1);
+}
+
+.spot-edit-form input[type="text"]::placeholder{
+  color: #999;
+  font-style: italic;
+}
+
+/* --- Styles pour les détails complets --- */
+.spot-details{
+  padding: 1rem;
+}
+
+.spot-info-list{
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  margin: 1rem 0;
+}
+
+.spot-info-list .spot-info-item{
+  padding: .75rem;
+  background: var(--c3);
+  border-radius: .5rem;
+  border-left: 3px solid var(--c1);
+}
+
+.spot-info-list .spot-info-item strong{
+  color: var(--c1);
+  margin-right: .5rem;
+}
+
+/* --- Style pour le bouton primaire --- */
+.btn--primary{
+  background: var(--c4);
+  color: var(--text-invert);
+  font-weight: 600;
+}
+
+.btn--primary:hover{
+  background: #5a7e2c;
+}
+
 /* --- Backdrop + blocage du scroll quand la fiche est ouverte --- */
 body.sheet-open { overflow: hidden; }
 body.sheet-open::after{

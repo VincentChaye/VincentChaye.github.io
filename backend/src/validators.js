@@ -58,3 +58,15 @@ export const nearQuerySchema = z.object({
 export const idParamSchema = z.object({
   id: z.string().regex(/^[a-f\d]{24}$/i, "invalid_object_id"),
 });
+
+/** Schema pour la mise à jour partielle d'un spot (PATCH) */
+export const updateSpotSchema = z.object({
+  name: z.string().min(1).max(120).optional(),
+  soustype: z.string().max(50).optional(),
+  niveau_min: z.string().max(10).optional(),
+  niveau_max: z.string().max(10).optional(),
+  orientation: z.string().max(10).optional(),
+}).refine(
+  (data) => Object.keys(data).length > 0,
+  { message: "Au moins un champ doit être fourni pour la mise à jour" }
+);
