@@ -70,6 +70,17 @@ export function materielSpecsRouter(db) {
     }
   });
 
+  // --- Récupérer toutes les catégories distinctes ---
+  r.get("/categories", async (req, res) => {
+    try {
+      const categories = await specs.distinct("category");
+      res.json({ categories: categories.sort() });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: "server_error" });
+    }
+  });
+
   // --- Lister les matériels ---
   r.get("/", async (req, res) => {
     try {
