@@ -48,49 +48,9 @@ async function fetchJSON(url, opts = {}) {
 
 // === Configuration du matériel ===
 const MATERIAL_CONFIG = {
-  // Catégories avec leurs intervalles d'inspection par défaut (en mois)
-  categories: {
-    "Corde": {
-      inspectionInterval: 6,
-      maxUsage: 500,
-      description: "Corde dynamique d'escalade"
-    },
-    "Dégaines": {
-      inspectionInterval: 12,
-      maxUsage: 1000,
-      description: "Dégaines sport ou trad"
-    },
-    "Casque": {
-      inspectionInterval: 12,
-      maxUsage: null,
-      description: "Casque d'escalade"
-    },
-    "Baudrier": {
-      inspectionInterval: 12,
-      maxUsage: null,
-      description: "Baudrier d'escalade"
-    },
-    "Chaussons": {
-      inspectionInterval: 6,
-      maxUsage: null,
-      description: "Chaussons d'escalade"
-    },
-    "Mousquetons": {
-      inspectionInterval: 12,
-      maxUsage: 2000,
-      description: "Mousquetons à vis ou droits"
-    },
-    "Longe": {
-      inspectionInterval: 6,
-      maxUsage: 200,
-      description: "Longe de via ferrata ou d'assurage"
-    },
-    "Autre": {
-      inspectionInterval: 6,
-      maxUsage: null,
-      description: "Autre équipement"
-    }
-  },
+  // Catégories chargées dynamiquement depuis l'API
+  categories: {},
+  availableCategories: [], // Liste simple des noms de catégories
 
   // États possibles
   states: {
@@ -101,6 +61,42 @@ const MATERIAL_CONFIG = {
     "retired": "Retiré du service"
   }
 };
+
+// Fonction pour récupérer les spécifications des catégories depuis l'API
+async function loadCategoriesFromAPI() {
+  try {
+    const response = await fetchJSON(ENDPOINT.SPECS);
+    const specs = response.items || [];
+    
+    // Construire l'objet categories avec les defaults depuis Materiel_Specs
+    specs.forEach(spec => {
+      const category = spec.category;
+      const defaults = spec.lifecycleDefaults || {};
+      
+      MATERIAL_CONFIG.categories[category] = {
+        inspectionInterval: defaults.maxMonthsBetweenInspections || 12,
+        maxUsage: defaults.maxOutings || null,
+        description: defaults.notes || `Équipement de type ${category}`
+      };
+    });
+    
+    // Créer la liste simple des catégories triée
+    MATERIAL_CONFIG.availableCategories = Object.keys(MATERIAL_CONFIG.categories).sort();
+    
+    console.log("Catégories chargées:", MATERIAL_CONFIG.availableCategories);
+  } catch (err) {
+    console.error("Erreur lors du chargement des catégories:", err);
+    // Valeurs par défaut en cas d'erreur
+    MATERIAL_CONFIG.categories = {
+      "Autre": {
+        inspectionInterval: 6,
+        maxUsage: null,
+        description: "Autre équipement"
+      }
+    };
+    MATERIAL_CONFIG.availableCategories = ["Autre"];
+  }
+}
 
 // === UI refs ===
 let listEl, addBtn, modal, form, title, search, tagFilter;
@@ -117,6 +113,29 @@ function initializeUIElements() {
   title = document.getElementById("gearFormTitle");
   search = document.getElementById("gearSearch");
   tagFilter = document.getElementById("gearTagFilter");
+}
+
+// Fonction pour remplir le filtre de catégories
+function populateCategoryFilter() {
+  if (!tagFilter) return;
+  
+  // Sauvegarder la valeur actuelle
+  const currentValue = tagFilter.value;
+  
+  // Vider et remplir avec les nouvelles catégories
+  tagFilter.innerHTML = '<option value="">Toutes catégories</option>';
+  
+  MATERIAL_CONFIG.availableCategories.forEach(category => {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category;
+    tagFilter.appendChild(option);
+  });
+  
+  // Restaurer la valeur si elle existe toujours
+  if (currentValue && MATERIAL_CONFIG.availableCategories.includes(currentValue)) {
+    tagFilter.value = currentValue;
+  }
 }
 
 let rows = [];
@@ -139,6 +158,12 @@ function formatDate(date) {
 
 // === Formulaire intelligent ===
 function createSmartForm() {
+  // Générer les options de catégories dynamiquement
+  const categoryOptions = MATERIAL_CONFIG.availableCategories.map(category => {
+    const config = MATERIAL_CONFIG.categories[category];
+    return `<option value="${category}" title="${config.description}">${category}</option>`;
+  }).join('');
+  
   const formHTML = `
     <button type="button" class="modal__close" id="modalCloseBtn" aria-label="Fermer">×</button>
     <h2 id="gearFormTitle">Équipement</h2>
@@ -154,9 +179,7 @@ function createSmartForm() {
       <label>Catégorie *
         <select name="category" class="select" required>
           <option value="">Choisir une catégorie...</option>
-          ${Object.entries(MATERIAL_CONFIG.categories).map(([key, config]) =>
-    `<option value="${key}" title="${config.description}">${key}</option>`
-  ).join('')}
+          ${categoryOptions}
         </select>
       </label>
       
@@ -970,8 +993,11 @@ function initStatsTab() {
 }
 
 // === Initialisation ===
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   console.log("Initialisation de la page matériel...");
+
+  // Charger les catégories depuis l'API
+  await loadCategoriesFromAPI();
 
   // Initialiser les éléments UI
   initializeUIElements();
@@ -1009,6 +1035,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   console.log("Tous les éléments UI sont présents");
+
+  // Remplir le filtre de catégories
+  populateCategoryFilter();
+  console.log("Filtre de catégories rempli avec", MATERIAL_CONFIG.availableCategories.length, "catégories");
 
   // Initialiser les onglets
   initTabs();
