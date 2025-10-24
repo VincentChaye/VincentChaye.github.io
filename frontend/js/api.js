@@ -61,9 +61,14 @@ function toSpot(s, i) {
       id: p.id ?? p._id ?? s.id ?? `spot-${i}`,
       name: p.name ?? p.titre ?? "Sans nom",
       type: p.type ?? p.soustype ?? "inconnu",
+      soustype: p.soustype ?? null,
       orientation: p.orientation ?? p?.info_complementaires?.orientation ?? null,
+      niveau_min: p.niveau_min ?? null,
+      niveau_max: p.niveau_max ?? null,
+      id_voix: p.id_voix ?? [],
       url: p.url ?? null,
       description: p.description ?? null,
+      info_complementaires: p.info_complementaires ?? null,
       lat, lng,
       raw: s,
     };
@@ -86,9 +91,14 @@ function toSpot(s, i) {
     id: s.id ?? s._id ?? `spot-${i}`,
     name: s.name ?? s.titre ?? "Sans nom",
     type: s.type ?? s.soustype ?? "inconnu",
+    soustype: s.soustype ?? null,
     orientation: s?.info_complementaires?.orientation ?? s.orientation ?? null,
+    niveau_min: s.niveau_min ?? null,
+    niveau_max: s.niveau_max ?? null,
+    id_voix: Array.isArray(s.id_voix) ? s.id_voix : [],
     url: s.url ?? null,
     description: s.description ?? null,
+    info_complementaires: s.info_complementaires ?? null,
     lat, lng,
     raw: s,
   };
@@ -137,12 +147,16 @@ async function tryFetch(url) {
 
   // Certains proxies renvoient 204/empty → gérons-le proprement
   const txt = await r.text();
-  if (!txt) return null;
+  if (!txt || txt.trim() === '') {
+    console.warn('[api] Empty response from:', url);
+    return null;
+  }
 
   try {
     return JSON.parse(txt);
   } catch (parseErr) {
-    throw new Error(`[json_parse_error] ${String(parseErr)} — preview: ${txt.slice(0, 200)}`);
+    console.error('[api] JSON parse error:', parseErr, 'URL:', url, 'Response preview:', txt.slice(0, 200));
+    throw new Error(`[json_parse_error] Réponse invalide du serveur. Preview: ${txt.slice(0, 100)}`);
   }
 }
 

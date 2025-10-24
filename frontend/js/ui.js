@@ -1,7 +1,7 @@
 /**
  * Gestion du thème clair/foncé + burger + UI commune
  */
-export function initCommonUI() {
+function initCommonUI() {
   const y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
 
@@ -81,4 +81,32 @@ function applyTheme(mode) {
   const isDark = mode === "dark";
   document.body.style.backgroundColor = isDark ? "#101418" : "#EBF2FA";
   document.body.style.color = isDark ? "#E8EEF4" : "#0E1A22";
+}
+
+// Export ES6
+export { initCommonUI, applyTheme };
+
+// Export CommonJS pour compatibilité
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { initCommonUI, applyTheme };
+}
+
+// Expose globally for non-module scripts
+if (typeof window !== 'undefined') {
+  window.initCommonUI = initCommonUI;
+  window.applyTheme = applyTheme;
+}
+
+// Auto-initialize if not in module context
+if (typeof document !== 'undefined' && document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Only auto-init if initCommonUI hasn't been called yet
+    if (!document.body.hasAttribute('data-ui-initialized')) {
+      initCommonUI();
+      document.body.setAttribute('data-ui-initialized', 'true');
+    }
+  });
+} else if (typeof document !== 'undefined' && !document.body.hasAttribute('data-ui-initialized')) {
+  initCommonUI();
+  document.body.setAttribute('data-ui-initialized', 'true');
 }

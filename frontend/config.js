@@ -7,8 +7,10 @@ function isLocalHost(host) {
 
 // Configuration globale pour l'application
 window.APP_CONFIG = {
-  API_URL: (typeof import !== "undefined" && import.meta?.env?.VITE_API_BASE_URL) || 
-           (typeof window !== "undefined" && isLocalHost(window.location.hostname) ? "http://localhost:3000" : PROD_API)
+  API_URL: window && window.location && isLocalHost(window.location.hostname) ? "http://localhost:3000" : PROD_API
 };
 
-export const API_BASE_URL = window.APP_CONFIG.API_URL;
+// Export pour compatibilité avec les modules ES6 si nécessaire
+if (typeof module != 'undefined' && module.exports) {
+  module.exports = { API_BASE_URL: window.APP_CONFIG.API_URL };
+}

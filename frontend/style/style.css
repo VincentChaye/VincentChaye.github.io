@@ -188,12 +188,152 @@ p, input, select, textarea, .card p, label, .footer { font-family: var(--font-bo
 .map-layout{position:relative; height:calc(100dvh - 56px)}
 .map{position:absolute; inset:0}
 
+/* Barre de recherche */
+.search-bar{
+  position:absolute; top:.75rem; left:.75rem; right:.75rem;
+  max-width: 400px;
+  z-index:2001; /* > filter-bar */
+}
+
+.search-bar input{
+  width:100%; padding:.6rem .75rem;
+  border:1px solid #d0dae4; border-radius:.6rem;
+  background:var(--surface); color:var(--text);
+  font-family:var(--font-body);
+  box-shadow:var(--shadow);
+}
+
+.search-bar input:focus{
+  outline:none; border-color:var(--c1);
+  box-shadow: 0 0 0 2px rgba(6,102,140,.2);
+}
+
+.search-results{
+  display:none;
+  position:absolute; top:100%; left:0; right:0;
+  margin-top:.25rem;
+  background:var(--surface); border-radius:.6rem;
+  box-shadow:var(--shadow);
+  max-height:300px; overflow-y:auto;
+}
+
+.search-result{
+  display:flex; align-items:center; gap:.5rem;
+  padding:.6rem .75rem;
+  cursor:pointer;
+  transition: background .15s ease;
+  border-bottom: 1px solid var(--c3);
+}
+
+.search-result:last-child{
+  border-bottom:none;
+}
+
+.search-result:hover{
+  background:var(--c3);
+}
+
+.search-result-icon{
+  font-size:1.2rem;
+  flex-shrink:0;
+}
+
+.search-result-name{
+  flex:1;
+  font-weight:500;
+}
+
+.search-result-type{
+  font-size:.85rem;
+  opacity:.7;
+  text-transform:capitalize;
+}
+
+.search-no-result{
+  padding:.75rem;
+  text-align:center;
+  opacity:.7;
+}
+
 /* Boutons flottants au-dessus de Leaflet (z-index relevé) */
 .filter-bar{
-  position:absolute; top:.75rem; left:50%; transform:translateX(-50%);
+  position:absolute; top:.75rem; right:.75rem;
   background:var(--surface); border-radius:1rem; box-shadow:var(--shadow);
-  padding:.4rem; display:flex; gap:.5rem;
+  padding:.4rem; display:flex; gap:.4rem; flex-wrap:wrap;
   z-index:2000; /* > contrôles Leaflet */
+}
+
+@media(max-width: 767px){
+  .filter-bar{
+    top:auto; bottom:.75rem; right:.75rem; left:auto;
+    flex-direction:column;
+  }
+  .search-bar{
+    left:.75rem; right:.75rem;
+    max-width:none;
+  }
+}
+
+.filter-select{
+  padding:.4rem .6rem;
+  border:1px solid #d0dae4; border-radius:.6rem;
+  background:var(--surface); color:var(--text);
+  font-family:var(--font-body);
+  font-size:.9rem;
+  cursor:pointer;
+}
+
+.btn--compact{
+  padding:.4rem .6rem;
+  font-size:.9rem;
+}
+
+/* Filtres avancés */
+.advanced-filters{
+  position:absolute; top:4.5rem; right:.75rem;
+  background:var(--surface); border-radius:1rem; box-shadow:var(--shadow);
+  padding:.75rem;
+  z-index:2000;
+  width:280px;
+}
+
+@media(max-width: 767px){
+  .advanced-filters{
+    left:.75rem; right:.75rem;
+    width:auto;
+  }
+}
+
+.filter-group{
+  margin-bottom:.5rem;
+}
+
+.filter-group:last-child{
+  margin-bottom:0;
+}
+
+.filter-group label{
+  display:block;
+  font-size:.9rem;
+  margin-bottom:.25rem;
+  font-weight:500;
+}
+
+.filter-group input[type="range"]{
+  width:100%;
+  cursor: pointer;
+  accent-color: var(--c1);
+}
+
+.filter-group label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#distanceValue {
+  font-weight: 700;
+  color: var(--c1);
 }
 
 /* --- Bottom Sheet au-dessus de la carte --- */
@@ -213,6 +353,150 @@ p, input, select, textarea, .card p, label, .footer { font-family: var(--font-bo
 .bottom-sheet__close{
   position:absolute; right:.5rem; top:.5rem;
   background:transparent; border:0; font-size:1.5rem; cursor:pointer; color:var(--text)
+}
+
+/* --- Styles pour la fiche spot enrichie --- */
+.spot-card{
+  font-family: var(--font-body);
+}
+
+.spot-title{
+  margin: 0 0 .75rem 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--c1);
+}
+
+.spot-info-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+  margin-bottom: .75rem;
+  padding: .75rem;
+  background: var(--c3);
+  border-radius: .6rem;
+}
+
+@media(max-width: 480px){
+  .spot-info-grid{
+    grid-template-columns: 1fr;
+  }
+}
+
+.spot-info-item{
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.spot-info-item strong{
+  color: var(--c2);
+  font-weight: 600;
+}
+
+.spot-description{
+  margin: .75rem 0;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.spot-info-extra{
+  margin: .5rem 0;
+  padding: .5rem;
+  background: var(--c3);
+  border-radius: .4rem;
+  font-size: .9rem;
+  font-style: italic;
+  opacity: .9;
+}
+
+.spot-actions{
+  display: flex;
+  gap: .5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.spot-actions .btn{
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* --- Styles pour le formulaire d'édition --- */
+.spot-edit-form{
+  padding: 1rem;
+}
+
+.spot-edit-form .form-group{
+  margin-bottom: 1rem;
+}
+
+.spot-edit-form label{
+  display: block;
+  margin-bottom: .5rem;
+  font-weight: 600;
+  color: var(--text);
+  font-size: .9rem;
+}
+
+.spot-edit-form input[type="text"],
+.spot-edit-form select{
+  width: 100%;
+  padding: .75rem;
+  border: 1px solid #d0dae4;
+  border-radius: .5rem;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color .2s ease;
+}
+
+.spot-edit-form input[type="text"]:focus,
+.spot-edit-form select:focus{
+  outline: none;
+  border-color: var(--c1);
+  box-shadow: 0 0 0 3px rgba(6, 102, 140, 0.1);
+}
+
+.spot-edit-form input[type="text"]::placeholder{
+  color: #999;
+  font-style: italic;
+}
+
+/* --- Styles pour les détails complets --- */
+.spot-details{
+  padding: 1rem;
+}
+
+.spot-info-list{
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  margin: 1rem 0;
+}
+
+.spot-info-list .spot-info-item{
+  padding: .75rem;
+  background: var(--c3);
+  border-radius: .5rem;
+  border-left: 3px solid var(--c1);
+}
+
+.spot-info-list .spot-info-item strong{
+  color: var(--c1);
+  margin-right: .5rem;
+}
+
+/* --- Style pour le bouton primaire --- */
+.btn--primary{
+  background: var(--c4);
+  color: var(--text-invert);
+  font-weight: 600;
+}
+
+.btn--primary:hover{
+  background: #5a7e2c;
 }
 
 /* --- Backdrop + blocage du scroll quand la fiche est ouverte --- */

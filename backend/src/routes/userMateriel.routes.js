@@ -35,7 +35,7 @@ export function userMaterielRouter(db) {
       }
     }
 
-    // lifecycle: normalisation condition + cast dates
+    // lifecycle: normalisation condition + cast dates + usage count
     if (body.lifecycle && typeof body.lifecycle === "object") {
       const allowed = ["new", "good", "worn", "retire-soon", "retired", null];
       const lc = { ...body.lifecycle };
@@ -47,9 +47,16 @@ export function userMaterielRouter(db) {
             : (String(lc.condition).toLowerCase() === "used" ? "worn" : "good");
       }
 
+      // Gestion des dates d'inspection
       if (lc.lastInspectionAt) lc.lastInspectionAt = new Date(lc.lastInspectionAt);
       if (lc.nextInspectionAt) lc.nextInspectionAt = new Date(lc.nextInspectionAt);
       if (lc.retiredAt) lc.retiredAt = new Date(lc.retiredAt);
+
+      // Gestion du compteur d'utilisation
+      if (lc.usageCount !== undefined) {
+        const usage = parseInt(lc.usageCount);
+        lc.usageCount = isNaN(usage) || usage < 0 ? 0 : usage;
+      }
 
       out.lifecycle = lc;
     }
@@ -186,6 +193,108 @@ export function userMaterielRouter(db) {
     const uid = new ObjectId(req.auth.uid);
     const result = await matos.deleteOne({ _id: new ObjectId(id), userId: uid });
     return res.json({ deleted: result.deletedCount === 1 });
+  });
+
+  // --------------------------------------------------------------------
+  // HELPER: Incrémenter/décrémenter le compteur d'utilisation
+  // --------------------------------------------------------------------
+  r.patch("/:id/usage", requireAuth, async (req, res) => {
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: "bad_id" });
+
+    try {
+      const uid = new ObjectId(req.auth.uid);
+      const { action } = req.body; // "increment" ou "decrement"
+      
+      if (!["increment", "decrement"].includes(action)) {
+        return res.status(400).json({ error: "invalid_action", detail: "Use 'increment' or 'decrement'" });
+      }
+
+      const increment = action === "increment" ? 1 : -1;
+      
+      const result = await matos.updateOne(
+        { _id: new ObjectId(id), userId: uid },
+        { 
+          $inc: { "lifecycle.usageCount": increment },
+          $set: { "meta.updatedAt": new Date() }
+        }
+      );
+
+      if (result.matchedCount === 0) return res.status(404).json({ error: "not_found" });
+      
+      // Récupérer la nouvelle valeur
+      const updated = await matos.findOne(
+        { _id: new ObjectId(id), userId: uid },
+        { projection: { "lifecycle.usageCount": 1 } }
+      );
+      
+      return res.json({ 
+        ok: true, 
+        usageCount: updated?.lifecycle?.usageCount || 0 
+      });
+    } catch (e) {
+      return res.status(400).json({ error: "invalid_request", detail: String(e?.message ?? e) });
+    }
+  });
+
+  // --------------------------------------------------------------------
+  // HELPER: Calculer la prochaine inspection selon la catégorie
+  // --------------------------------------------------------------------
+  r.post("/:id/inspection", requireAuth, async (req, res) => {
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: "bad_id" });
+
+    try {
+      const uid = new ObjectId(req.auth.uid);
+      
+      // Récupérer l'équipement
+      const item = await matos.findOne(
+        { _id: new ObjectId(id), userId: uid },
+        { projection: SAFE_PROJECTION }
+      );
+      
+      if (!item) return res.status(404).json({ error: "not_found" });
+
+      // Configuration des intervalles d'inspection par catégorie (en mois)
+      const inspectionIntervals = {
+        "Corde": 6,
+        "Dégaines": 12,
+        "Casque": 12,
+        "Baudrier": 12,
+        "Chaussons": 6,
+        "Mousquetons": 12,
+        "Longe": 6,
+        "Autre": 6
+      };
+
+      const interval = inspectionIntervals[item.category] || 6;
+      const now = new Date();
+      const nextInspection = new Date(now);
+      nextInspection.setMonth(nextInspection.getMonth() + interval);
+
+      // Mettre à jour les dates d'inspection
+      const result = await matos.updateOne(
+        { _id: new ObjectId(id), userId: uid },
+        { 
+          $set: { 
+            "lifecycle.lastInspectionAt": now,
+            "lifecycle.nextInspectionAt": nextInspection,
+            "meta.updatedAt": new Date()
+          }
+        }
+      );
+
+      if (result.matchedCount === 0) return res.status(404).json({ error: "not_found" });
+      
+      return res.json({ 
+        ok: true, 
+        lastInspectionAt: now.toISOString(),
+        nextInspectionAt: nextInspection.toISOString(),
+        intervalMonths: interval
+      });
+    } catch (e) {
+      return res.status(400).json({ error: "invalid_request", detail: String(e?.message ?? e) });
+    }
   });
 
   return r;
