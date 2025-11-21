@@ -8,7 +8,7 @@ export function requireAuth(req, res, next) {
 
     const payload = jwt.verify(token, process.env.JWT_SECRET || "dev_secret");
 
-    // IMPORTANT: ton login signe { uid: user._id }, on lit EXACTEMENT 'uid'
+    // IMPORTANT: login signe { uid: user._id }, on lit EXACTEMENT 'uid'
     const uid = payload?.uid;
     if (!uid) return res.status(401).json({ error: "unauthorized" });
 
