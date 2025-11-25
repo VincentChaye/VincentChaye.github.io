@@ -7,7 +7,6 @@
   <title>ZoneDeGrimpe — Paramètres</title>
   <link rel="icon" href="./assets/ZoneDeGrimpeIcon.png" />
   <link rel="stylesheet" href="./style/style.css" />
-  <!-- CSS spécifique et sûr pour Paramètres -->
   <link rel="stylesheet" href="./style/parametres.css" />
 </head>
 
@@ -23,12 +22,12 @@
     <nav id="nav" class="nav">
       <a href="./index.html">Accueil</a>
       <a href="./materiel.html">Matériel</a>
-      <a class="is-active" href="./parametres.html">Paramètres</a>
+      <a class="active" href="./parametres.html">Paramètres</a>
+      <button id="themeToggle" class="btn btn--ghost" type="button">Thème</button>
     </nav>
   </header>
 
   <main class="container settings" id="settingsRoot" hidden>
-    <!-- Section 1 : Informations personnelles -->
     <details class="card" open>
       <summary class="card__title">Informations personnelles</summary>
       <div class="card__content">
@@ -55,7 +54,6 @@
           <div class="field__label">Rôle</div>
           <div class="field__value" id="role">—</div>
         </div>
-
       
         <div class="field">
           <div class="field__label">Niveau</div>
@@ -66,8 +64,6 @@
           </div>
         </div>
      
-
-
         <div class="field field--avatar">
           <div class="field__label">Avatar</div>
           <div class="field__value">
@@ -79,7 +75,6 @@
       </div>
     </details>
 
-    <!-- Section 2 : Compte -->
     <details class="card">
       <summary class="card__title">Compte</summary>
       <div class="card__content">
@@ -97,8 +92,8 @@
   </footer>
 
   <script src="./config.js"></script>
-  <script src="./js/ui.js"></script>
-  <script src="./js/parametres.js"></script>
+  <script type="module" src="./js/ui.js"></script>
+  <script type="module" src="./js/parametres.js"></script>
 </body>
 
 </html>

@@ -2,6 +2,10 @@
  * Gestion du thème clair/foncé + burger + UI commune
  */
 function initCommonUI() {
+  // Sécurité : Empêcher l'initialisation multiple
+  if (document.body.hasAttribute("data-ui-initialized")) return;
+  document.body.setAttribute("data-ui-initialized", "true");
+
   const y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
 
@@ -14,7 +18,7 @@ function initCommonUI() {
 
     const openNav = () => {
       nav.classList.add("nav--open");
-      hamburger.classList.add("is-open");              // visuel croix (×)
+      hamburger.classList.add("is-open");
       hamburger.setAttribute("aria-expanded", "true");
       document.body.setAttribute("data-nav-open", "true");
       (links[0] || nav).focus?.();
@@ -32,13 +36,11 @@ function initCommonUI() {
       nav.classList.contains("nav--open") ? closeNav() : openNav();
     };
 
-    // Ouvrir/fermer via le bouton
     hamburger.addEventListener("click", (e) => {
-      e.stopPropagation(); // évite de compter comme "clic hors menu"
+      e.stopPropagation();
       toggle();
     });
 
-    // Fermer en cliquant *hors* du nav
     document.addEventListener("click", (e) => {
       if (
         nav.classList.contains("nav--open") &&
@@ -49,26 +51,33 @@ function initCommonUI() {
       }
     });
 
-    // Fermer avec Échap
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && nav.classList.contains("nav--open")) {
         closeNav();
       }
     });
 
-    // Fermer en cliquant un lien du menu
     links.forEach((a) => a.addEventListener("click", () => closeNav()));
   }
 
   // --- Thème clair / foncé ---
   const themeToggle = document.getElementById("themeToggle");
+  // Récupérer la préférence ou utiliser 'light' par défaut
   const saved = localStorage.getItem("zdg_theme_pref") || "light";
+  
+  // Appliquer le thème immédiatement
   applyTheme(saved);
 
+  // Attacher l'événement au bouton SI il existe
   if (themeToggle) {
+    // Mettre à jour le texte du bouton
     themeToggle.textContent = saved === "dark" ? "Clair ☀️" : "Foncé 🌙";
-    themeToggle.addEventListener("click", () => {
-      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    
+    themeToggle.addEventListener("click", (e) => {
+      e.preventDefault(); // Empêche le comportement par défaut si c'est dans un form ou un lien
+      const current = document.documentElement.dataset.theme;
+      const next = current === "dark" ? "light" : "dark";
+      
       localStorage.setItem("zdg_theme_pref", next);
       applyTheme(next);
       themeToggle.textContent = next === "dark" ? "Clair ☀️" : "Foncé 🌙";
@@ -78,9 +87,8 @@ function initCommonUI() {
 
 function applyTheme(mode) {
   document.documentElement.dataset.theme = mode;
-  const isDark = mode === "dark";
-  document.body.style.backgroundColor = isDark ? "#101418" : "#EBF2FA";
-  document.body.style.color = isDark ? "#E8EEF4" : "#0E1A22";
+  // Note: Les couleurs de fond/texte sont maintenant gérées par le CSS (variables)
+  // On laisse le CSS faire le travail basé sur l'attribut data-theme
 }
 
 // Export ES6
@@ -99,14 +107,7 @@ if (typeof window !== 'undefined') {
 
 // Auto-initialize if not in module context
 if (typeof document !== 'undefined' && document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    // Only auto-init if initCommonUI hasn't been called yet
-    if (!document.body.hasAttribute('data-ui-initialized')) {
-      initCommonUI();
-      document.body.setAttribute('data-ui-initialized', 'true');
-    }
-  });
-} else if (typeof document !== 'undefined' && !document.body.hasAttribute('data-ui-initialized')) {
+  document.addEventListener('DOMContentLoaded', () => initCommonUI());
+} else if (typeof document !== 'undefined') {
   initCommonUI();
-  document.body.setAttribute('data-ui-initialized', 'true');
 }
