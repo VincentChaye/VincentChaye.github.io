@@ -1,0 +1,234 @@
+/*
+ * ZoneDeGrimpe — Liquid Glass v2 — design system du prototype.
+ * Source : bloc <style> de ZoneDeGrimpe-LiquidGlass-v2.html, copié VERBATIM puis scopé sous
+ * .lg-root (cf. src/redesign/README.md) pour ne pas repeindre l'app existante.
+ * Fichier GÉNÉRÉ — ne pas éditer à la main. Migration vers tokens Tailwind = étape ultérieure.
+ * OPTIM : la photo de fond (`.bgg`, l.45) était un base64 inline de ~2,5 Mo dans ce CSS ;
+ * externalisée en `assets/rock-bg.jpg` (asset Vite hashé + cacheable). Les animations
+ * « style Apple » (tap/scroll/transitions) vivent dans `interactions.css`.
+ */
+.lg-root *,
+.lg-root *::before,
+.lg-root *::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+ --a3:#F5CC6E;--a4:#E8B84B;--a5:#D4A030;--a6:#B8861E;
+ --ut:rgba(18,12,6,.20);--th:rgba(18,12,6,.38);--rg:rgba(18,12,6,.52);--tk:rgba(18,12,6,.68);
+ --bs:rgba(255,255,255,.14);--ba:rgba(212,160,48,.20);--bx:rgba(255,255,255,.06);
+ --bmd:blur(24px) saturate(1.6);--blg:blur(36px) saturate(1.8);--bsm:blur(16px);
+ --rp:9999px;--rxl:26px;--rlg:20px;--rmd:16px;--rsm:12px;
+ --sc:0 4px 24px rgba(0,0,0,.45),0 1px 4px rgba(0,0,0,.3);
+ --sa:0 0 28px rgba(212,160,48,.18),0 4px 20px rgba(0,0,0,.4);
+ --st:0 8px 40px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.lg-root{font-size:16px;-webkit-font-smoothing:antialiased}
+.lg-root{background:#07050300;color:#f0ece6;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0a0704}
+.lg-root .g{background:var(--rg);backdrop-filter:var(--bmd);-webkit-backdrop-filter:var(--bmd);border:1px solid var(--ba);box-shadow:var(--sc);position:relative;overflow:hidden}
+.lg-root .g::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),rgba(212,160,48,.40),rgba(255,255,255,.22),transparent);z-index:1}
+.lg-root .g::after{content:'';position:absolute;top:0;left:0;right:0;height:45%;background:linear-gradient(180deg,rgba(255,255,255,.04),transparent);pointer-events:none;z-index:1}
+.lg-root .gt{background:var(--th);backdrop-filter:var(--bsm);-webkit-backdrop-filter:var(--bsm);border:1px solid var(--bs)}
+.lg-root .gk{background:var(--tk);backdrop-filter:var(--blg);-webkit-backdrop-filter:var(--blg);border:1px solid var(--ba)}
+
+/* PHONE */
+.lg-root .ph{width:390px;height:844px;position:relative;flex-shrink:0;border-radius:52px;background:#0a0704;box-shadow:0 0 0 2px rgba(255,255,255,.12),0 0 0 4px rgba(0,0,0,.6),0 40px 120px rgba(0,0,0,.9),0 0 60px rgba(212,160,48,.08);overflow:hidden}
+.lg-root .di{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:20px;z-index:1000;display:flex;align-items:center;justify-content:center;gap:8px}
+.lg-root .dic{width:10px;height:10px;border-radius:50%;background:#1a1a1a;border:1px solid #333}
+.lg-root .dis{width:6px;height:6px;border-radius:50%;background:#0a2a1a}
+.lg-root .sb{position:absolute;top:0;left:0;right:0;height:59px;z-index:200;display:flex;align-items:flex-end;padding:0 28px 10px;justify-content:space-between;font-size:14px;font-weight:600;color:rgba(240,236,230,.9);pointer-events:none}
+.lg-root .sbi{display:flex;align-items:center;gap:6px;opacity:.9}
+.lg-root .bat{width:22px;height:11px;border:1.5px solid rgba(240,236,230,.7);border-radius:3px;position:relative}
+.lg-root .bat::after{content:'';position:absolute;right:-5px;top:50%;transform:translateY(-50%);width:3px;height:5px;background:rgba(240,236,230,.7);border-radius:0 2px 2px 0}
+.lg-root .batf{position:absolute;left:2px;top:2px;bottom:2px;width:70%;background:rgba(240,236,230,.8);border-radius:1.5px}
+
+/* BG */
+.lg-root .bgs{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:52px}
+/* ══ PHOTO BACKGROUND — escalade.jpeg ══ */
+/* ══ PHOTO BACKGROUND — nov_2022-273.jpg ══ */
+.lg-root .bgg{
+ position:absolute;top:-8%;left:-8%;right:-8%;bottom:-8%;
+ background:url("../assets/rock-bg.jpg") center/cover no-repeat;
+ animation:rockDrift 26s ease-in-out infinite;
+ will-change:transform;
+}
+@keyframes rockDrift{
+ 0% {transform:translate(0%,0%)   scale(1)}
+ 20% {transform:translate(-2.0%,-1.2%) scale(1.01)}
+ 42% {transform:translate(-1.0%,-2.2%) scale(1.015)}
+ 58% {transform:translate(0.8%,-1.6%) scale(1.01)}
+ 76% {transform:translate(1.6%,-0.4%) scale(1.005)}
+ 90% {transform:translate(0.6%, 0.2%) scale(1.002)}
+ 100%{transform:translate(0%,0%)   scale(1)}
+}
+.lg-root .bgm{
+ position:absolute;inset:0;
+ background:rgba(0,0,0,.48);
+}
+.lg-root .gt1{
+ position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+ width:500px;height:300px;
+ background:radial-gradient(ellipse,rgba(180,100,20,.28),transparent 70%);
+ filter:blur(40px);
+ animation:gp 9s ease-in-out infinite;
+}
+@keyframes gp{0%,100%{opacity:.7}50%{opacity:1}}
+
+/* PAGES */
+.lg-root .pw{position:absolute;inset:0;z-index:10;border-radius:52px;overflow:hidden}
+.lg-root .sc{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:110px;opacity:0;transform:translateX(30px);transition:opacity .3s,transform .3s;pointer-events:none;scrollbar-width:none}
+.lg-root .sc::-webkit-scrollbar{display:none}
+.lg-root .sc.active{opacity:1;transform:none;pointer-events:all}
+
+/* NAVBAR */
+.lg-root .nb{position:sticky;top:0;z-index:100;height:102px;display:flex;align-items:flex-end;padding:0 20px 14px;padding-top:60px}
+.lg-root .nbb{position:absolute;inset:0;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:none}
+.lg-root .nbb::after{display:none}
+.lg-root .nbi{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;width:100%}
+.lg-root .nl{display:flex;align-items:center;gap:9px}
+.lg-root .lb{width:33px;height:33px;border-radius:9px;background:linear-gradient(145deg,#1e4a2a,#2a6e3c);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1)}
+.lg-root .nt{font-size:17px;font-weight:700;letter-spacing:-.4px;color:#f0ece6;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;pointer-events:none}
+.lg-root .na{display:flex;gap:8px}
+.lg-root .ib{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);color:rgba(240,236,230,.75);cursor:pointer;transition:all .2s}
+.lg-root .ib:hover,
+.lg-root .ib:active{background:rgba(212,160,48,.18);border-color:rgba(212,160,48,.35);color:#D4A030}
+.lg-root .back-btn{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:500;color:#D4A030;cursor:pointer}
+
+/* SHARED */
+.lg-root .sh{padding:28px 20px 12px;font-size:20px;font-weight:700;letter-spacing:-.5px;color:#f0ece6}
+.lg-root .sh-sm{padding:20px 20px 10px;font-size:17px;font-weight:700;letter-spacing:-.3px;color:#f0ece6}
+.lg-root .qi{width:42px;height:42px;border-radius:13px;background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.22);display:flex;align-items:center;justify-content:center;color:#D4A030;flex-shrink:0}
+.lg-root .tag{padding:0;font-size:11px;font-weight:500;letter-spacing:.1px}
+.lg-root .tag-a{background:none;border:none;color:rgba(240,236,230,.50)}
+.lg-root .tag-g{background:none;border:none;color:rgba(240,236,230,.50)}
+.lg-root .tag-b{background:none;border:none;color:rgba(240,236,230,.50)}
+.lg-root .tag-r{background:none;border:none;color:rgba(240,236,230,.50)}
+.lg-root svg{display:block}
+
+/* TAB BAR */
+.lg-root .tbw{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:200}
+.lg-root .tb{display:flex;align-items:center;gap:2px;padding:8px 10px;border-radius:var(--rp);background:rgba(10,7,4,.76);backdrop-filter:blur(32px) saturate(2);-webkit-backdrop-filter:blur(32px) saturate(2);border:1px solid rgba(212,160,48,.16);box-shadow:var(--st);position:relative;overflow:hidden}
+.lg-root .tb::before{content:'';position:absolute;top:0;left:18%;right:18%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),rgba(212,160,48,.25),rgba(255,255,255,.18),transparent)}
+.lg-root .ti{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:var(--rp);cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);color:rgba(240,236,230,.40);min-width:52px}
+.lg-root .ti:active{transform:scale(.9)}
+.lg-root .ti.active{color:#1a0f05;background:linear-gradient(145deg,rgba(212,160,48,.92),rgba(232,184,75,.96));box-shadow:0 2px 14px rgba(212,160,48,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+.lg-root .ti:hover:not(.active){color:rgba(240,236,230,.75);background:rgba(255,255,255,.05)}
+.lg-root .tii{font-size:20px;line-height:1}
+.lg-root .til{font-size:9px;font-weight:600;letter-spacing:.2px;line-height:1}
+
+/* DESKTOP */
+.lg-root .dw{display:flex;align-items:flex-start;gap:32px;padding:24px}
+.lg-root .si{width:200px;flex-shrink:0;padding-top:16px}
+.lg-root .sit{font-size:22px;font-weight:800;letter-spacing:-.8px;color:#f0ece6;margin-bottom:4px}
+.lg-root .sis{font-size:12px;color:rgba(240,236,230,.4);line-height:1.5;margin-bottom:20px}
+.lg-root .sibadge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--rp);background:rgba(212,160,48,.10);border:1px solid rgba(212,160,48,.20);font-size:11px;font-weight:600;color:#E8B84B;margin-bottom:12px}
+.lg-root .snav{display:flex;flex-direction:column;gap:4px;margin-bottom:16px}
+.lg-root .snv-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(240,236,230,.30);margin-bottom:6px;margin-top:12px}
+.lg-root .snb{padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;text-align:left;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.05);color:rgba(240,236,230,.58);transition:all .15s;width:100%}
+.lg-root .snb.active{background:rgba(212,160,48,.15)!important;color:#E8B84B!important;border-color:rgba(212,160,48,.25)!important}
+.lg-root .snb:hover:not(.active){background:rgba(255,255,255,.08);color:rgba(240,236,230,.85)}
+
+
+/* tab bar — always visible */
+.lg-root .tbw{transition:none}
+
+/* ── SCROLL EDGE EFFECTS ── */
+/* Bottom edge: content fades before going under tab bar */
+.lg-root .pw::after{
+ content:'';position:absolute;bottom:0;left:0;right:0;height:120px;
+ background:linear-gradient(to top,rgba(8,8,8,.85) 0%,rgba(8,8,8,.4) 40%,transparent 100%);
+ pointer-events:none;z-index:50
+}
+
+
+/* ── HALF-SHEET INSET (spot sheet on carte, modals) ── */
+.lg-root .half-sheet{
+ margin:0 8px 8px;
+ border-radius:28px!important;
+ box-shadow:0 -8px 60px rgba(0,0,0,.65),0 0 0 1px rgba(212,160,48,.14)!important;
+}
+/* Drag indicator pill */
+.lg-root .sheet-handle{
+ width:36px;height:4px;border-radius:9999px;
+ background:rgba(255,255,255,.22);
+ margin:10px auto 0;
+}
+
+/* ── MORPHING BUTTON ANIMATION ── */
+@keyframes morphPop{
+ 0%{transform:scale(.92);opacity:.6}
+ 60%{transform:scale(1.03);opacity:1}
+ 100%{transform:scale(1);opacity:1}
+}
+@keyframes morphSheet{
+ 0%{transform:translateY(24px) scale(.97);opacity:0}
+ 100%{transform:translateY(0) scale(1);opacity:1}
+}
+.lg-root .morph-btn:active{animation:morphPop .28s cubic-bezier(.34,1.56,.64,1) forwards}
+.lg-root .sheet-open{animation:morphSheet .32s cubic-bezier(.32,1.2,.64,1) forwards}
+
+/* ── ACCESSIBILITY ── */
+@media (prefers-reduced-transparency){
+ .lg-root .g{background:rgba(10,7,4,.92)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ .lg-root .nbb{background:rgba(10,7,4,.97)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ .lg-root .tb{background:rgba(10,7,4,.97)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ .lg-root .bg-rock-photo{opacity:.6!important}
+}
+@media (prefers-reduced-motion){
+ .lg-root *,
+.lg-root *::before,
+.lg-root *::after{animation-duration:.001s!important;transition-duration:.001s!important}
+ .lg-root .bg-rock-photo{animation:none!important}
+ .lg-root .sc{transition:opacity .001s!important}
+}
+
+/* ── CONCENTRIC ROUNDING (nested elements) ── */
+/* Items inside rounded containers get slightly smaller radius */
+.lg-root .g .g{border-radius:calc(var(--rlg) - 4px)!important}
+
+/* ══ BACKGROUND EXTENSION EFFECT (Apple iOS 26) ══
+  Mirrors + blurs adjacent content at sidebar/sheet boundaries.
+  Creates the illusion content "stretches" under the glass panel. */
+
+/* Base class */
+.lg-root .bg-ext{position:absolute;pointer-events:none;z-index:0;overflow:hidden}
+
+/* ── Sheet version: extends map content upward under the bottom sheet ── */
+.lg-root .bg-ext-sheet{
+ left:8px;right:8px;    /* matches .half-sheet inset */
+ height:80px;
+ border-radius:28px 28px 0 0;
+ /* Mirrors the content just above — done via backdrop + gradient overlay */
+ backdrop-filter:blur(32px) saturate(1.8);
+ -webkit-backdrop-filter:blur(32px) saturate(1.8);
+ /* Gradient mask: transparent at top (shows content) → matches sheet bg at bottom */
+ background:linear-gradient(
+  to bottom,
+  rgba(10,7,4,0) 0%,
+  rgba(10,7,4,.15) 40%,
+  rgba(14,9,4,.55) 80%,
+  rgba(14,9,4,.82) 100%
+ );
+ border-left:1px solid rgba(212,160,48,.10);
+ border-right:1px solid rgba(212,160,48,.10);
+ border-top:1px solid rgba(212,160,48,.14);
+}
+
+/* ── Sidebar version: extends phone content under the desktop side nav ── */
+.lg-root .si{position:relative}
+.lg-root .si::after{
+ content:'';
+ position:absolute;
+ top:0;right:-18px;bottom:0;width:18px;
+ backdrop-filter:blur(28px) saturate(1.6);
+ -webkit-backdrop-filter:blur(28px) saturate(1.6);
+ background:linear-gradient(90deg,rgba(10,7,4,.35),transparent);
+ pointer-events:none;
+ z-index:10;
+}
+
+/* ── Navbar version: content visually extends under the glass navbar ── */
+/* The sticky navbar already has backdrop-filter — we add a soft extension below it */
+.lg-root .nb::after{display:none}
+
+
+/* ── Google Maps style stars ── */
+.lg-root .stars{display:inline-flex;gap:1px;align-items:center}
+.lg-root .star-svg{display:inline-block}

@@ -1,0 +1,53 @@
+/*
+ * ZoneDeGrimpe — Liquid Glass — couche PLEIN ÉCRAN NATIF.
+ * Activée par la classe `.native` posée par PageFrame quand `isNativeApp` (app installée).
+ * Sur le web (preview, gallery), cette classe est absente → cadre téléphone 390×844 inchangé.
+ *
+ * Idée : sur un vrai device, le cadre fixe `.ph` serait letterboxé et la fausse barre d'état `.sb`
+ * doublerait celle de l'OS. On fait remplir l'écran au `.ph`, on masque le faux chrome, et on gère
+ * le notch / home-indicator via `env(safe-area-inset-*)` (viewport-fit=cover est déjà dans index.html).
+ *
+ * `env()` vaut 0 quand le webview ne déborde pas sous la barre d'état (mode non-overlay) et la hauteur
+ * du notch quand il déborde (overlay) → le CSS s'adapte aux deux modes sans connaître la config OS.
+ * Tout est scopé `.lg-root.native`.
+ */
+
+/* ── Cadre plein écran ── */
+.lg-root.native .ph {
+  width: 100dvw;
+  height: 100dvh;
+  border-radius: 0;
+  box-shadow: none;
+}
+.lg-root.native .bgs,
+.lg-root.native .pw,
+.lg-root.native .sc {
+  border-radius: 0;
+}
+
+/* ── Faux chrome masqué (le device fournit notch + barre d'état réels) ── */
+.lg-root.native .di,
+.lg-root.native .sb {
+  display: none;
+}
+
+/* ── Safe-area HAUT ──
+   Le contenu défile sous le notch ; la nav `.nb` réservait déjà ~60px (ex-fausse barre d'état) :
+   on compense pour que l'espace total haut reste ≈ constant (≈60px), notch ou pas.
+   La bande de safe-area laisse voir le fond rocheux `.bgs` (plein écran, derrière tout). */
+.lg-root.native .sc {
+  padding-top: env(safe-area-inset-top);
+}
+.lg-root.native .nb {
+  padding-top: max(0px, calc(60px - env(safe-area-inset-top)));
+}
+
+/* ── Safe-area BAS ──
+   La tab bar flottante (`bottom:20px`) remonte au-dessus du home-indicator, et le scroll garde sa
+   marge (110px) augmentée d'autant pour ne pas masquer le dernier contenu. */
+.lg-root.native .tbw {
+  bottom: calc(20px + env(safe-area-inset-bottom));
+}
+.lg-root.native .sc {
+  padding-bottom: calc(110px + env(safe-area-inset-bottom));
+}

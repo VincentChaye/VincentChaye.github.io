@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:native": "vite --mode capacitor",
     "build": "tsc -b && vite build",
     "build:native": "tsc -b && vite build --mode capacitor",
     "cap:sync": "npm run build:native && cap sync",

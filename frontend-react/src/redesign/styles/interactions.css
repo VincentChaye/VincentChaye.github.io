@@ -1,0 +1,70 @@
+/*
+ * ZoneDeGrimpe — Liquid Glass — couche d'INTERACTIONS (animations style Apple/iOS).
+ * Séparée de liquid-glass.css (copie verbatim du prototype, à ne pas éditer).
+ * Importée par PageFrame. Tout est scopé sous .lg-root.
+ *
+ * 1. Tap feedback uniforme  → piloté par usePressFeedback (lib/usePressFeedback.ts) :
+ *    le hook pose .lg-pressable + .is-pressing sur l'élément cliquable le plus proche
+ *    (cursor:pointer) au pointerdown, retire .is-pressing au relâchement/scroll.
+ * 2. Entrée d'écran (.sc-enter), bulles de message, menus/feuilles, pop d'onglet.
+ *
+ * prefers-reduced-motion est déjà neutralisé globalement par liquid-glass.css
+ * (durées → .001s) ; le hook se désactive aussi en JS pour éviter le "snap" du scale.
+ */
+
+/* ── 1. TAP FEEDBACK (spring Apple, ressort au relâchement) ── */
+.lg-root .lg-pressable {
+  transition: transform .26s cubic-bezier(.34, 1.56, .64, 1);
+}
+.lg-root .lg-pressable.is-pressing {
+  transform: scale(.96);
+  transition-duration: .12s; /* enfoncement plus vif que le retour */
+}
+
+/* ── 2. ENTRÉE D'ÉCRAN (par route) ──
+   Classe NEUVE posée par PageFrame sur son .sc : ne touche pas .sc.active
+   (partagé avec la galerie de preview). Joue à chaque montage de page.
+   Glissement HORIZONTAL (entrée depuis la droite) = "push" iOS, fidèle au
+   transform:translateX(30px) du prototype. NB : 1re passe « entrée seule »
+   (l'écran sortant disparaît net) — un vrai push/pop coordonné garderait la
+   route sortante montée (View Transitions / AnimatePresence). */
+@keyframes lgScreenIn {
+  from { opacity: 0; transform: translateX(26px); }
+  to   { opacity: 1; transform: none; }
+}
+.lg-root .sc-enter {
+  animation: lgScreenIn .34s cubic-bezier(.32, .72, 0, 1) both;
+}
+
+/* ── 3. BULLES DE MESSAGE / LIGNES — montée + fondu (joue 1x au montage) ── */
+@keyframes lgItemIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.lg-root .lg-item-in {
+  animation: lgItemIn .28s cubic-bezier(.32, .72, 0, 1) both;
+}
+
+/* ── 4. MENUS / FEUILLES — pop depuis le bas (réutilise l'esprit de morphSheet) ── */
+@keyframes lgPopIn {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+.lg-root .lg-pop {
+  animation: lgPopIn .26s cubic-bezier(.32, 1.2, .64, 1) both;
+  transform-origin: bottom left;
+}
+
+/* ── 5. OVERLAYS plein écran — fondu doux ── */
+@keyframes lgFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.lg-root .lg-fade { animation: lgFadeIn .2s ease both; }
+
+/* ── 6. POP D'ONGLET ACTIF (nav bar) — l'icône rebondit à la sélection ── */
+@keyframes lgTabPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+.lg-root .ti.active .tii {
+  animation: lgTabPop .42s cubic-bezier(.34, 1.56, .64, 1);
+}
