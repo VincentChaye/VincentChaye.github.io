@@ -23,7 +23,7 @@ interface Contrib { id: string; name: string; status: string; createdAt: string;
 const TAB_ON = 'padding:10px;border-radius:14px;text-align:center;font-size:14px;font-weight:700;cursor:pointer;background:linear-gradient(145deg,rgba(212,160,48,.85),rgba(232,184,75,.9));color:#1a0f05;box-shadow:0 2px 10px rgba(212,160,48,.3)';
 const TAB_OFF = 'padding:10px;border-radius:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:rgba(240,236,230,.55)';
 const CONTRIB_ROW = 'border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer';
-const EMPTY = 'border-radius:18px;padding:18px;font-size:13px;color:rgba(240,236,230,.45);text-align:center';
+const EMPTY = 'border-radius:18px;padding:18px;font-size:13px;color:rgba(240,236,230,.6);text-align:center';
 const PIN = (color: string) => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
 );
@@ -172,7 +172,7 @@ export function MySpotsPage() {
                     <div style={css(`width:44px;height:44px;border-radius:12px;background:rgba(${st.pin === '#80D880' ? '80,160,80' : st.pin === '#D4A030' ? '212,160,48' : '200,80,80'},.12);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:2`)}>{PIN(st.pin)}</div>
                     <div style={css('flex:1;position:relative;z-index:2')}>
                       <div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:3px')}>{c.name}</div>
-                      <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>{edited ? 'Modifié' : 'Ajouté'} · {relAge(c.updatedAt || c.createdAt)}</div>
+                      <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>{edited ? 'Modifié' : 'Ajouté'} · {relAge(c.updatedAt || c.createdAt)}</div>
                     </div>
                     <span style={css(`${st.badge};border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;position:relative;z-index:2`)}>{st.label}</span>
                   </div>

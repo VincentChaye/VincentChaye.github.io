@@ -4,14 +4,14 @@ import type { ScreenId } from '../lib/nav';
 import { NavBar } from '../components/NavBar';
 import { IconButton } from '../components/primitives';
 
-const GROUP_TITLE = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.35);padding:16px 0 10px';
+const GROUP_TITLE = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.6);padding:16px 0 10px';
 const ROW = 'border-radius:18px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;margin-bottom:10px';
 const AVATAR = 'position:relative;z-index:2;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0';
 const BODY = 'flex:1;position:relative;z-index:2';
 const TEXT = 'font-size:14px;color:#f0ece6;line-height:1.4;margin-bottom:4px';
 const TEXT_READ = 'font-size:14px;color:rgba(240,236,230,.75);line-height:1.4;margin-bottom:4px';
-const TIME = 'font-size:12px;color:rgba(240,236,230,.40)';
-const TIME_READ = 'font-size:12px;color:rgba(240,236,230,.35)';
+const TIME = 'font-size:12px;color:rgba(240,236,230,.6)';
+const TIME_READ = 'font-size:12px;color:rgba(240,236,230,.6)';
 const DOT = 'width:8px;height:8px;border-radius:50%;background:#D4A030;flex-shrink:0;margin-top:4px;box-shadow:0 0 8px rgba(212,160,48,.6)';
 
 /** SCREEN: NOTIFICATIONS — port fidèle (proto l.687-745). */

@@ -75,16 +75,17 @@
 .lg-root .pw{position:absolute;inset:0;z-index:10;border-radius:52px;overflow:hidden}
 .lg-root .sc{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:110px;opacity:0;transform:translateX(30px);transition:opacity .3s,transform .3s;pointer-events:none;scrollbar-width:none}
 .lg-root .sc::-webkit-scrollbar{display:none}
-.lg-root .sc.active{opacity:1;transform:none;pointer-events:all}
+.lg-root .sc.active{opacity:1;transform:translateX(0);pointer-events:all}
 
 /* NAVBAR */
-.lg-root .nb{position:sticky;top:0;z-index:100;height:102px;display:flex;align-items:flex-end;padding:0 20px 14px;padding-top:60px}
+.lg-root{--safe-top:0px;--panel-top:59px}
+.lg-root .nb{position:sticky;top:0;z-index:100;height:calc(102px + var(--safe-top));display:flex;align-items:flex-end;padding:0 20px 14px;padding-top:calc(60px + var(--safe-top))}
 .lg-root .nbb{position:absolute;inset:0;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:none}
 .lg-root .nbb::after{display:none}
 .lg-root .nbi{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;width:100%}
 .lg-root .nl{display:flex;align-items:center;gap:9px}
 .lg-root .lb{width:33px;height:33px;border-radius:9px;background:linear-gradient(145deg,#1e4a2a,#2a6e3c);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1)}
-.lg-root .nt{font-size:17px;font-weight:700;letter-spacing:-.4px;color:#f0ece6;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;pointer-events:none}
+.lg-root .nt{display:none}
 .lg-root .na{display:flex;gap:8px}
 .lg-root .ib{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);color:rgba(240,236,230,.75);cursor:pointer;transition:all .2s}
 .lg-root .ib:hover,
@@ -169,13 +170,14 @@
  .lg-root .g{background:rgba(10,7,4,.92)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
  .lg-root .nbb{background:rgba(10,7,4,.97)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
  .lg-root .tb{background:rgba(10,7,4,.97)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
- .lg-root .bg-rock-photo{opacity:.6!important}
+ .lg-root .bgg{opacity:.6!important}
 }
 @media (prefers-reduced-motion){
  .lg-root *,
 .lg-root *::before,
 .lg-root *::after{animation-duration:.001s!important;transition-duration:.001s!important}
- .lg-root .bg-rock-photo{animation:none!important}
+ .lg-root .bgg,
+ .lg-root .gt1{animation:none!important}
  .lg-root .sc{transition:opacity .001s!important}
 }
 

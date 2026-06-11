@@ -1,0 +1,124 @@
+/*
+ * ZoneDeGrimpe — Liquid Glass — couche d'OPTIMISATION « Apple Liquid Glass » (iOS 26).
+ * Additive et NON destructive : liquid-glass.css reste la copie verbatim du prototype
+ * (fichier GÉNÉRÉ, ne pas éditer). Ce fichier est importé APRÈS dans PageFrame → l'ordre
+ * source fait gagner les surcharges à spécificité égale (pas de !important sauf quand
+ * l'original en pose un, ex. .half-sheet). Tout est scopé `.lg-root`.
+ *
+ * Principe Apple Liquid Glass : un matériau translucide qui (1) capte la lumière sur ses
+ * arêtes (liseré spéculaire haut vif → faible tout autour → ombre interne basse = épaisseur),
+ * (2) « lentille » le fond (saturation + flou accrus, jamais au prix de la lisibilité du texte),
+ * (3) garde des contrôles flottants en pilule (tab bar, feuilles) bien détourés.
+ *
+ * Contrainte assumée : les panneaux flottent sur une PHOTO statique très contrastée — pas de
+ * contenu vivant à réfracter. On augmente donc la « glassiness » uniquement là où le contraste
+ * du texte survit : on monte flou + saturation (n'altèrent pas la luminance), PAS la luminosité.
+ */
+
+/* ── Matériau : flou + saturation accrus (lentille « liquide »), luminance inchangée ── */
+.lg-root {
+  --bmd: blur(30px) saturate(1.9);   /* surface .g  (24px/1.6 → 30px/1.9) */
+  --blg: blur(40px) saturate(2.05);  /* surface .gk épaisse */
+  --bsm: blur(20px) saturate(1.7);   /* surface .gt fine */
+}
+
+/* ── Arête spéculaire toutes-faces sur la surface glass de base ──
+   var(--sc) = ombre portée d'origine, préservée ; on empile les liserés internes. */
+.lg-root .g {
+  box-shadow:
+    var(--sc),
+    inset 0 1px 0 rgba(255, 255, 255, .20),       /* haut : reflet vif */
+    inset 0 0 0 1px rgba(255, 255, 255, .045),     /* tour : liseré faible */
+    inset 0 -10px 24px -16px rgba(0, 0, 0, .55);   /* bas : ombre interne = épaisseur */
+}
+
+/* ── Glass fine : même grammaire de liseré, dosée plus légère. ──
+   (`.gk` épaisse non utilisée dans le redesign → pas de surcharge dédiée.) */
+.lg-root .gt {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .14),
+    inset 0 0 0 1px rgba(255, 255, 255, .04),
+    inset 0 -8px 18px -14px rgba(0, 0, 0, .4);
+}
+
+/* ── Pastille glass des boutons-icônes : arête spéculaire + fond un brin plus dense. ──
+   VOLONTAIREMENT SANS backdrop-filter : `.ib` est nombreux (navbar, actions) et n'avait
+   AUCUN flou à l'origine ; en ajouter un = N passes de blur par écran → coûteux sur device
+   Capacitor. On garde le rendu « verre » via les liserés seuls (gratuits). */
+.lg-root .ib {
+  background: rgba(255, 255, 255, .09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    inset 0 0 0 1px rgba(255, 255, 255, .04),
+    0 2px 8px rgba(0, 0, 0, .3);
+}
+
+/* ── Tab bar flottante : l'élément signature Apple. Flou + saturation + arête renforcés. ── */
+.lg-root .tb {
+  backdrop-filter: blur(40px) saturate(2.2);
+  -webkit-backdrop-filter: blur(40px) saturate(2.2);
+  box-shadow:
+    var(--st),
+    inset 0 1px 0 rgba(255, 255, 255, .24),
+    inset 0 0 0 1px rgba(255, 255, 255, .055),
+    inset 0 -12px 22px -16px rgba(0, 0, 0, .6);
+}
+/* Pilule d'onglet actif : reflet spéculaire haut plus marqué sur l'or. */
+.lg-root .ti.active {
+  box-shadow:
+    0 2px 16px rgba(212, 160, 48, .5),
+    inset 0 1px 0 rgba(255, 255, 255, .45),
+    inset 0 -6px 12px -8px rgba(120, 80, 10, .5);
+}
+
+/* ── Feuille demi-écran (spot sheet / modales) : arête spéculaire + épaisseur ──
+   L'original pose ses ombres en !important → on doit en remettre pour gagner. */
+.lg-root .half-sheet {
+  box-shadow:
+    0 -8px 60px rgba(0, 0, 0, .65),
+    inset 0 1px 0 rgba(255, 255, 255, .22),
+    inset 0 0 0 1px rgba(212, 160, 48, .16),
+    inset 0 -14px 32px -20px rgba(0, 0, 0, .55) !important;
+}
+/* Poignée de drag : un brin plus lumineuse (capte la lumière). */
+.lg-root .sheet-handle {
+  background: rgba(255, 255, 255, .3);
+}
+
+/* ── Scrim de bas de page : adouci + réchauffé ──
+   L'original (rgba(8,8,8,.85)) assombrissait fort le contenu (anti-glass). On garde assez
+   d'opacité au tout-bas pour la lisibilité de la tab bar, mais on fond plus vite vers le haut. */
+.lg-root .pw::after {
+  height: 104px;
+  background: linear-gradient(
+    to top,
+    rgba(8, 6, 3, .72) 0%,
+    rgba(8, 6, 3, .34) 46%,
+    transparent 100%
+  );
+}
+
+/* NB CTA or : pas de gloss ajouté ici. Seul HomePage utilise `.morph-btn` ; les autres CTA or
+   (Se connecter, Itinéraire GPS, Voir le spot…) sont en style inline sans classe commune.
+   Glosser le seul `.morph-btn` créerait une incohérence (règle `consistency`). Le bon correctif =
+   un composant partagé <GoldButton> qui porte le gloss sur TOUS les CTA or (cf. REVIEW, pistes). */
+
+/* ── Contraste texte (WCAG AA) : liquid-glass.css est GÉNÉRÉ (do-not-edit), donc on relève
+   ici le plancher d'opacité des libellés warm-white qui passaient sous 4.5:1 sur le fond
+   sombre/photo. (Côté TSX, les `color:rgba(240,236,230,.xx)` < .5 ont été remontés à .6.)
+   - `.ti` : libellé d'onglet inactif (9px) — le plus critique ; .40 → .62.
+   - `.sis` / `.snv-t` : sous-titre et titres de section de la sidebar desktop. */
+.lg-root .ti:not(.active) { color: rgba(240, 236, 230, .62); }
+.lg-root .sis { color: rgba(240, 236, 230, .6); }
+.lg-root .snv-t { color: rgba(240, 236, 230, .55); }
+
+/* ── Accessibilité : si l'utilisateur réduit la transparence, on neutralise nos liserés
+   internes lumineux (le bloc prefers-reduced-transparency d'origine remet déjà bg opaque). ── */
+@media (prefers-reduced-transparency) {
+  .lg-root .g,
+  .lg-root .gt,
+  .lg-root .tb,
+  .lg-root .ib {
+    box-shadow: var(--sc) !important;
+  }
+}

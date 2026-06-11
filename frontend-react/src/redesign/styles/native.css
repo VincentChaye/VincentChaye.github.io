@@ -35,12 +35,7 @@
    Le contenu défile sous le notch ; la nav `.nb` réservait déjà ~60px (ex-fausse barre d'état) :
    on compense pour que l'espace total haut reste ≈ constant (≈60px), notch ou pas.
    La bande de safe-area laisse voir le fond rocheux `.bgs` (plein écran, derrière tout). */
-.lg-root.native .sc {
-  padding-top: env(safe-area-inset-top);
-}
-.lg-root.native .nb {
-  padding-top: max(0px, calc(60px - env(safe-area-inset-top)));
-}
+.lg-root.native { --safe-top: env(safe-area-inset-top); --panel-top: env(safe-area-inset-top); }
 
 /* ── Safe-area BAS ──
    La tab bar flottante (`bottom:20px`) remonte au-dessus du home-indicator, et le scroll garde sa
@@ -50,4 +45,19 @@
 }
 .lg-root.native .sc {
   padding-bottom: calc(110px + env(safe-area-inset-bottom));
+}
+
+/* ── Bouton Retour masqué sur les pages racines de la tab bar (app native uniquement) ──
+   Sur mobile, le geste de retour système suffit ; les sous-pages (PageFrame sans `tab`)
+   conservent leur bouton Retour. */
+.lg-root.native.has-tab .back-btn {
+  display: none;
+}
+
+/* ── Header non sticky sur les pages racines de la tab bar (app native) ──
+   Le `.nb` sticky restait collé en haut pendant le scroll : son fond étant transparent,
+   le contenu passait sous le titre (illisible), et un fond opaque dénaturait le design.
+   On le laisse simplement défiler avec le contenu. */
+.lg-root.native.has-tab .nb {
+  position: relative;
 }

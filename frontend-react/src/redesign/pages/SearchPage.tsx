@@ -110,12 +110,12 @@ export function SearchPage() {
         </div>
 
         {/* Results */}
-        <div style={css('font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.35);margin-bottom:12px')}>
+        <div style={css('font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.6);margin-bottom:12px')}>
           {loading ? 'Chargement…' : `${filtered.length} spot${filtered.length > 1 ? 's' : ''} trouvé${filtered.length > 1 ? 's' : ''}`}
         </div>
         <div style={css('display:flex;flex-direction:column;gap:10px')}>
           {!loading && filtered.length === 0 && (
-            <div className="g" style={css('border-radius:18px;padding:16px;font-size:13px;color:rgba(240,236,230,.45);text-align:center')}>Aucun spot ne correspond.</div>
+            <div className="g" style={css('border-radius:18px;padding:16px;font-size:13px;color:rgba(240,236,230,.6);text-align:center')}>Aucun spot ne correspond.</div>
           )}
           {filtered.slice(0, CAP).map((s) => (
             <SearchResultRow
@@ -128,7 +128,7 @@ export function SearchPage() {
             />
           ))}
           {!loading && filtered.length > CAP && (
-            <div style={css('text-align:center;font-size:12px;color:rgba(240,236,230,.35);padding:6px 0')}>+{filtered.length - CAP} autres — affine ta recherche</div>
+            <div style={css('text-align:center;font-size:12px;color:rgba(240,236,230,.6);padding:6px 0')}>+{filtered.length - CAP} autres — affine ta recherche</div>
           )}
         </div>
       </div>

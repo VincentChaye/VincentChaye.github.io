@@ -52,7 +52,7 @@ export interface TabDef {
 export const TABS: TabDef[] = [
   { id: 'accueil', label: 'Accueil', icon: 'home' },
   { id: 'carte', label: 'Carte', icon: 'map' },
-  { id: 'fil', label: 'Fil', icon: 'feed' },
+  { id: 'fil', label: 'Social', icon: 'feed' },
   { id: 'messagerie', label: 'Messages', icon: 'messages' },
   { id: 'profil', label: 'Profil', icon: 'user' },
 ];
@@ -72,7 +72,7 @@ export const SIDE_NAV: NavGroup[] = [
     items: [
       { id: 'accueil', label: 'Accueil' },
       { id: 'carte', label: 'Carte' },
-      { id: 'fil', label: "Fil d'activité" },
+      { id: 'fil', label: 'Social' },
       { id: 'messagerie', label: 'Messages' },
       { id: 'profil', label: 'Profil' },
     ],

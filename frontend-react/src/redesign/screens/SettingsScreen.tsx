@@ -4,7 +4,7 @@ import type { ScreenId } from '../lib/nav';
 import { NavBar } from '../components/NavBar';
 import { Toggle } from '../components/Toggle';
 
-const GROUP = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.35);padding:16px 4px 10px';
+const GROUP = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.6);padding:16px 4px 10px';
 const CARD = 'border-radius:20px;overflow:hidden;display:flex;flex-direction:column';
 const ROW_B = 'padding:14px 18px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;position:relative;z-index:2';
 const ROW = 'padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;z-index:2';
@@ -12,9 +12,9 @@ const ROWN_B = 'padding:14px 18px;display:flex;align-items:center;gap:14px;borde
 const ROWN = 'padding:14px 18px;display:flex;align-items:center;gap:14px;position:relative;z-index:2';
 const TITLE_MB = 'font-size:15px;font-weight:600;color:#f0ece6;margin-bottom:2px';
 const TITLE = 'font-size:15px;font-weight:600;color:#f0ece6';
-const SUB = 'font-size:12px;color:rgba(240,236,230,.45)';
+const SUB = 'font-size:12px;color:rgba(240,236,230,.6)';
 const CHEV = 'color:rgba(240,236,230,.22);font-size:18px';
-const VALUE = 'font-size:13px;color:rgba(240,236,230,.45);font-weight:500';
+const VALUE = 'font-size:13px;color:rgba(240,236,230,.6);font-weight:500';
 const ICONBOX = 'width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0';
 
 /** SCREEN: PARAMÈTRES — port fidèle (proto l.958-1012). */
@@ -82,7 +82,7 @@ export function SettingsScreen({ active, goTo }: { active: ScreenId; goTo: (id: 
         {/* À propos */}
         <div style={css(GROUP)}>À propos</div>
         <div className="g" style={css(CARD)}>
-          <div style={css(ROW_B)}><div style={css('flex:1')}><div style={css(TITLE)}>Version</div></div><div style={css('font-size:13px;color:rgba(240,236,230,.45)')}>1.0.0-beta</div></div>
+          <div style={css(ROW_B)}><div style={css('flex:1')}><div style={css(TITLE)}>Version</div></div><div style={css('font-size:13px;color:rgba(240,236,230,.6)')}>1.0.0-beta</div></div>
           <div style={css(ROW_B)}><div style={css('flex:1')}><div style={css(TITLE)}>Conditions d'utilisation</div></div><div style={css(CHEV)}>›</div></div>
           <div style={css(ROW)}><div style={css('flex:1')}><div style={css(TITLE)}>Politique de confidentialité</div></div><div style={css(CHEV)}>›</div></div>
         </div>

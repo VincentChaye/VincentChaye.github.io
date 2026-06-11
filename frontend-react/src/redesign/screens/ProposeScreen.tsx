@@ -7,7 +7,7 @@ import { TypeCard } from '../components/TypeCard';
 
 const FIELD = 'border-radius:16px;overflow:hidden';
 const FIELD_LABEL = 'padding:12px 16px 2px;font-size:11px;font-weight:600;color:rgba(212,160,48,.8);letter-spacing:.3px';
-const FIELD_VALUE = 'padding:0 16px 12px;font-size:16px;color:rgba(240,236,230,.4)';
+const FIELD_VALUE = 'padding:0 16px 12px;font-size:16px;color:rgba(240,236,230,.6)';
 
 /** SCREEN: PROPOSER UN SPOT — port fidèle (proto l.796-858). */
 export function ProposeScreen({ active, goTo }: { active: ScreenId; goTo: (id: ScreenId) => void }) {
@@ -30,7 +30,7 @@ export function ProposeScreen({ active, goTo }: { active: ScreenId; goTo: (id: S
         <div style={css('flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.12)')} />
         <div style={css('flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.12)')} />
       </div>
-      <div style={css('padding:0 20px 6px;font-size:12px;color:rgba(240,236,230,.40);font-weight:500')}>Étape 1 sur 4 — Type de spot</div>
+      <div style={css('padding:0 20px 6px;font-size:12px;color:rgba(240,236,230,.6);font-weight:500')}>Étape 1 sur 4 — Type de spot</div>
       <SectionHeader small style={css('padding-top:4px')}>Quel type de spot ?</SectionHeader>
       <div style={css('padding:0 20px;display:flex;flex-direction:column;gap:10px')}>
         <TypeCard selected iconStyle="background:rgba(212,160,48,.15);border:1px solid rgba(212,160,48,.3)" title="Falaise" desc="Escalade sur paroi naturelle en extérieur" />
@@ -51,7 +51,7 @@ export function ProposeScreen({ active, goTo }: { active: ScreenId; goTo: (id: S
         <div className="g" style={css(FIELD)}>
           <div style={css('position:relative;z-index:2')}>
             <div style={css(FIELD_LABEL)}>Description</div>
-            <div style={css('padding:0 16px 18px;font-size:16px;color:rgba(240,236,230,.4);min-height:60px')}>Décris le spot...</div>
+            <div style={css('padding:0 16px 18px;font-size:16px;color:rgba(240,236,230,.6);min-height:60px')}>Décris le spot...</div>
           </div>
         </div>
         <div style={css('display:grid;grid-template-columns:1fr 1fr;gap:10px')}>

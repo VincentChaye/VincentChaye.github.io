@@ -13,7 +13,7 @@ function StatBox({ label, labelColor, value, sub }: { label: string; labelColor:
       <div style={css('position:relative;z-index:2')}>
         <div style={css(`font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:${labelColor};margin-bottom:8px`)}>{label}</div>
         <div style={css('font-size:30px;font-weight:800;letter-spacing:-1px;color:#f0ece6;margin-bottom:2px')}>{value}</div>
-        <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>{sub}</div>
+        <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>{sub}</div>
       </div>
     </div>
   );
@@ -51,7 +51,7 @@ export function AdminScreen({ active, goTo }: { active: ScreenId; goTo: (id: Scr
               <div style={css('width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,rgba(40,65,30,.8),rgba(20,45,15,.9));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(80,160,80,.2)')} />
               <div style={css('flex:1')}>
                 <div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:3px')}>Aiguille de la République</div>
-                <div style={css('font-size:12px;color:rgba(240,236,230,.45);margin-bottom:6px;display:flex;align-items:center;gap:5px')}>
+                <div style={css('font-size:12px;color:rgba(240,236,230,.6);margin-bottom:6px;display:flex;align-items:center;gap:5px')}>
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>Chamonix · par MarieFalaise
                 </div>
                 <div style={css('display:flex;gap:6px')}><Tag variant="a">Falaise</Tag><Tag variant="g">5c→7a</Tag></div>
@@ -70,7 +70,7 @@ export function AdminScreen({ active, goTo }: { active: ScreenId; goTo: (id: Scr
               <div style={css('width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,rgba(30,55,20,.8),rgba(15,35,10,.9));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(100,150,60,.2)')} />
               <div style={css('flex:1')}>
                 <div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:3px')}>Chaos des Trois Fontaines</div>
-                <div style={css('font-size:12px;color:rgba(240,236,230,.45);margin-bottom:6px')}>Fontainebleau · par Pierre_bloc</div>
+                <div style={css('font-size:12px;color:rgba(240,236,230,.6);margin-bottom:6px')}>Fontainebleau · par Pierre_bloc</div>
                 <div style={css('display:flex;gap:6px')}><Tag variant="g">Bloc</Tag><Tag variant="a">3A→7B</Tag></div>
               </div>
             </div>
@@ -89,7 +89,7 @@ export function AdminScreen({ active, goTo }: { active: ScreenId; goTo: (id: Scr
           <div style={css('width:36px;height:36px;border-radius:11px;background:rgba(200,120,60,.14);border:1px solid rgba(200,120,60,.22);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;position:relative;z-index:2')} />
           <div style={css('flex:1;position:relative;z-index:2')}>
             <div style={css('font-size:14px;font-weight:600;color:#f0ece6;margin-bottom:2px')}>Modification: Gorges du Verdon</div>
-            <div style={css('font-size:12px;color:rgba(240,236,230,.45);margin-bottom:8px')}>MarieFalaise · ajout 2 voies</div>
+            <div style={css('font-size:12px;color:rgba(240,236,230,.6);margin-bottom:8px')}>MarieFalaise · ajout 2 voies</div>
             <div style={css('display:flex;gap:8px')}>
               <div style={css('padding:6px 14px;border-radius:9999px;font-size:12px;font-weight:600;background:rgba(80,160,80,.15);border:1px solid rgba(80,160,80,.25);color:#88D088;cursor:pointer')}>{' '}OK</div>
               <div style={css('padding:6px 14px;border-radius:9999px;font-size:12px;font-weight:600;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);color:rgba(240,236,230,.65);cursor:pointer')}>Voir diff</div>

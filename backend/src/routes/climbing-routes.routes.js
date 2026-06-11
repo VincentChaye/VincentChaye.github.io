@@ -167,6 +167,46 @@ export function climbingRoutesRouter(db) {
     }
   });
 
+  // POST /api/climbing-routes/by-spots — Voies de plusieurs spots (public, usage hors-ligne)
+  // Body : { spotIds: string[] } — 1 à 500 ids ; les ids invalides sont ignorés silencieusement.
+  // Réponse : { "spotIdA": [voies...], ... } — seuls les spots ayant des voies sont inclus.
+  r.post("/by-spots", async (req, res) => {
+    try {
+      const { spotIds } = req.body || {};
+      if (!Array.isArray(spotIds) || spotIds.length === 0 || spotIds.length > 500) {
+        return res.status(400).json({ error: "invalid_payload", detail: "spotIds doit être un tableau de 1 à 500 éléments" });
+      }
+      // Filtre les ids valides (ObjectId 24 hex) ; les invalides sont ignorés
+      const validIds = spotIds
+        .filter((id) => typeof id === "string" && ObjectId.isValid(id))
+        .map((id) => id.toString());
+
+      // Si aucun id valide, on retourne un objet vide plutôt qu'une erreur
+      if (validIds.length === 0) {
+        return res.json({});
+      }
+
+      // Même filtre de statut public que GET /spot/:spotId (pas d'admin ici — endpoint public)
+      const docs = await routes
+        .find({ spotId: { $in: validIds }, status: { $nin: ["pending", "rejected"] } })
+        .sort({ grade: 1, name: 1 })
+        .toArray();
+
+      // Groupement par spotId (clé = string)
+      const result = {};
+      for (const doc of docs) {
+        const key = doc.spotId.toString();
+        if (!result[key]) result[key] = [];
+        result[key].push(doc);
+      }
+
+      res.json(result);
+    } catch (e) {
+      console.error("[POST /climbing-routes/by-spots]", e);
+      res.status(500).json({ error: "server_error" });
+    }
+  });
+
   // DELETE /api/climbing-routes/:id — Supprimer une voie (admin ou auteur)
   r.delete("/:id", requireAuth, async (req, res) => {
     if (!ObjectId.isValid(req.params.id)) {

@@ -12,6 +12,49 @@
  * (durées → .001s) ; le hook se désactive aussi en JS pour éviter le "snap" du scale.
  */
 
+/* ── 0. BOUTON ACCESSIBLE (.lg-btn — primitive Pressable) ──
+   Remplace les `<div onClick>` par un vrai <button> : focus clavier, Entrée/Espace,
+   rôle « button » annoncé. Ici on (a) neutralise le chrome natif pour garder le visuel
+   du proto à l'identique, (b) pose un anneau de focus visible, (c) garantit une cible
+   tactile ≥ 44×44 sans changer la taille visuelle. */
+.lg-root .lg-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  line-height: inherit;
+  cursor: pointer;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.lg-root .lg-btn:disabled { cursor: default; }
+
+/* Anneau de focus — clavier uniquement (pas au clic/tap). */
+.lg-root .lg-btn:focus-visible {
+  outline: 2px solid var(--a4);
+  outline-offset: 2px;
+}
+
+/* Cible tactile ≥ 44×44 : pseudo-élément centré qui étend la zone cliquable sans
+   modifier la taille rendue. `hit={false}` (.lg-btn--nohit) l'enlève pour les boutons
+   collés (zoom empilé) où l'agrandissement chevaucherait le voisin. */
+.lg-root .lg-btn:not(.lg-btn--nohit)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  min-width: 44px;
+  min-height: 44px;
+}
+
 /* ── 1. TAP FEEDBACK (spring Apple, ressort au relâchement) ── */
 .lg-root .lg-pressable {
   transition: transform .26s cubic-bezier(.34, 1.56, .64, 1);
@@ -30,7 +73,7 @@
    route sortante montée (View Transitions / AnimatePresence). */
 @keyframes lgScreenIn {
   from { opacity: 0; transform: translateX(26px); }
-  to   { opacity: 1; transform: none; }
+  to   { opacity: 1; transform: translateX(0); }
 }
 .lg-root .sc-enter {
   animation: lgScreenIn .34s cubic-bezier(.32, .72, 0, 1) both;

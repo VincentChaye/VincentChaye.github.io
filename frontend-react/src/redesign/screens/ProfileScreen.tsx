@@ -11,7 +11,7 @@ const GEAR = (
 );
 const STAT = 'border-radius:16px;padding:14px 10px;text-align:center';
 const STAT_VALUE = 'font-size:20px;font-weight:800;letter-spacing:-.5px;color:#f0ece6;margin-bottom:3px';
-const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.43);text-transform:uppercase;letter-spacing:.5px';
+const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.5px';
 
 /** SCREEN: PROFIL — port fidèle (proto l.931-956). */
 export function ProfileScreen({ active, goTo }: { active: ScreenId; goTo: (id: ScreenId) => void }) {
@@ -31,7 +31,7 @@ export function ProfileScreen({ active, goTo }: { active: ScreenId; goTo: (id: S
           <div style={css('position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(212,160,48,.2)')} />
         </div>
         <div style={css('font-size:22px;font-weight:800;letter-spacing:-.6px;color:#f0ece6;margin-bottom:4px')}>Vincent C.</div>
-        <div style={css('font-size:14px;color:rgba(240,236,230,.45);margin-bottom:16px')}>@vincentchaye · Valbonne </div>
+        <div style={css('font-size:14px;color:rgba(240,236,230,.6);margin-bottom:16px')}>@vincentchaye · Valbonne </div>
         <div style={css('display:flex;flex-direction:column;gap:2px;margin-bottom:24px')}>
           <span style={css('font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:rgba(212,160,48,.65);font-weight:600')}>Grimpeur confirmé</span>
           <span style={css('font-size:15px;font-weight:700;color:rgba(240,236,230,.80);letter-spacing:-.3px')}>Max 7b</span>

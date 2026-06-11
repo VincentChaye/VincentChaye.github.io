@@ -53,19 +53,19 @@ export function SpotSheet({ goTo }: { goTo: (id: ScreenId) => void }) {
               <div style={css(GLASS_CIRCLE)}>
                 <SendIcon width={15} height={15} stroke="rgba(240,236,230,.82)" />
               </div>
-              <span style={css('font-size:10px;color:rgba(240,236,230,.42);white-space:nowrap;margin-top:4px')}>GPS</span>
+              <span style={css('font-size:10px;color:rgba(240,236,230,.6);white-space:nowrap;margin-top:4px')}>GPS</span>
             </div>
             <div style={css('display:flex;flex-direction:column;align-items:center')}>
               <div style={css(GLASS_CIRCLE)}>
                 <BookmarkIcon width={15} height={15} stroke="rgba(240,236,230,.82)" />
               </div>
-              <span style={css('font-size:10px;color:rgba(240,236,230,.42);white-space:nowrap;margin-top:4px')}>Sauvegarder</span>
+              <span style={css('font-size:10px;color:rgba(240,236,230,.6);white-space:nowrap;margin-top:4px')}>Sauvegarder</span>
             </div>
             <div style={css('display:flex;flex-direction:column;align-items:center')}>
               <div style={css(GLASS_CIRCLE)}>
                 <Share2Icon width={15} height={15} stroke="rgba(240,236,230,.82)" />
               </div>
-              <span style={css('font-size:10px;color:rgba(240,236,230,.42);white-space:nowrap;margin-top:4px')}>Partager</span>
+              <span style={css('font-size:10px;color:rgba(240,236,230,.6);white-space:nowrap;margin-top:4px')}>Partager</span>
             </div>
           </div>
         </div>

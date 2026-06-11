@@ -46,10 +46,16 @@ export function initSocketIO(httpServer, db) {
     broadcastStatus(uid, true);
 
     // --- Join conversation room ---
-    socket.on("join", (convId) => {
-      if (typeof convId === "string") {
+    socket.on("join", async (convId) => {
+      if (typeof convId !== "string") return;
+      try {
+        const conv = await conversations.findOne({
+          _id: new ObjectId(convId),
+          participants: uid,
+        });
+        if (!conv) return;
         socket.join(`conv:${convId}`);
-      }
+      } catch { /* ObjectId invalide ou erreur DB */ }
     });
 
     // --- Leave conversation room ---
@@ -126,22 +132,33 @@ export function initSocketIO(httpServer, db) {
       const inserted = await messages.insertOne(msg);
       const fullMsg = { ...msg, _id: inserted.insertedId };
 
-      // Update conversation lastMessage + unread for the other participants
-      const unreadInc = {};
-      for (const p of conv.participants) {
-        if (p !== uid) unreadInc[`unread.${p}`] = 1;
+      // Determine which participants are currently in the conversation room
+      // (i.e. have it open) — they don't need their unread counter incremented.
+      const presentUids = new Set();
+      const roomSockets = io.sockets.adapter.rooms.get(`conv:${convId}`);
+      if (roomSockets) {
+        for (const socketId of roomSockets) {
+          const s = io.sockets.sockets.get(socketId);
+          if (s?.uid) presentUids.add(s.uid);
+        }
       }
 
-      await conversations.updateOne(
-        { _id: convObjId },
-        {
-          $set: {
-            lastMessage: { content: lastContent, senderUid: uid, createdAt: msg.createdAt },
-            updatedAt: msg.createdAt,
-          },
-          $inc: unreadInc,
-        }
-      );
+      // Update conversation lastMessage + unread only for absent participants
+      const unreadInc = {};
+      for (const p of conv.participants) {
+        if (p !== uid && !presentUids.has(p)) unreadInc[`unread.${p}`] = 1;
+      }
+
+      const update = {
+        $set: {
+          lastMessage: { content: lastContent, senderUid: uid, createdAt: msg.createdAt },
+          updatedAt: msg.createdAt,
+          hiddenFor: [],
+        },
+      };
+      if (Object.keys(unreadInc).length > 0) update.$inc = unreadInc;
+
+      await conversations.updateOne({ _id: convObjId }, update);
 
       // Broadcast to all in room
       io.to(`conv:${convId}`).emit("new_message", fullMsg);
@@ -152,6 +169,7 @@ export function initSocketIO(httpServer, db) {
           io.to(`user:${p}`).emit("conversation_updated", {
             _id: convId,
             lastMessage: { content: lastContent, senderUid: uid, createdAt: msg.createdAt },
+            updatedAt: msg.createdAt,
           });
         }
       }
@@ -162,6 +180,7 @@ export function initSocketIO(httpServer, db) {
     // --- Typing indicator ---
     socket.on("typing", ({ convId, isTyping }) => {
       if (typeof convId !== "string") return;
+      if (!socket.rooms.has(`conv:${convId}`)) return;
       socket.to(`conv:${convId}`).emit("typing", { convId, uid, isTyping: !!isTyping });
     });
 

@@ -20,9 +20,9 @@ export function SearchResultRow({
       <div style={css(`width:50px;height:50px;border-radius:14px;${thumbStyle};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0`)} />
       <div style={css('flex:1;position:relative;z-index:2')}>
         <div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:3px')}>{name}</div>
-        <div style={css('font-size:12px;color:rgba(240,236,230,.45);display:flex;align-items:center;gap:8px')}>{tag}{meta}</div>
+        <div style={css('font-size:12px;color:rgba(240,236,230,.6);display:flex;align-items:center;gap:8px')}>{tag}{meta}</div>
       </div>
-      <div style={css('font-size:13px;color:rgba(240,236,230,.35)')}>›</div>
+      <div style={css('font-size:13px;color:rgba(240,236,230,.6)')}>›</div>
     </div>
   );
 }

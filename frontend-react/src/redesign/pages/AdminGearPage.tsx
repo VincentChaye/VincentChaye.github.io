@@ -158,9 +158,9 @@ export function AdminGearPage() {
 
       <div style={css('padding:0 20px 24px;display:flex;flex-direction:column;gap:10px')}>
         {loading ? (
-          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.45);font-size:13px')}>Chargement…</div>
+          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Chargement…</div>
         ) : specs.length === 0 ? (
-          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.45);font-size:13px')}>Aucune référence.</div>
+          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Aucune référence.</div>
         ) : specs.map((s) => (
           <div key={s._id} className="g" style={css('border-radius:18px;padding:14px 16px')}>
             <div style={css('position:relative;z-index:2;display:flex;align-items:flex-start;gap:12px')}>
@@ -169,7 +169,7 @@ export function AdminGearPage() {
                 : <div style={css('width:44px;height:44px;border-radius:12px;flex-shrink:0;background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.2)')} />}
               <div style={css('flex:1;min-width:0')}>
                 <div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:3px')}>{s.brand} {s.model}</div>
-                <div style={css('font-size:12px;color:rgba(240,236,230,.45);display:flex;gap:8px;flex-wrap:wrap')}>
+                <div style={css('font-size:12px;color:rgba(240,236,230,.6);display:flex;gap:8px;flex-wrap:wrap')}>
                   <span>{CAT_LABEL[s.category] ?? s.category}</span>
                   {s.uiaaLifetimeYears != null && <span>· {s.uiaaLifetimeYears} ans</span>}
                   {!s.epiTracked && <span>· non-EPI</span>}

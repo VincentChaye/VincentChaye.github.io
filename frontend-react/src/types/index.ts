@@ -286,6 +286,7 @@ export interface Conversation {
   participantInfo: ParticipantInfo[];
   lastMessage: LastMessage | null;
   unread: Record<string, number>;
+  hiddenFor?: string[];
   createdAt: string;
   updatedAt: string;
 }

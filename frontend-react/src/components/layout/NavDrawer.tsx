@@ -13,7 +13,7 @@ const NAV_SECTIONS = [
     items: [
       { to: '/', icon: Home, label: 'Accueil' },
       { to: '/map', icon: MapPin, label: 'Carte' },
-      { to: '/feed', icon: Newspaper, label: "Fil d'actu" },
+      { to: '/feed', icon: Newspaper, label: 'Social' },
       { to: '/messages', icon: MessageSquare, label: 'Messages' },
     ],
     requiresAuth: false,

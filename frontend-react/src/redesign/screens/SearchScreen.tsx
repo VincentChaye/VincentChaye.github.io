@@ -26,7 +26,7 @@ export function SearchScreen({ active, goTo }: { active: ScreenId; goTo: (id: Sc
           <div style={css('color:rgba(212,160,48,.7);position:relative;z-index:2')}>
             <SearchIcon width={18} height={18} />
           </div>
-          <div style={css('font-size:16px;color:rgba(240,236,230,.45);flex:1;position:relative;z-index:2')}>Spot, lieu, cotation...</div>
+          <div style={css('font-size:16px;color:rgba(240,236,230,.6);flex:1;position:relative;z-index:2')}>Spot, lieu, cotation...</div>
           <div style={css('font-size:14px;color:#D4A030;font-weight:500;position:relative;z-index:2;cursor:pointer')}>Annuler</div>
         </div>
 
@@ -40,7 +40,7 @@ export function SearchScreen({ active, goTo }: { active: ScreenId; goTo: (id: Sc
         </div>
 
         {/* Results */}
-        <div style={css('font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.35);margin-bottom:12px')}>5 711 spots trouvés</div>
+        <div style={css('font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.6);margin-bottom:12px')}>5 711 spots trouvés</div>
         <div style={css('display:flex;flex-direction:column;gap:10px')}>
           <SearchResultRow onClick={() => goTo('spot-detail')} thumbStyle="background:linear-gradient(145deg,rgba(40,70,30,.8),rgba(20,45,15,.9));border:1px solid rgba(212,160,48,.15)" name="Gorges du Verdon" meta="4c→8b · 12 km" tag={<Tag variant="a" style={css('font-size:10px;padding:3px 8px')}>Falaise</Tag>} />
           <SearchResultRow thumbStyle="background:linear-gradient(145deg,rgba(30,55,20,.8),rgba(15,35,10,.9));border:1px solid rgba(80,160,80,.15)" name="Fontainebleau" meta="1A→8C · 45 km" tag={<Tag variant="g" style={css('font-size:10px;padding:3px 8px')}>Bloc</Tag>} />

@@ -25,7 +25,7 @@ export function RouteRow({ grade, gradeBg, gradeBorder, gradeColor, name, meta, 
       </div>
       <div style={css('flex:1')}>
         <div style={css('font-size:15px;font-weight:600;color:#f0ece6;margin-bottom:2px')}>{name}</div>
-        <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>{meta}</div>
+        <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>{meta}</div>
       </div>
       {tag}
     </GlassCard>

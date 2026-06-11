@@ -24,7 +24,7 @@ export function GearRow({
       <div style={css(`width:40px;height:40px;border-radius:12px;${iconBox};display:flex;align-items:center;justify-content:center;flex-shrink:0`)}>{icon}</div>
       <div style={css('flex:1')}>
         <div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:2px')}>{name}</div>
-        <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>{sub}</div>
+        <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>{sub}</div>
       </div>
       <span style={css(badgeStyle)}>{badge}</span>
     </div>

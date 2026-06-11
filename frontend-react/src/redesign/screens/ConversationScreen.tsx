@@ -12,7 +12,7 @@ const SENT_ROW = 'display:flex;justify-content:flex-end;max-width:78%;align-self
 const SENT_BUBBLE = 'background:linear-gradient(145deg,rgba(212,160,48,.85),rgba(232,184,75,.90));border:1px solid rgba(255,255,255,.20);border-radius:18px 18px 4px 18px;padding:10px 14px;box-shadow:0 2px 12px rgba(212,160,48,.20)';
 const SENT_TEXT = 'font-size:14px;color:#1a0f05;font-weight:500;line-height:1.4';
 const AVATAR = 'width:28px;height:28px;border-radius:50%;background:linear-gradient(145deg,rgba(212,160,48,.4),rgba(180,100,20,.3));display:flex;align-items:center;justify-content:center;font-weight:700;color:#E8B84B;font-size:11px;flex-shrink:0';
-const SEP = 'font-size:11px;color:rgba(240,236,230,.30);font-weight:500';
+const SEP = 'font-size:11px;color:rgba(240,236,230,.6);font-weight:500';
 
 /** SCREEN: CONVERSATION — port fidèle (proto l.1087-1204). */
 export function ConversationScreen({ active, goTo }: { active: ScreenId; goTo: (id: ScreenId) => void }) {
@@ -90,7 +90,7 @@ export function ConversationScreen({ active, goTo }: { active: ScreenId; goTo: (
           </div>
 
           <div style={css('display:flex;justify-content:flex-end;padding-right:2px')}>
-            <span style={css('font-size:11px;color:rgba(240,236,230,.30)')}>Lu · 10:43</span>
+            <span style={css('font-size:11px;color:rgba(240,236,230,.6)')}>Lu · 10:43</span>
           </div>
         </div>
 
@@ -99,9 +99,9 @@ export function ConversationScreen({ active, goTo }: { active: ScreenId; goTo: (
           <div style={css('display:flex;align-items:center;gap:10px')}>
             <div style={css('flex:1;display:flex;align-items:center;background:rgba(255,255,255,.07);backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5);border:1px solid rgba(255,255,255,.11);border-radius:9999px;padding:10px 16px;gap:8px;position:relative;overflow:hidden')}>
               <div style={css('position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent)')} />
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,236,230,.30)" strokeWidth="2" style={css('flex-shrink:0')}><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" strokeWidth="3" /><line x1="15" y1="9" x2="15.01" y2="9" strokeWidth="3" /></svg>
-              <span style={css('font-size:15px;color:rgba(240,236,230,.30);flex:1')}>Message…</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,236,230,.30)" strokeWidth="2" style={css('flex-shrink:0')}><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,236,230,.6)" strokeWidth="2" style={css('flex-shrink:0')}><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" strokeWidth="3" /><line x1="15" y1="9" x2="15.01" y2="9" strokeWidth="3" /></svg>
+              <span style={css('font-size:15px;color:rgba(240,236,230,.6);flex:1')}>Message…</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,236,230,.6)" strokeWidth="2" style={css('flex-shrink:0')}><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
             </div>
             <div style={css('width:38px;height:38px;border-radius:50%;background:linear-gradient(145deg,rgba(212,160,48,.88),rgba(232,184,75,.94));display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;box-shadow:0 3px 12px rgba(212,160,48,.30);border:1px solid rgba(255,255,255,.22)')}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a0f05" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" /></svg>

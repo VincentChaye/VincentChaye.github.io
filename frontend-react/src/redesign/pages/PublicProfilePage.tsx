@@ -26,7 +26,7 @@ interface LogItem { _id: string; spotName?: string; routeName?: string; grade?: 
 
 const STAT = 'border-radius:16px;padding:14px 10px;text-align:center';
 const STAT_VALUE = 'font-size:20px;font-weight:800;letter-spacing:-.5px;color:#f0ece6;margin-bottom:3px';
-const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.43);text-transform:uppercase;letter-spacing:.5px';
+const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.5px';
 const ACT_CARD = 'border-radius:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start';
 const ACT_ICON = 'width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:2';
 
@@ -117,7 +117,7 @@ export function PublicProfilePage() {
           <div className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Retour</div>
           <div style={css('flex:1')} />
           <div className="na">
-            <IconButton style={css('cursor:pointer')} onClick={handleShare}><Share2Icon width={16} height={16} /></IconButton>
+            <IconButton aria-label="Partager le profil" style={css('cursor:pointer')} onClick={handleShare}><Share2Icon width={16} height={16} /></IconButton>
           </div>
         </div>
       </NavBar>
@@ -128,7 +128,7 @@ export function PublicProfilePage() {
           <div style={css('position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(80,130,200,.2)')} />
         </div>
         <div style={css('font-size:22px;font-weight:800;letter-spacing:-.6px;color:#f0ece6;margin-bottom:4px')}>{name}</div>
-        <div style={css('font-size:14px;color:rgba(240,236,230,.45);margin-bottom:16px')}>{prof.username ? `@${prof.username}` : ''}</div>
+        <div style={css('font-size:14px;color:rgba(240,236,230,.6);margin-bottom:16px')}>{prof.username ? `@${prof.username}` : ''}</div>
         {levelLabel && (
           <div style={css('display:flex;flex-direction:column;gap:2px;margin-bottom:20px')}>
             <span style={css('font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:rgba(212,160,48,.65);font-weight:600')}>Grimpeur {levelLabel}</span>
@@ -151,17 +151,17 @@ export function PublicProfilePage() {
       </div>
 
       <div style={css('padding:0 20px')}>
-        <div style={css('font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.35);padding:0 4px 12px')}>Activité récente</div>
+        <div style={css('font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.6);padding:0 4px 12px')}>Activité récente</div>
         <div style={css('display:flex;flex-direction:column;gap:10px')}>
           {activity.length === 0 ? (
-            <div className="g" style={css('border-radius:16px;padding:16px;font-size:13px;color:rgba(240,236,230,.45);text-align:center')}>{ascents === null ? 'Activité non publique.' : 'Aucune activité récente.'}</div>
+            <div className="g" style={css('border-radius:16px;padding:16px;font-size:13px;color:rgba(240,236,230,.6);text-align:center')}>{ascents === null ? 'Activité non publique.' : 'Aucune activité récente.'}</div>
           ) : (
             activity.map((it) => (
               <div key={it._id} className="g" style={css(ACT_CARD)}>
                 <div style={css(`${ACT_ICON};background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.2)`)}><ActivityIcon width={15} height={15} stroke="#D4A030" /></div>
                 <div style={css('flex:1;position:relative;z-index:2')}>
                   <div style={css('font-size:14px;font-weight:600;color:#f0ece6;margin-bottom:3px')}>{activityText(it)}</div>
-                  <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>{[it.spotName, relShort(it.date || it.createdAt)].filter(Boolean).join(' · ')}</div>
+                  <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>{[it.spotName, relShort(it.date || it.createdAt)].filter(Boolean).join(' · ')}</div>
                 </div>
               </div>
             ))

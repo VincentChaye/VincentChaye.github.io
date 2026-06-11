@@ -35,7 +35,7 @@ export function FavSpotCard({
       <div style={css('padding:12px 14px;position:relative;z-index:2')}>
         <div style={css('font-size:16px;font-weight:700;color:#f0ece6;margin-bottom:3px')}>{name}</div>
         <div style={css('display:flex;align-items:center;justify-content:space-between')}>
-          <span style={css('font-size:12px;color:rgba(240,236,230,.45)')}>{location}</span>
+          <span style={css('font-size:12px;color:rgba(240,236,230,.6)')}>{location}</span>
           <div style={css('display:flex;align-items:center;gap:4px')}>{STAR}<span style={css('font-size:12px;color:rgba(240,236,230,.55)')}>{rating}</span></div>
         </div>
       </div>

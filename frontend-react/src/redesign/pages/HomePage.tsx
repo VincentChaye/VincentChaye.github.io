@@ -4,7 +4,7 @@ import { apiFetch } from '@/lib/api';
 import { css } from '../lib/css';
 import { PageFrame } from '../components/PageFrame';
 import { NavBar } from '../components/NavBar';
-import { IconButton, SectionHeader } from '../components/primitives';
+import { IconButton, Pressable, SectionHeader } from '../components/primitives';
 import { StatsGrid } from '../components/StatsGrid';
 import { ListRow } from '../components/ListRow';
 import { FeatureCard } from '../components/FeatureCard';
@@ -30,9 +30,9 @@ export function HomePage() {
 
   return (
     <PageFrame tab="accueil">
-      <NavBar style={css('height:100px')}>
-        <div style={css('position:absolute;top:62px;right:20px')}>
-          <IconButton style={css('cursor:pointer')} onClick={() => navigate('/redesign/notifications')}>
+      <NavBar style={css('height:calc(100px + var(--safe-top))')}>
+        <div style={css('position:absolute;top:calc(62px + var(--safe-top));right:20px')}>
+          <IconButton aria-label="Notifications" style={css('cursor:pointer')} onClick={() => navigate('/redesign/notifications')}>
             <BellIcon width={16} height={16} />
           </IconButton>
         </div>
@@ -47,10 +47,10 @@ export function HomePage() {
         <p style={css('font-size:15px;line-height:1.55;color:rgba(240,236,230,.55);margin-bottom:28px;padding:0 8px')}>
           Explore les spots, découvre de nouvelles falaises et partage tes meilleurs blocs.
         </p>
-        <div onClick={() => navigate('/redesign/map')} className="morph-btn" style={css('display:inline-flex;align-items:center;gap:9px;padding:15px 28px;border-radius:9999px;background:linear-gradient(145deg,rgba(212,160,48,.90),rgba(232,184,75,.95));border:1px solid rgba(255,255,255,.28);color:#1a0f05;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(212,160,48,.40),inset 0 1px 0 rgba(255,255,255,.30);position:relative;overflow:hidden')}>
+        <Pressable onClick={() => navigate('/redesign/map')} className="morph-btn" style={css('display:inline-flex;align-items:center;gap:9px;padding:15px 28px;border-radius:9999px;background:linear-gradient(145deg,rgba(212,160,48,.90),rgba(232,184,75,.95));border:1px solid rgba(255,255,255,.28);color:#1a0f05;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(212,160,48,.40),inset 0 1px 0 rgba(255,255,255,.30);position:relative;overflow:hidden')}>
           <SearchIcon width={16} height={16} strokeWidth={2.5} />
           Explorer la carte
-        </div>
+        </Pressable>
         <div style={css('width:62px;height:62px;border-radius:18px;background:rgba(42,110,60,.18);backdrop-filter:blur(20px);border:1px solid rgba(212,160,48,.20);display:flex;align-items:center;justify-content:center;font-size:28px;margin:28px auto 0;box-shadow:0 0 28px rgba(212,160,48,.18)')} />
       </div>
 
@@ -67,7 +67,7 @@ export function HomePage() {
       <SectionHeader>Ton espace</SectionHeader>
       <div style={css('padding:0 20px;display:flex;flex-direction:column;gap:10px')}>
         <ListRow icon={<BookOpenIcon width={18} height={18} />} title="Carnet" subtitle="Ton carnet d'ascensions" onClick={() => navigate('/redesign/logbook')} />
-        <ListRow icon={<ActivityIcon width={18} height={18} />} title="Fil d'activité" subtitle="Activité de la communauté" onClick={() => navigate('/redesign/feed')} />
+        <ListRow icon={<ActivityIcon width={18} height={18} />} title="Social" subtitle="Activité de la communauté" onClick={() => navigate('/redesign/feed')} />
         <ListRow icon={<MapPinIcon width={18} height={18} />} title="Mes Spots" subtitle="Favoris & propositions" onClick={() => navigate('/redesign/my-spots')} />
       </div>
 

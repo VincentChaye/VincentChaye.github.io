@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { css } from '../lib/css';
 
-/** Story circulaire du fil d'activité (proto l.566-585). `circleStyle` = bg/bord/ombre/couleur du cercle. */
+/** Story circulaire de l'écran Social (proto l.566-585). `circleStyle` = bg/bord/ombre/couleur du cercle. */
 export function StoryItem({
   circleStyle,
   label,

@@ -30,7 +30,7 @@ export function MessagesScreen({ active, goTo }: { active: ScreenId; goTo: (id: 
         <ConversationRow avatarStyle="border-radius:50%;background:linear-gradient(145deg,rgba(90,60,160,.4),rgba(60,30,120,.3))" avatarColor="#a88fe0" avatarFontSize="16px" initials="T" name="Thomas Roc" time="Lun." preview="On part grimper samedi ? Fontainebleau" />
 
         {/* Groupes */}
-        <div style={css('margin-top:6px;margin-bottom:8px;padding:0 4px;font-size:12px;font-weight:600;color:rgba(240,236,230,.35);letter-spacing:.6px;text-transform:uppercase')}>Groupes</div>
+        <div style={css('margin-top:6px;margin-bottom:8px;padding:0 4px;font-size:12px;font-weight:600;color:rgba(240,236,230,.6);letter-spacing:.6px;text-transform:uppercase')}>Groupes</div>
 
         <ConversationRow avatarStyle="border-radius:14px;background:linear-gradient(145deg,rgba(212,160,48,.25),rgba(180,100,20,.2))" avatarColor="#E8B84B" avatarFontSize="13px" initials="CES" name="Club Escalade Sud" time="Mar." preview="Lucas : Sortie dimanche confirmee !" unread />
       </div>

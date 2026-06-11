@@ -82,7 +82,7 @@ export function ForgotPasswordPage() {
             <button type="submit" disabled={loading} style={css(`margin-top:8px;padding:16px;border-radius:16px;background:linear-gradient(145deg,rgba(212,160,48,.90),rgba(232,184,75,.95));border:1px solid rgba(255,255,255,.25);text-align:center;font-size:16px;font-weight:700;color:#1a0f05;cursor:pointer;box-shadow:0 4px 20px rgba(212,160,48,.35),inset 0 1px 0 rgba(255,255,255,.25);width:100%;font-family:inherit${loading ? ';opacity:.6' : ''}`)}>
               {loading ? 'Envoi…' : 'Envoyer le lien'}
             </button>
-            <div style={css('text-align:center;padding:8px 0;font-size:14px;color:rgba(240,236,230,.4);cursor:pointer')} onClick={() => navigate('/redesign/login')}>Retour à la connexion</div>
+            <div style={css('text-align:center;padding:8px 0;font-size:14px;color:rgba(240,236,230,.6);cursor:pointer')} onClick={() => navigate('/redesign/login')}>Retour à la connexion</div>
           </form>
         )}
       </div>

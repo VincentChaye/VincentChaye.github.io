@@ -26,6 +26,8 @@ interface MessagesStore {
   sendMessage: (convId: string, content: string, attachments?: MessageAttachment[], sharedObject?: SharedObject) => Promise<void>;
   uploadMedia: (file: File) => Promise<MessageAttachment>;
   setActiveConversation: (id: string | null) => void;
+  markUnread: (convId: string) => Promise<void>;
+  hideConversation: (convId: string) => Promise<void>;
 
   // Group actions
   createGroup: (name: string, participantUids: string[]) => Promise<Conversation>;
@@ -58,8 +60,7 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
     try {
       const convs = await apiFetch<Conversation[]>('/api/messages/conversations', { auth: true });
       const myUid = getUserUid();
-      const total = convs.reduce((sum, c) => sum + (myUid ? (c.unread?.[myUid] ?? 0) : 0), 0);
-      set({ conversations: convs, unreadTotal: total });
+      set({ conversations: convs, unreadTotal: computeUnreadTotal(convs, myUid) });
     } catch { /* silent */ }
   },
 
@@ -68,19 +69,36 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
     getSocket().emit('join', convId);
     getSocket().emit('read', convId);
     apiFetch(`/api/messages/conversations/${convId}/read`, { method: 'PATCH', auth: true }).catch(() => {});
-    const myUid = getUserUid() ?? '';
-    set((s) => ({
-      conversations: s.conversations.map((c) =>
-        c._id === convId ? { ...c, unread: { ...c.unread, [myUid]: 0 } } : c
-      ),
-      unreadTotal: Math.max(
-        0,
-        s.unreadTotal - (s.conversations.find((c) => c._id === convId)?.unread?.[myUid] ?? 0)
-      ),
-    }));
+    const myUid = getUserUid();
+    set((s) => {
+      const convs = s.conversations.map((c) =>
+        c._id === convId ? { ...c, unread: { ...c.unread, [myUid ?? '']: 0 } } : c
+      );
+      return { conversations: convs, unreadTotal: computeUnreadTotal(convs, myUid) };
+    });
     if (!get().messages[convId]) {
       await loadMessages(convId, set, get);
     }
+  },
+
+  markUnread: async (convId: string) => {
+    await apiFetch(`/api/messages/conversations/${convId}/unread`, { method: 'PATCH', auth: true }).catch(() => {});
+    const myUid = getUserUid();
+    set((s) => {
+      const convs = s.conversations.map((c) =>
+        c._id === convId ? { ...c, unread: { ...c.unread, [myUid ?? '']: 1 } } : c
+      );
+      return { conversations: convs, unreadTotal: computeUnreadTotal(convs, myUid) };
+    });
+  },
+
+  hideConversation: async (convId: string) => {
+    await apiFetch(`/api/messages/conversations/${convId}`, { method: 'DELETE', auth: true }).catch(() => {});
+    const myUid = getUserUid();
+    set((s) => {
+      const convs = s.conversations.filter((c) => c._id !== convId);
+      return { conversations: convs, unreadTotal: computeUnreadTotal(convs, myUid) };
+    });
   },
 
   loadMoreMessages: async (convId: string) => {
@@ -216,6 +234,14 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
 
   _onNewMessage: (msg) => {
     const convId = String(msg.conversationId);
+    const myUid = getUserUid();
+    // Message reçu dans la conversation active et pas de soi → marquer lu (DB à 0),
+    // sans incrémenter le compteur local. L'incrément des non-lus est géré par
+    // _onConversationUpdated (un seul handler pour éviter le double comptage).
+    if (get().activeConversationId === convId && msg.senderUid !== myUid) {
+      getSocket().emit('read', convId);
+      apiFetch(`/api/messages/conversations/${convId}/read`, { method: 'PATCH', auth: true }).catch(() => {});
+    }
     set((s) => {
       const existing = s.messages[convId] ?? [];
       if (existing.some((m) => m._id === msg._id)) return s;
@@ -228,23 +254,45 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
         (msg.sharedObject?.type === 'spot' ? '📍 Spot partagé' : null) ||
         (msg.sharedObject?.type === 'route' ? '🧗 Voie partagée' : null) ||
         '';
-      return {
-        messages: { ...s.messages, [convId]: [...existing, msg] },
-        conversations: s.conversations.map((c) =>
+      const conversations = sortByUpdatedAt(
+        s.conversations.map((c) =>
           c._id === convId
             ? { ...c, lastMessage: { content: previewContent, senderUid: msg.senderUid, createdAt: msg.createdAt }, updatedAt: msg.createdAt }
             : c
-        ),
+        )
+      );
+      return {
+        messages: { ...s.messages, [convId]: [...existing, msg] },
+        conversations,
       };
     });
   },
 
   _onConversationUpdated: (partial) => {
-    set((s) => ({
-      conversations: s.conversations.map((c) =>
-        c._id === partial._id ? { ...c, ...partial } : c
-      ),
-    }));
+    const myUid = getUserUid();
+    const exists = get().conversations.some((c) => c._id === partial._id);
+    // Conv réaffichée côté serveur (hiddenFor remis à []) mais absente localement
+    // (l'utilisateur l'avait masquée) → resynchroniser.
+    if (!exists) {
+      get().loadConversations();
+      return;
+    }
+    const isActive = get().activeConversationId === partial._id;
+    set((s) => {
+      const conversations = sortByUpdatedAt(
+        s.conversations.map((c) => {
+          if (c._id !== partial._id) return c;
+          const merged = { ...c, ...partial };
+          // Incrément des non-lus uniquement si la conv n'est pas active
+          // (le cas actif est géré par _onNewMessage qui émet `read`).
+          if (!isActive && myUid) {
+            merged.unread = { ...merged.unread, [myUid]: (c.unread?.[myUid] ?? 0) + 1 };
+          }
+          return merged;
+        })
+      );
+      return { conversations, unreadTotal: computeUnreadTotal(conversations, myUid) };
+    });
   },
 
   _onUserStatus: ({ uid, online }) => {
@@ -292,6 +340,17 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
     set((s) => ({ conversations: s.conversations.filter((c) => c._id !== convId) }));
   },
 }));
+
+/** Somme des messages non lus pour l'utilisateur courant sur toutes les conversations. */
+function computeUnreadTotal(convs: Conversation[], myUid: string | null): number {
+  if (!myUid) return 0;
+  return convs.reduce((sum, c) => sum + (c.unread?.[myUid] ?? 0), 0);
+}
+
+/** Tri décroissant par `updatedAt` (la conv qui reçoit un message remonte en tête). */
+function sortByUpdatedAt(convs: Conversation[]): Conversation[] {
+  return [...convs].sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : a.updatedAt > b.updatedAt ? -1 : 0));
+}
 
 function getUserUid(): string | null {
   try {

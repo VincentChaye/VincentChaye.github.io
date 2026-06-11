@@ -94,7 +94,7 @@ const TILE_LAYERS: Record<MapLayerKey, { url: string; attribution: string; maxZo
     maxZoom: 17,
   },
 };
-const MAP_LAYER_ORDER: MapLayerKey[] = ['osm', 'satellite', 'topo'];
+const MAP_LAYER_ORDER: MapLayerKey[] = ['satellite', 'osm', 'topo'];
 
 /* ---------- Spot data normalization ---------- */
 function normalizeSpot(s: Record<string, unknown>, i: number): Spot | null {
@@ -289,7 +289,7 @@ export function MapPage() {
   const [filterDistance, setFilterDistance] = useState(0); // 0 = no limit
 
   // Map layer
-  const [mapLayer, setMapLayer] = useState<MapLayerKey>('osm');
+  const [mapLayer, setMapLayer] = useState<MapLayerKey>('satellite');
   const cycleLayer = useCallback(() => {
     setMapLayer((prev) => {
       const idx = MAP_LAYER_ORDER.indexOf(prev);
@@ -616,7 +616,7 @@ export function MapPage() {
               'text-text-secondary transition-all duration-200',
               'hover:bg-surface hover:text-sage hover:shadow-elevated',
               'active:scale-95',
-              mapLayer !== 'osm' && 'bg-sage text-white border-sage hover:bg-sage-hover hover:text-white',
+              mapLayer !== 'satellite' && 'bg-sage text-white border-sage hover:bg-sage-hover hover:text-white',
             )}
             title={t(`map.layer.${mapLayer}`)}
             type="button"

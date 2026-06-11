@@ -26,7 +26,7 @@ export function MapScreen({ active, goTo }: { active: ScreenId; goTo: (id: Scree
             <div style={css('color:rgba(212,160,48,.7);position:relative;z-index:1')}>
               <SearchIcon width={16} height={16} />
             </div>
-            <div style={css('font-size:15px;color:rgba(240,236,230,.45);flex:1;position:relative;z-index:1')}>Rechercher un spot...</div>
+            <div style={css('font-size:15px;color:rgba(240,236,230,.6);flex:1;position:relative;z-index:1')}>Rechercher un spot...</div>
             <div
               onClick={() => goTo('filtres' as ScreenId)}
               style={css('width:30px;height:30px;border-radius:50%;background:rgba(212,160,48,.15);border:1px solid rgba(212,160,48,.25);display:flex;align-items:center;justify-content:center;color:#D4A030;position:relative;z-index:1;cursor:pointer')}

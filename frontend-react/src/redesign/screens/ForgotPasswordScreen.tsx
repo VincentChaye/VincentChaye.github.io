@@ -39,7 +39,7 @@ export function ForgotPasswordScreen({ active, goTo }: { active: ScreenId; goTo:
           <GlassCard onClick={() => goTo('login')} style={css('border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#1a0f05;cursor:pointer;margin-top:8px;letter-spacing:-.2px')}>
             Envoyer le lien
           </GlassCard>
-          <div style={css('text-align:center;padding:8px 0;font-size:14px;color:rgba(240,236,230,.4);cursor:pointer')} onClick={() => goTo('login')}>Retour à la connexion</div>
+          <div style={css('text-align:center;padding:8px 0;font-size:14px;color:rgba(240,236,230,.6);cursor:pointer')} onClick={() => goTo('login')}>Retour à la connexion</div>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import './styles/liquid-glass.css';
+import './styles/liquid-glass-enhance.css';
 import { css } from './lib/css';
 import { ALL_SCREEN_IDS, BUILT_SCREENS, type ScreenId } from './lib/nav';
 import { SidePanel } from './components/SidePanel';

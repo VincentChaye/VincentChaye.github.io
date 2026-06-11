@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { css } from '../lib/css';
+import { Pressable } from './primitives';
 
 /** Pastille de filtre de la carte (active ambre / inactive glass). */
 export function FilterPill({
@@ -20,5 +21,6 @@ export function FilterPill({
     (shadow ? ';box-shadow:0 2px 12px rgba(212,160,48,.35)' : '');
   const off =
     ';background:rgba(12,8,4,.68);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.10);color:rgba(240,236,230,.60)';
-  return <div onClick={onClick} style={css(base + (active ? on : off) + (onClick ? ';cursor:pointer' : ''))}>{children}</div>;
+  // aria-pressed expose l'état sélectionné aux lecteurs d'écran (la couleur seule ne suffit pas).
+  return <Pressable aria-pressed={active} onClick={onClick} style={css(base + (active ? on : off))}>{children}</Pressable>;
 }

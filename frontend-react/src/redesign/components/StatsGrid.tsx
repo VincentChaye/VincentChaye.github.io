@@ -20,7 +20,7 @@ export function StatsGrid({ items }: { items: StatItem[] }) {
           <div style={css('font-size:26px;font-weight:800;letter-spacing:-1px;color:#f0ece6;margin-bottom:3px')}>
             {it.value}
           </div>
-          <div style={css('font-size:10px;font-weight:500;color:rgba(240,236,230,.45);text-transform:uppercase;letter-spacing:.7px')}>
+          <div style={css('font-size:10px;font-weight:500;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.7px')}>
             {it.label}
           </div>
           {i < items.length - 1 && (

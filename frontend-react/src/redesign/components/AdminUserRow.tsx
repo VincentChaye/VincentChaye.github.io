@@ -22,7 +22,7 @@ export function AdminUserRow({
       <div style={css(`width:32px;height:32px;border-radius:50%;${avatarBg};display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0`)} />
       <div style={css('flex:1')}>
         <div style={css('font-size:14px;font-weight:600;color:#f0ece6')}>{name}</div>
-        <div style={css('font-size:11px;color:rgba(240,236,230,.40)')}>{meta}</div>
+        <div style={css('font-size:11px;color:rgba(240,236,230,.6)')}>{meta}</div>
       </div>
       <Tag variant={badgeVariant} style={css('font-size:10px;padding:3px 8px')}>{badge}</Tag>
     </div>

@@ -7,8 +7,8 @@ import { GearRow } from '../components/GearRow';
 import { BackChevronIcon } from '../lib/icons';
 
 const STAT = 'border-radius:16px;padding:14px 10px;text-align:center';
-const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.43);text-transform:uppercase;letter-spacing:.5px';
-const SECTION = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.35);padding:0 4px 10px';
+const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.5px';
+const SECTION = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.6);padding:0 4px 10px';
 const CARD = 'border-radius:20px;overflow:hidden;display:flex;flex-direction:column;margin-bottom:16px';
 const BADGE_OK = 'background:rgba(80,160,80,.2);border:1px solid rgba(80,160,80,.3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#80D880';
 const BADGE_WARN = 'background:rgba(232,128,128,.2);border:1px solid rgba(232,128,128,.3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#E88080';

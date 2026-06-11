@@ -8,7 +8,8 @@ import { PageFrame } from '../components/PageFrame';
 import { NavBar } from '../components/NavBar';
 import { IconButton } from '../components/primitives';
 import { ProfileMenuRow } from '../components/ProfileMenuRow';
-import { BookOpenIcon, MapPinIcon, UsersIcon, ShieldIcon } from '../lib/icons';
+import { BookOpenIcon, DownloadIcon } from '../lib/icons';
+import { isOfflineEnabled } from '@/offline/env';
 
 /**
  * SWAP — Profil (« mon profil », design Liquid Glass) câblé aux vraies données PROTÉGÉES.
@@ -25,9 +26,9 @@ const GEAR = (
 const ROPE = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6.5 6.5 11 11" /><path d="m21 21-1-1" /><path d="m3 3 1 1" /><path d="m18 22 4-4" /><path d="m2 6 4-4" /><path d="m3 10 7-7" /><path d="m14 21 7-7" /></svg>;
 const LOGOUT = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>;
 
-const STAT = 'border-radius:16px;padding:14px 10px;text-align:center';
+const STAT = 'border-radius:16px;padding:14px 4px;text-align:center';
 const STAT_VALUE = 'font-size:20px;font-weight:800;letter-spacing:-.5px;color:#f0ece6;margin-bottom:3px';
-const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.43);text-transform:uppercase;letter-spacing:.5px';
+const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.5px';
 
 const LEVEL_FR: Record<string, string> = {
   debutant: 'débutant', intermediaire: 'intermédiaire', confirme: 'confirmé', expert: 'expert', pro: 'pro',
@@ -84,7 +85,7 @@ export function ProfilePage() {
         <div className="nbi">
           <div style={css('flex:1')} />
           <div className="na">
-            <IconButton style={css('cursor:pointer')} onClick={() => navigate('/settings')}>{GEAR}</IconButton>
+            <IconButton aria-label="Paramètres" style={css('cursor:pointer')} onClick={() => navigate('/settings')}>{GEAR}</IconButton>
           </div>
         </div>
       </NavBar>
@@ -95,27 +96,27 @@ export function ProfilePage() {
           <div style={css('position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(212,160,48,.2)')} />
         </div>
         <div style={css('font-size:22px;font-weight:800;letter-spacing:-.6px;color:#f0ece6;margin-bottom:4px')}>{user.displayName || user.username}</div>
-        <div style={css('font-size:14px;color:rgba(240,236,230,.45);margin-bottom:16px')}>{user.username ? `@${user.username}` : user.email}</div>
+        <div style={css('font-size:14px;color:rgba(240,236,230,.6);margin-bottom:16px')}>{user.username ? `@${user.username}` : user.email}</div>
         {(levelLabel || maxGrade !== '—') && (
           <div style={css('display:flex;flex-direction:column;gap:2px;margin-bottom:24px')}>
             {levelLabel && <span style={css('font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:rgba(212,160,48,.65);font-weight:600')}>Grimpeur {levelLabel}</span>}
             {maxGrade !== '—' && <span style={css('font-size:15px;font-weight:700;color:rgba(240,236,230,.80);letter-spacing:-.3px')}>Max {maxGrade}</span>}
           </div>
         )}
-        <div style={css('display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px')}>
-          <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{ascents ?? '—'}</div><div style={css(STAT_LABEL)}>Ascensions</div></div></div>
-          <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{spotsClimbed ?? '—'}</div><div style={css(STAT_LABEL)}>Spots</div></div></div>
-          <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{pub.friendsCount}</div><div style={css(STAT_LABEL)}>Amis</div></div></div>
-          <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{pub.spotsContributed}</div><div style={css(STAT_LABEL)}>Contribs</div></div></div>
+        <div style={css('display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:280px;margin:0 auto 24px')}>
+          <div style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{ascents ?? '—'}</div><div style={css(STAT_LABEL)}>Ascensions</div></div></div>
+          <div role="button" onClick={() => navigate('/redesign/my-spots')} style={css(STAT + ';cursor:pointer')}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{spotsClimbed ?? '—'}</div><div style={css(STAT_LABEL)}>Spots</div></div></div>
+          <div role="button" onClick={() => navigate('/redesign/friends')} style={css(STAT + ';cursor:pointer')}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{pub.friendsCount}</div><div style={css(STAT_LABEL)}>Amis</div></div></div>
+          <div role="button" onClick={() => navigate('/redesign/my-spots?tab=contrib')} style={css(STAT + ';cursor:pointer')}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{pub.spotsContributed}</div><div style={css(STAT_LABEL)}>Contribs</div></div></div>
         </div>
       </div>
 
       <div style={css('padding:0 20px;display:flex;flex-direction:column;gap:8px')}>
         <ProfileMenuRow onClick={() => navigate('/redesign/logbook')} iconBox="background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.20)" iconColor="#D4A030" label="Mon carnet de grimpe" icon={<BookOpenIcon width={16} height={16} />} />
-        <ProfileMenuRow onClick={() => navigate('/redesign/my-spots')} iconBox="background:rgba(80,160,80,.12);border:1px solid rgba(80,160,80,.20)" iconColor="#80D880" label="Mes spots favoris" icon={<MapPinIcon width={16} height={16} />} />
-        <ProfileMenuRow onClick={() => navigate('/redesign/friends')} iconBox="background:rgba(80,130,200,.12);border:1px solid rgba(80,130,200,.20)" iconColor="#88BBEE" label="Mes amis" icon={<UsersIcon width={16} height={16} />} />
-        <ProfileMenuRow onClick={() => navigate('/redesign/my-spots?tab=contrib')} iconBox="background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.20)" iconColor="#D4A030" label="Mes contributions" icon={<ShieldIcon width={16} height={16} />} />
         <ProfileMenuRow onClick={() => navigate('/redesign/gear')} iconBox="background:rgba(232,128,128,.12);border:1px solid rgba(232,128,128,.20)" iconColor="#E88080" label="Mon matériel" icon={ROPE} />
+        {isOfflineEnabled() && (
+          <ProfileMenuRow onClick={() => navigate('/redesign/offline')} iconBox="background:rgba(136,216,128,.12);border:1px solid rgba(136,216,128,.20)" iconColor="#88D880" label="Mode hors ligne" icon={<DownloadIcon width={16} height={16} />} />
+        )}
         <ProfileMenuRow onClick={() => navigate('/settings')} iconBox="background:rgba(80,130,200,.12);border:1px solid rgba(80,130,200,.20)" iconColor="#88BBEE" label="Paramètres" icon={GEAR} />
         <ProfileMenuRow onClick={handleLogout} marginTop iconBox="background:rgba(200,80,80,.12);border:1px solid rgba(200,80,80,.20)" iconColor="#E88080" labelColor="rgba(240,150,150,.85)" label="Se déconnecter" icon={LOGOUT} />
       </div>

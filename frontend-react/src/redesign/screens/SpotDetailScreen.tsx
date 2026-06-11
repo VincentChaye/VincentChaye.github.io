@@ -9,7 +9,7 @@ import { BackChevronIcon, HeartIcon, ShareUploadIcon, MapPinIcon } from '../lib/
 
 const STAT_CELL = 'text-align:center;padding:14px 8px;position:relative';
 const STAT_VALUE = 'font-size:18px;font-weight:800;color:#f0ece6;margin-bottom:2px';
-const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.45);text-transform:uppercase;letter-spacing:.5px';
+const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.5px';
 const STAT_DIVIDER = 'position:absolute;right:0;top:20%;bottom:20%;width:1px;background:rgba(212,160,48,.15)';
 
 /** SCREEN: SPOT DETAIL — port fidèle (proto l.473-558). */

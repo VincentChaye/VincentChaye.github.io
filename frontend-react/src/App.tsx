@@ -95,6 +95,9 @@ const RedesignAdminUsersPage = lazy(() =>
 const RedesignAdminGearPage = lazy(() =>
   import('@/redesign/pages/AdminGearPage').then((m) => ({ default: m.AdminGearPage })),
 );
+const RedesignOfflinePage = lazy(() =>
+  import('@/redesign/pages/OfflinePage').then((m) => ({ default: m.OfflinePage })),
+);
 import { useThemeStore } from '@/stores/theme.store';
 import { useMessagesStore } from '@/stores/messages.store';
 import { useOutingStore } from '@/stores/outing.store';
@@ -358,6 +361,14 @@ function App() {
           element={
             <Suspense fallback={null}>
               <RedesignMapPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/redesign/offline"
+          element={
+            <Suspense fallback={null}>
+              <RedesignOfflinePage />
             </Suspense>
           }
         />

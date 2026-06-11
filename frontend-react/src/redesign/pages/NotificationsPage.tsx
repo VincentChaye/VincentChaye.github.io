@@ -19,14 +19,14 @@ import { BackChevronIcon } from '../lib/icons';
  * d'action sociale ici). Non connecté → invite à se connecter. i18n en dur (FR), comme la maquette.
  */
 
-const GROUP_TITLE = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.35);padding:16px 0 10px';
+const GROUP_TITLE = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.6);padding:16px 0 10px';
 const ROW = 'border-radius:18px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;cursor:pointer';
 const AVATAR = 'position:relative;z-index:2;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0';
 const BODY = 'flex:1;position:relative;z-index:2';
 const TEXT = 'font-size:14px;color:#f0ece6;line-height:1.4;margin-bottom:4px';
 const TEXT_READ = 'font-size:14px;color:rgba(240,236,230,.75);line-height:1.4;margin-bottom:4px';
-const TIME = 'font-size:12px;color:rgba(240,236,230,.40)';
-const TIME_READ = 'font-size:12px;color:rgba(240,236,230,.35)';
+const TIME = 'font-size:12px;color:rgba(240,236,230,.6)';
+const TIME_READ = 'font-size:12px;color:rgba(240,236,230,.6)';
 const DOT = 'width:8px;height:8px;border-radius:50%;background:#D4A030;flex-shrink:0;margin-top:4px;box-shadow:0 0 8px rgba(212,160,48,.6)';
 const B = css('font-weight:700');
 
@@ -150,7 +150,7 @@ export function NotificationsPage() {
         {loading ? (
           <div style={css('min-height:300px;display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.5);font-size:14px')}>Chargement…</div>
         ) : notifications.length === 0 ? (
-          <div style={css('padding:60px 8px;text-align:center;color:rgba(240,236,230,.45);font-size:14px')}>Aucune notification pour le moment.</div>
+          <div style={css('padding:60px 8px;text-align:center;color:rgba(240,236,230,.6);font-size:14px')}>Aucune notification pour le moment.</div>
         ) : (
           groups.map(({ b, items }) => (
             <div key={b}>

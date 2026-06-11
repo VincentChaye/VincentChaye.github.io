@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import type { HTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -17,12 +17,42 @@ export function GlassCard({ className, children, ...rest }: HTMLAttributes<HTMLD
   );
 }
 
-/** `.ib` — pastille glass ronde pour bouton-icône (navbar / actions). */
-export function IconButton({ className, children, ...rest }: HTMLAttributes<HTMLDivElement>) {
+/**
+ * `Pressable` — bouton accessible de base du redesign. À utiliser PARTOUT à la place des
+ * `<div onClick>` : rend un vrai `<button>` (type="button" par défaut), donc focusable au
+ * clavier, activable Entrée/Espace, et annoncé « bouton » par les lecteurs d'écran — gratuit.
+ *
+ * Le CSS `.lg-btn` (interactions.css) :
+ *  - neutralise le chrome natif du bouton → visuel IDENTIQUE au `<div>` d'origine ;
+ *  - pose un anneau de focus visible au clavier (`:focus-visible`) ;
+ *  - garantit une cible tactile ≥ 44×44px via un `::after` (Apple/WCAG) SANS changer la
+ *    taille visuelle. `hit={false}` désactive cet agrandissement quand les boutons sont
+ *    collés (ex. zoom +/− empilés) pour éviter le chevauchement des zones de touche.
+ *
+ * Icône seule ? Passe `aria-label` (sinon le bouton n'a pas de nom accessible).
+ * Le feedback tactile (scale spring) est posé automatiquement par usePressFeedback
+ * (cible tout `cursor:pointer`, dont `.lg-btn`).
+ */
+export function Pressable({
+  className,
+  children,
+  type,
+  hit = true,
+  ...rest
+}: { hit?: boolean } & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <div className={cn('ib', className)} {...rest}>
+    <button type={type ?? 'button'} className={cn('lg-btn', !hit && 'lg-btn--nohit', className)} {...rest}>
       {children}
-    </div>
+    </button>
+  );
+}
+
+/** `.ib` — pastille glass ronde pour bouton-icône (navbar / actions). Bouton accessible. */
+export function IconButton({ className, children, ...rest }: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <Pressable className={cn('ib', className)} {...rest}>
+      {children}
+    </Pressable>
   );
 }
 

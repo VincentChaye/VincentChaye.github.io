@@ -7,7 +7,7 @@ import { BackChevronIcon, Share2Icon, ActivityIcon, MapPinIcon } from '../lib/ic
 
 const STAT = 'border-radius:16px;padding:14px 10px;text-align:center';
 const STAT_VALUE = 'font-size:20px;font-weight:800;letter-spacing:-.5px;color:#f0ece6;margin-bottom:3px';
-const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.43);text-transform:uppercase;letter-spacing:.5px';
+const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.5px';
 const ACT_CARD = 'border-radius:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start';
 const ACT_ICON = 'width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:2';
 
@@ -34,7 +34,7 @@ export function PublicProfileScreen({ active, goTo }: { active: ScreenId; goTo: 
           <div style={css('position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(80,130,200,.2)')} />
         </div>
         <div style={css('font-size:22px;font-weight:800;letter-spacing:-.6px;color:#f0ece6;margin-bottom:4px')}>Thomas R.</div>
-        <div style={css('font-size:14px;color:rgba(240,236,230,.45);margin-bottom:16px')}>@thomasr · Grenoble </div>
+        <div style={css('font-size:14px;color:rgba(240,236,230,.6);margin-bottom:16px')}>@thomasr · Grenoble </div>
         <div style={css('display:flex;flex-direction:column;gap:2px;margin-bottom:20px')}>
           <span style={css('font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:rgba(212,160,48,.65);font-weight:600')}>Grimpeur expert</span>
           <span style={css('font-size:15px;font-weight:700;color:rgba(240,236,230,.80);letter-spacing:-.3px')}>Max 8a</span>
@@ -56,20 +56,20 @@ export function PublicProfileScreen({ active, goTo }: { active: ScreenId; goTo: 
 
       {/* Activité récente */}
       <div style={css('padding:0 20px')}>
-        <div style={css('font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.35);padding:0 4px 12px')}>Activité récente</div>
+        <div style={css('font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.6);padding:0 4px 12px')}>Activité récente</div>
         <div style={css('display:flex;flex-direction:column;gap:10px')}>
           <div className="g" style={css(ACT_CARD)}>
             <div style={css(`${ACT_ICON};background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.2)`)}><ActivityIcon width={15} height={15} stroke="#D4A030" /></div>
             <div style={css('flex:1;position:relative;z-index:2')}>
               <div style={css('font-size:14px;font-weight:600;color:#f0ece6;margin-bottom:3px')}>Flash de <span style={css('color:#D4A030')}>L'Égypte 7b+</span></div>
-              <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>Gorges du Verdon · il y a 2j</div>
+              <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>Gorges du Verdon · il y a 2j</div>
             </div>
           </div>
           <div className="g" style={css(ACT_CARD)}>
             <div style={css(`${ACT_ICON};background:rgba(80,160,80,.12);border:1px solid rgba(80,160,80,.2)`)}><MapPinIcon width={15} height={15} stroke="#80D880" /></div>
             <div style={css('flex:1;position:relative;z-index:2')}>
               <div style={css('font-size:14px;font-weight:600;color:#f0ece6;margin-bottom:3px')}>Spot proposé : <span style={css('color:#80D880')}>Belvédère de Sisteron</span></div>
-              <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>Sisteron, 04 · il y a 5j</div>
+              <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>Sisteron, 04 · il y a 5j</div>
             </div>
           </div>
         </div>

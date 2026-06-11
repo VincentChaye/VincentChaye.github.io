@@ -19,7 +19,7 @@ import { BackChevronIcon } from '../lib/icons';
 
 interface Person { friendshipId?: string; _id: string; username?: string; displayName?: string; avatarUrl?: string; }
 
-const GROUP = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.35);padding:0 4px 10px';
+const GROUP = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.6);padding:0 4px 10px';
 const REQ_ROW = 'padding:14px 16px;display:flex;align-items:center;gap:14px;position:relative;z-index:2';
 const ACCEPT = 'padding:6px 14px;border-radius:10px;font-size:13px;font-weight:700;color:#1a0f05;cursor:pointer;background:linear-gradient(145deg,rgba(212,160,48,.9),rgba(232,184,75,.95))';
 const REFUSE = 'padding:6px 14px;border-radius:10px;font-size:13px;font-weight:600;color:rgba(240,236,230,.5);cursor:pointer;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)';
@@ -98,7 +98,7 @@ export function FriendsPage() {
       <div style={css('padding:0 20px')}>
         {/* Recherche (filtre mes amis) */}
         <div className="g" style={css('border-radius:16px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:18px')}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,236,230,.4)" strokeWidth="2.2" strokeLinecap="round" style={css('flex-shrink:0;position:relative;z-index:2')}><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,236,230,.6)" strokeWidth="2.2" strokeLinecap="round" style={css('flex-shrink:0;position:relative;z-index:2')}><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
           <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Rechercher un ami…" style={css('font-size:15px;color:#f0ece6;background:transparent;border:none;outline:none;flex:1;font-family:inherit;position:relative;z-index:2;min-width:0')} />
         </div>
 
@@ -116,7 +116,7 @@ export function FriendsPage() {
                       <div style={css(`width:44px;height:44px;border-radius:50%;${avStyle(i)};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#f0ece6;flex-shrink:0;overflow:hidden`)}>
                         {p.avatarUrl ? <img src={p.avatarUrl} alt="" style={css('width:100%;height:100%;object-fit:cover')} /> : initialOf(p)}
                       </div>
-                      <div style={css('flex:1;min-width:0')}><div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:2px')}>{nameOf(p)}</div><div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>{p.username ? `@${p.username}` : ''}</div></div>
+                      <div style={css('flex:1;min-width:0')}><div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:2px')}>{nameOf(p)}</div><div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>{p.username ? `@${p.username}` : ''}</div></div>
                       <div style={css(`display:flex;gap:8px${busy === p.friendshipId ? ';opacity:.5;pointer-events:none' : ''}`)}>
                         <div style={css(ACCEPT)} onClick={() => respond(p, 'accept')}>Accepter</div>
                         <div style={css(REFUSE)} onClick={() => respond(p, 'decline')}>Refuser</div>
@@ -128,9 +128,9 @@ export function FriendsPage() {
             )}
 
             {/* Mes amis */}
-            <div style={css(GROUP)}>Mes amis <span style={css('color:rgba(240,236,230,.3);font-weight:500')}>{friends.length}</span></div>
+            <div style={css(GROUP)}>Mes amis <span style={css('color:rgba(240,236,230,.6);font-weight:500')}>{friends.length}</span></div>
             {filteredFriends.length === 0 ? (
-              <div className="g" style={css('border-radius:20px;padding:18px;font-size:13px;color:rgba(240,236,230,.45);text-align:center')}>
+              <div className="g" style={css('border-radius:20px;padding:18px;font-size:13px;color:rgba(240,236,230,.6);text-align:center')}>
                 {friends.length === 0 ? "Tu n'as pas encore d'amis. Ajoute des grimpeurs depuis leur profil." : 'Aucun ami ne correspond.'}
               </div>
             ) : (

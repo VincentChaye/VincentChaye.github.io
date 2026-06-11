@@ -8,7 +8,7 @@ import { IconButton, Tag } from '../components/primitives';
 import { BackChevronIcon, UsersIcon } from '../lib/icons';
 
 /**
- * SWAP — Fil d'activité (design Liquid Glass) câblé aux vraies données (PUBLIC).
+ * SWAP — Social (design Liquid Glass) câblé aux vraies données (PUBLIC).
  * Route additive `/redesign/feed`. `/api/feed/global` (comme la page live, sans auth). Items =
  * `logbook` (ascension) ou `spot` (proposition). Clic carte spot → `/redesign/spot/:id`.
  *
@@ -68,9 +68,9 @@ export function FeedPage() {
       <NavBar>
         <div className="nbi">
           <div className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Retour</div>
-          <span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Fil</span>
+          <span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Social</span>
           <div className="na">
-            <IconButton style={css('cursor:pointer')} onClick={() => navigate('/redesign/friends')}><UsersIcon width={16} height={16} /></IconButton>
+            <IconButton aria-label="Amis" style={css('cursor:pointer')} onClick={() => navigate('/redesign/friends')}><UsersIcon width={16} height={16} /></IconButton>
           </div>
         </div>
       </NavBar>
@@ -79,7 +79,7 @@ export function FeedPage() {
         {items === null ? (
           <div style={css('min-height:300px;display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.5);font-size:14px')}>Chargement…</div>
         ) : items.length === 0 ? (
-          <div className="g" style={css('border-radius:18px;padding:18px;font-size:13px;color:rgba(240,236,230,.45);text-align:center')}>Aucune activité récente.</div>
+          <div className="g" style={css('border-radius:18px;padding:18px;font-size:13px;color:rgba(240,236,230,.6);text-align:center')}>Aucune activité récente.</div>
         ) : (
           items.map((it) => {
             const c = gradeColors(it.grade);
@@ -97,7 +97,7 @@ export function FeedPage() {
                     </div>
                     <div style={css('flex:1;min-width:0')}>
                       <div style={css('font-size:14px;font-weight:700;color:#f0ece6')}>{nameOf(it)}</div>
-                      <div style={css('font-size:11px;color:rgba(240,236,230,.40)')}>{relDate(it.createdAt)}{it.spot?.name ? ` · ${it.spot.name}` : ''}</div>
+                      <div style={css('font-size:11px;color:rgba(240,236,230,.6)')}>{relDate(it.createdAt)}{it.spot?.name ? ` · ${it.spot.name}` : ''}</div>
                     </div>
                   </div>
 

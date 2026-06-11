@@ -9,7 +9,7 @@ import { BackChevronIcon } from '../lib/icons';
 
 const STAT_CARD = 'border-radius:16px;padding:16px 12px;text-align:center';
 const STAT_VALUE = 'font-size:24px;font-weight:800;letter-spacing:-.8px;color:#f0ece6;margin-bottom:3px';
-const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.45);text-transform:uppercase;letter-spacing:.6px';
+const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.6px';
 
 /** SCREEN: CARNET — port fidèle (proto l.655-685). */
 export function LogbookScreen({ active, goTo }: { active: ScreenId; goTo: (id: ScreenId) => void }) {

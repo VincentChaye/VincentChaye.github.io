@@ -33,7 +33,7 @@ function StatBox({ label, labelColor, value, sub }: { label: string; labelColor:
       <div style={css('position:relative;z-index:2')}>
         <div style={css(`font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:${labelColor};margin-bottom:8px`)}>{label}</div>
         <div style={css('font-size:30px;font-weight:800;letter-spacing:-1px;color:#f0ece6;margin-bottom:2px')}>{value}</div>
-        <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>{sub}</div>
+        <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>{sub}</div>
       </div>
     </div>
   );
@@ -136,14 +136,14 @@ export function AdminPage() {
           <div style={css('position:relative;z-index:2')}>
             <div style={css('font-size:22px;margin-bottom:6px')}>👥</div>
             <div style={css('font-size:14px;font-weight:700;color:#f0ece6')}>Utilisateurs</div>
-            <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>Rôles, ban, suppression</div>
+            <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>Rôles, ban, suppression</div>
           </div>
         </div>
         <div className="g" onClick={() => navigate('/redesign/admin/gear')} style={css('border-radius:16px;padding:16px;cursor:pointer')}>
           <div style={css('position:relative;z-index:2')}>
             <div style={css('font-size:22px;margin-bottom:6px')}>🧗</div>
             <div style={css('font-size:14px;font-weight:700;color:#f0ece6')}>Matériel</div>
-            <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>Catalogue EPI</div>
+            <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>Catalogue EPI</div>
           </div>
         </div>
       </div>
@@ -152,9 +152,9 @@ export function AdminPage() {
       <SectionHeader small>Spots en attente de modération</SectionHeader>
       <div style={css('padding:0 20px;display:flex;flex-direction:column;gap:10px')}>
         {loading ? (
-          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.45);font-size:13px')}>Chargement…</div>
+          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Chargement…</div>
         ) : spots.length === 0 ? (
-          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.45);font-size:13px')}>Aucun spot en attente. 🎉</div>
+          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Aucun spot en attente. 🎉</div>
         ) : spots.map((s) => {
           const id = String(s._id);
           const tt = TYPE_TAG[(s.type as string) ?? 'crag'] ?? TYPE_TAG.crag;
@@ -166,7 +166,7 @@ export function AdminPage() {
                   <div style={css('width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,rgba(40,65,30,.8),rgba(20,45,15,.9));flex-shrink:0;border:1px solid rgba(80,160,80,.2)')} />
                   <div style={css('flex:1;min-width:0')}>
                     <div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:3px')}>{(s.name as string) || 'Sans nom'}</div>
-                    <div style={css('font-size:12px;color:rgba(240,236,230,.45);margin-bottom:6px')}>par {authorName(s)}</div>
+                    <div style={css('font-size:12px;color:rgba(240,236,230,.6);margin-bottom:6px')}>par {authorName(s)}</div>
                     <div style={css('display:flex;gap:6px')}><Tag variant={tt.variant}>{tt.label}</Tag>{g && <Tag variant="g">{g}</Tag>}</div>
                   </div>
                 </div>
@@ -185,7 +185,7 @@ export function AdminPage() {
       <SectionHeader small>Modifications en révision</SectionHeader>
       <div style={css('padding:0 20px;display:flex;flex-direction:column;gap:10px')}>
         {loading ? null : edits.length === 0 ? (
-          <div className="g" style={css('border-radius:18px;padding:14px 16px;text-align:center;color:rgba(240,236,230,.45);font-size:13px')}>Aucune modification en attente.</div>
+          <div className="g" style={css('border-radius:18px;padding:14px 16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Aucune modification en attente.</div>
         ) : edits.map((e) => {
           const id = String(e._id);
           const nChanges = e.changes && typeof e.changes === 'object' ? Object.keys(e.changes as object).length : 0;
@@ -194,7 +194,7 @@ export function AdminPage() {
               <div style={css('width:36px;height:36px;border-radius:11px;background:rgba(200,120,60,.14);border:1px solid rgba(200,120,60,.22);flex-shrink:0;position:relative;z-index:2')} />
               <div style={css('flex:1;min-width:0;position:relative;z-index:2')}>
                 <div style={css('font-size:14px;font-weight:600;color:#f0ece6;margin-bottom:2px')}>Modification : {(e.spotName as string) || 'un spot'}</div>
-                <div style={css('font-size:12px;color:rgba(240,236,230,.45);margin-bottom:8px')}>{nChanges} champ{nChanges > 1 ? 's' : ''} modifié{nChanges > 1 ? 's' : ''}</div>
+                <div style={css('font-size:12px;color:rgba(240,236,230,.6);margin-bottom:8px')}>{nChanges} champ{nChanges > 1 ? 's' : ''} modifié{nChanges > 1 ? 's' : ''}</div>
                 <div style={css(`display:flex;gap:8px${busy === id ? ';opacity:.5;pointer-events:none' : ''}`)}>
                   <div style={css('padding:6px 14px;border-radius:9999px;font-size:12px;font-weight:600;background:rgba(80,160,80,.15);border:1px solid rgba(80,160,80,.25);color:#88D088;cursor:pointer')} onClick={() => moderateEdit(id, 'approve')}>Approuver</div>
                   <div style={css('padding:6px 14px;border-radius:9999px;font-size:12px;font-weight:600;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);color:rgba(240,236,230,.65);cursor:pointer')} onClick={() => navigate('/admin/spots')}>Voir diff</div>
@@ -212,7 +212,7 @@ export function AdminPage() {
         <div className="g" style={css('border-radius:20px;overflow:hidden')}>
           <div style={css('position:relative;z-index:2')}>
             {users.length === 0 ? (
-              <div style={css('padding:16px;text-align:center;color:rgba(240,236,230,.45);font-size:13px')}>—</div>
+              <div style={css('padding:16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>—</div>
             ) : users.map((u, i) => {
               const admin = ((u.roles as string[]) || []).includes('admin');
               return (

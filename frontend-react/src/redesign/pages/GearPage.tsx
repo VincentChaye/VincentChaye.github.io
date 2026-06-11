@@ -19,8 +19,8 @@ import { BackChevronIcon } from '../lib/icons';
  */
 
 const STAT = 'border-radius:16px;padding:14px 10px;text-align:center';
-const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.43);text-transform:uppercase;letter-spacing:.5px';
-const SECTION = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.35);padding:0 4px 10px';
+const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.5px';
+const SECTION = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(240,236,230,.6);padding:0 4px 10px';
 const CARD = 'border-radius:20px;overflow:hidden;display:flex;flex-direction:column;margin-bottom:16px';
 const BADGE_OK = 'background:rgba(80,160,80,.2);border:1px solid rgba(80,160,80,.3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#80D880';
 const BADGE_WARN = 'background:rgba(232,128,128,.2);border:1px solid rgba(232,128,128,.3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#E88080';
@@ -97,7 +97,7 @@ export function GearPage() {
           <div className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Retour</div>
           <span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Matériel</span>
           <div className="na">
-            <IconButton style={css('cursor:pointer')} title="Ajouter un EPI" onClick={() => navigate('/gear')}>
+            <IconButton aria-label="Ajouter un EPI" style={css('cursor:pointer')} title="Ajouter un EPI" onClick={() => navigate('/gear')}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
             </IconButton>
           </div>
@@ -115,7 +115,7 @@ export function GearPage() {
         {loading && items.length === 0 ? (
           <div style={css('min-height:200px;display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.5);font-size:14px')}>Chargement…</div>
         ) : items.length === 0 ? (
-          <div className="g" style={css('border-radius:20px;padding:18px;font-size:13px;color:rgba(240,236,230,.45);text-align:center;margin-bottom:16px')}>Aucun équipement enregistré. Ajoute ton premier EPI.</div>
+          <div className="g" style={css('border-radius:20px;padding:18px;font-size:13px;color:rgba(240,236,230,.6);text-align:center;margin-bottom:16px')}>Aucun équipement enregistré. Ajoute ton premier EPI.</div>
         ) : (
           groups.map(({ cat, list }) => (
             <div key={cat}>

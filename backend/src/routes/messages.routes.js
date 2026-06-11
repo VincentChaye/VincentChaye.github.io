@@ -35,7 +35,7 @@ export function messagesRouter(db, io) {
     const uid = req.auth.uid;
     try {
       const convs = await conversations
-        .find({ participants: uid })
+        .find({ participants: uid, hiddenFor: { $ne: uid } })
         .sort({ updatedAt: -1 })
         .limit(50)
         .toArray();
@@ -368,6 +368,38 @@ export function messagesRouter(db, io) {
       await conversations.updateOne(
         { _id: convId, participants: uid },
         { $set: { [`unread.${uid}`]: 0 } }
+      );
+      res.json({ ok: true });
+    } catch {
+      res.status(500).json({ error: "server_error" });
+    }
+  });
+
+  // PATCH /api/messages/conversations/:id/unread
+  router.patch("/conversations/:id/unread", requireAuth, async (req, res) => {
+    const uid = req.auth.uid;
+    let convId;
+    try { convId = new ObjectId(req.params.id); } catch { return res.status(400).json({ error: "invalid_id" }); }
+    try {
+      await conversations.updateOne(
+        { _id: convId, participants: uid },
+        { $set: { [`unread.${uid}`]: 1 } }
+      );
+      res.json({ ok: true });
+    } catch {
+      res.status(500).json({ error: "server_error" });
+    }
+  });
+
+  // DELETE /api/messages/conversations/:id — masquer pour cet utilisateur
+  router.delete("/conversations/:id", requireAuth, async (req, res) => {
+    const uid = req.auth.uid;
+    let convId;
+    try { convId = new ObjectId(req.params.id); } catch { return res.status(400).json({ error: "invalid_id" }); }
+    try {
+      await conversations.updateOne(
+        { _id: convId, participants: uid },
+        { $addToSet: { hiddenFor: uid } }
       );
       res.json({ ok: true });
     } catch {

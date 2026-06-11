@@ -40,8 +40,8 @@ interface LogbookStats {
 
 const STAT_CARD = 'border-radius:16px;padding:16px 12px;text-align:center';
 const STAT_VALUE = 'font-size:24px;font-weight:800;letter-spacing:-.8px;color:#f0ece6;margin-bottom:3px';
-const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.45);text-transform:uppercase;letter-spacing:.6px';
-const EMPTY = 'border-radius:16px;padding:16px;font-size:13px;color:rgba(240,236,230,.45);text-align:center';
+const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.6px';
+const EMPTY = 'border-radius:16px;padding:16px;font-size:13px;color:rgba(240,236,230,.6);text-align:center';
 
 const STYLE_LABEL: Record<string, string> = { onsight: 'Onsight', flash: 'Flash', redpoint: 'Redpoint', repeat: 'Répét.' };
 

@@ -132,9 +132,9 @@ export function AdminUsersPage() {
 
       <div style={css('padding:0 20px;display:flex;flex-direction:column;gap:10px')}>
         {loading ? (
-          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.45);font-size:13px')}>Chargement…</div>
+          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Chargement…</div>
         ) : users.length === 0 ? (
-          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.45);font-size:13px')}>Aucun utilisateur.</div>
+          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Aucun utilisateur.</div>
         ) : users.map((u) => {
           const admin = (u.roles ?? []).includes('admin');
           const banned = u.status === 'banned';
@@ -155,11 +155,11 @@ export function AdminUsersPage() {
                       {banned && <Tag variant="r">· Banni</Tag>}
                       {self && <Tag variant="b">· Toi</Tag>}
                     </div>
-                    <div style={css('font-size:12px;color:rgba(240,236,230,.45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap')}>{u.email || (u.username ? `@${u.username}` : '—')}</div>
+                    <div style={css('font-size:12px;color:rgba(240,236,230,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap')}>{u.email || (u.username ? `@${u.username}` : '—')}</div>
                   </div>
                 </div>
                 {self ? (
-                  <div style={css('font-size:12px;color:rgba(240,236,230,.35);font-style:italic')}>Ton compte — actions désactivées.</div>
+                  <div style={css('font-size:12px;color:rgba(240,236,230,.6);font-style:italic')}>Ton compte — actions désactivées.</div>
                 ) : (
                   <div style={css(`display:flex;gap:8px;flex-wrap:wrap${dis ? ';opacity:.5;pointer-events:none' : ''}`)}>
                     <div onClick={() => toggleAdmin(u._id, admin)} style={css(`${CHIP};${admin ? CHIP_NEUTRAL : CHIP_AMBER}`)}>{admin ? 'Retirer admin' : 'Promouvoir'}</div>

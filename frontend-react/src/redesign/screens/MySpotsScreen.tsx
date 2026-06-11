@@ -50,7 +50,7 @@ export function MySpotsScreen({ active, goTo }: { active: ScreenId; goTo: (id: S
               <div style={css('width:44px;height:44px;border-radius:12px;background:rgba(80,160,80,.12);border:1px solid rgba(80,160,80,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:2')}>{PIN('#80D880')}</div>
               <div style={css('flex:1;position:relative;z-index:2')}>
                 <div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:3px')}>Calanque de Morgiou</div>
-                <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>Ajouté · il y a 3 mois</div>
+                <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>Ajouté · il y a 3 mois</div>
               </div>
               <span style={css('background:rgba(80,160,80,.2);border:1px solid rgba(80,160,80,.3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#80D880;position:relative;z-index:2')}>Approuvé</span>
             </div>
@@ -58,7 +58,7 @@ export function MySpotsScreen({ active, goTo }: { active: ScreenId; goTo: (id: S
               <div style={css('width:44px;height:44px;border-radius:12px;background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:2')}>{PIN('#D4A030')}</div>
               <div style={css('flex:1;position:relative;z-index:2')}>
                 <div style={css('font-size:15px;font-weight:700;color:#f0ece6;margin-bottom:3px')}>Bois de Saint-Pons</div>
-                <div style={css('font-size:12px;color:rgba(240,236,230,.45)')}>Modifié · il y a 1 semaine</div>
+                <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>Modifié · il y a 1 semaine</div>
               </div>
               <span style={css('background:rgba(212,160,48,.18);border:1px solid rgba(212,160,48,.28);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#D4A030;position:relative;z-index:2')}>En attente</span>
             </div>

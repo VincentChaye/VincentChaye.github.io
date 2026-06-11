@@ -15,3 +15,8 @@ ZoneDeGrimpe/
 /*.png
 audit/
 ZDG/
+# Artefacts locaux (root seulement)
+/*.ipa
+/*.7z
+/design.htlm
+shots/

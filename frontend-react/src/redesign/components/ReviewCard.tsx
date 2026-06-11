@@ -17,7 +17,7 @@ export function ReviewCard({ avatarBg, name, time, text }: ReviewCardProps) {
           <div style={css(`width:36px;height:36px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-size:16px`)} />
           <div>
             <div style={css('font-size:14px;font-weight:600;color:#f0ece6')}>{name}</div>
-            <div style={css('font-size:11px;color:rgba(240,236,230,.40)')}>{time} · </div>
+            <div style={css('font-size:11px;color:rgba(240,236,230,.6)')}>{time} · </div>
           </div>
         </div>
         <div style={css('font-size:13px;line-height:1.5;color:rgba(240,236,230,.65)')}>{text}</div>

@@ -73,7 +73,7 @@ export function HomeScreen({ active, goTo }: { active: ScreenId; goTo: (id: Scre
         />
         <ListRow
           icon={<ActivityIcon width={18} height={18} />}
-          title="Fil d'activité"
+          title="Social"
           subtitle="Activité de tes amis"
           onClick={() => goTo('fil')}
         />

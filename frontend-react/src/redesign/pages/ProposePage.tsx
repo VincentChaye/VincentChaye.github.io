@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { css } from '../lib/css';
 import { PageFrame } from '../components/PageFrame';
 import { NavBar } from '../components/NavBar';
-import { GlassCard, SectionHeader } from '../components/primitives';
+import { GlassCard, SectionHeader, Pressable } from '../components/primitives';
 import { TypeCard } from '../components/TypeCard';
 import { BackChevronIcon } from '../lib/icons';
 
@@ -44,6 +44,7 @@ export function ProposePage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [queued, setQueued] = useState(false);
 
   function geolocate() {
     if (!navigator.geolocation) { setError('Géolocalisation indisponible.'); return; }
@@ -65,8 +66,9 @@ export function ProposePage() {
     }
     setLoading(true);
     try {
-      await apiFetch('/api/spots', {
+      const result = await apiFetch<{ queued?: boolean }>('/api/spots', {
         method: 'POST', auth: true,
+        queueable: 'spot',
         body: JSON.stringify({
           name: name.trim(), type,
           location: { type: 'Point', coordinates: [lngN, latN] },
@@ -74,6 +76,9 @@ export function ProposePage() {
           description: description.trim() || null,
         }),
       });
+      if (result && result.queued) {
+        setQueued(true);
+      }
       setDone(true);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -86,10 +91,10 @@ export function ProposePage() {
   if (!isAuthenticated) {
     return (
       <PageFrame>
-        <NavBar><div className="nbi"><div className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Retour</div><span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Proposer un spot</span></div></NavBar>
+        <NavBar><div className="nbi"><Pressable className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Retour</Pressable><span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Proposer un spot</span></div></NavBar>
         <div style={css('padding:60px 28px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center')}>
           <div style={css('font-size:15px;color:rgba(240,236,230,.6)')}>Connecte-toi pour proposer un spot.</div>
-          <div onClick={() => navigate('/redesign/login?next=/redesign/propose')} style={css('padding:12px 22px;border-radius:9999px;background:linear-gradient(145deg,rgba(212,160,48,.88),rgba(232,184,75,.94));color:#1a0f05;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 18px rgba(212,160,48,.28)')}>Se connecter</div>
+          <Pressable onClick={() => navigate('/redesign/login?next=/redesign/propose')} style={css('padding:12px 22px;border-radius:9999px;background:linear-gradient(145deg,rgba(212,160,48,.88),rgba(232,184,75,.94));color:#1a0f05;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 18px rgba(212,160,48,.28)')}>Se connecter</Pressable>
         </div>
       </PageFrame>
     );
@@ -100,14 +105,26 @@ export function ProposePage() {
       <PageFrame>
         <NavBar><div className="nbi"><span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Proposer un spot</span></div></NavBar>
         <div style={css('padding:50px 28px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center')}>
-          <div style={css('width:72px;height:72px;border-radius:50%;background:rgba(80,160,80,.15);border:1.5px solid rgba(80,160,80,.3);display:flex;align-items:center;justify-content:center;color:#88D088')}>
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M20 6 9 17l-5-5" /></svg>
+          <div style={css(`width:72px;height:72px;border-radius:50%;${queued ? 'background:rgba(212,160,48,.15);border:1.5px solid rgba(212,160,48,.3);color:#D4A030' : 'background:rgba(80,160,80,.15);border:1.5px solid rgba(80,160,80,.3);color:#88D088'};display:flex;align-items:center;justify-content:center`)}>
+            {queued
+              ? <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M12 2v10m0 0 3-3m-3 3-3-3M4.93 19a10 10 0 1 0 14.14 0" /></svg>
+              : <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M20 6 9 17l-5-5" /></svg>
+            }
           </div>
-          <div style={css('font-size:20px;font-weight:800;color:#f0ece6')}>{isAdmin ? 'Spot publié !' : 'Spot proposé !'}</div>
+          <div style={css('font-size:20px;font-weight:800;color:#f0ece6')}>
+            {queued ? 'Spot enregistré hors ligne' : (isAdmin ? 'Spot publié !' : 'Spot proposé !')}
+          </div>
           <div style={css('font-size:14px;color:rgba(240,236,230,.55);line-height:1.5;max-width:280px')}>
-            {isAdmin ? 'Ton spot est en ligne immédiatement.' : 'Merci ! Ta proposition sera examinée par un modérateur avant publication.'}
+            {queued
+              ? 'Il sera envoyé automatiquement dès le retour du réseau.'
+              : (isAdmin ? 'Ton spot est en ligne immédiatement.' : 'Merci ! Ta proposition sera examinée par un modérateur avant publication.')}
           </div>
-          <div onClick={() => navigate('/redesign/my-spots?tab=contrib')} style={css('padding:12px 22px;border-radius:9999px;background:linear-gradient(145deg,rgba(212,160,48,.88),rgba(232,184,75,.94));color:#1a0f05;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 18px rgba(212,160,48,.28)')}>Voir mes contributions</div>
+          {!queued && (
+            <Pressable onClick={() => navigate('/redesign/my-spots?tab=contrib')} style={css('padding:12px 22px;border-radius:9999px;background:linear-gradient(145deg,rgba(212,160,48,.88),rgba(232,184,75,.94));color:#1a0f05;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 18px rgba(212,160,48,.28)')}>Voir mes contributions</Pressable>
+          )}
+          {queued && (
+            <Pressable onClick={() => navigate('/redesign/offline')} style={css('padding:12px 22px;border-radius:9999px;background:rgba(212,160,48,.15);border:1px solid rgba(212,160,48,.25);color:#D4A030;font-weight:700;font-size:14px;cursor:pointer')}>Voir la file de synchro</Pressable>
+          )}
         </div>
       </PageFrame>
     );
@@ -117,7 +134,7 @@ export function ProposePage() {
     <PageFrame>
       <NavBar>
         <div className="nbi">
-          <div className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Annuler</div>
+          <Pressable className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Annuler</Pressable>
           <span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Proposer un spot</span>
         </div>
       </NavBar>
@@ -152,10 +169,10 @@ export function ProposePage() {
 
         <SectionHeader small>Localisation *</SectionHeader>
         <div style={css('padding:0 20px;display:flex;flex-direction:column;gap:12px')}>
-          <div onClick={geolocate} style={css(`border-radius:14px;padding:13px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.22);color:#D4A030;display:flex;align-items:center;justify-content:center;gap:8px${geoLoading ? ';opacity:.6' : ''}`)}>
+          <Pressable onClick={geolocate} style={css(`border-radius:14px;padding:13px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.22);color:#D4A030;display:flex;align-items:center;justify-content:center;gap:8px${geoLoading ? ';opacity:.6' : ''}`)}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
             {geoLoading ? 'Localisation…' : 'Utiliser ma position actuelle'}
-          </div>
+          </Pressable>
           <div style={css('display:grid;grid-template-columns:1fr 1fr;gap:10px')}>
             <GlassCard style={css(FIELD)}><div style={css('position:relative;z-index:2')}><div style={css(FIELD_LABEL)}>Latitude</div><input value={lat} onChange={(e) => setLat(e.target.value)} inputMode="decimal" placeholder="43.800" style={css(FIELD_INPUT)} /></div></GlassCard>
             <GlassCard style={css(FIELD)}><div style={css('position:relative;z-index:2')}><div style={css(FIELD_LABEL)}>Longitude</div><input value={lng} onChange={(e) => setLng(e.target.value)} inputMode="decimal" placeholder="6.500" style={css(FIELD_INPUT)} /></div></GlassCard>
