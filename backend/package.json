@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node --env-file=.env server.js",
+    "test": "node --test 'test/**/*.test.js'",
     "update-spots": "node scripts/update-spot-data.js",
     "test-extraction": "node scripts/test-extraction.js",
     "import-osm": "node scripts/import-osm.js",
