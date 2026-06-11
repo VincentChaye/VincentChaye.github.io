@@ -368,6 +368,15 @@ export function storiesRouter(db) {
     let oid;
     try { oid = new ObjectId(req.params.id); } catch { return res.status(400).json({ error: "invalid_id" }); }
     try {
+      const story = await stories.findOne({ _id: oid }, { projection: { userId: 1 } });
+      if (!story) return res.status(404).json({ error: "story_not_found" });
+
+      if (story.userId !== req.auth.uid) {
+        const author = await users.findOne({ _id: new ObjectId(story.userId) }, { projection: userProjection });
+        if (!author) return res.status(404).json({ error: "user_not_found" });
+        if (!(await canView(req.auth.uid, author))) return res.status(403).json({ error: "forbidden" });
+      }
+
       await stories.updateOne(
         { _id: oid, "views.uid": { $ne: req.auth.uid } },
         { $push: { views: { uid: req.auth.uid, at: new Date() } } }
