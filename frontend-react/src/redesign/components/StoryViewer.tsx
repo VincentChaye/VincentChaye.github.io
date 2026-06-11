@@ -53,6 +53,7 @@ export function StoryViewer({ groups, initialGroup, onClose, onSeen }: Props) {
   const rafRef = useRef(0);
   const startRef = useRef(0);
   const elapsedRef = useRef(0);
+  const pressStartRef = useRef(0);
 
   const group = groups[gi];
   const story: Story | undefined = group?.stories[si];
@@ -81,6 +82,7 @@ export function StoryViewer({ groups, initialGroup, onClose, onSeen }: Props) {
     setProgress(0);
     elapsedRef.current = 0;
     setReplyText('');
+    setSentFlash(null);
     setViewsOpen(false);
     setViews(null);
     markStoryViewed(story._id).then(() => onSeen?.(story._id)).catch(() => {});
@@ -138,14 +140,16 @@ export function StoryViewer({ groups, initialGroup, onClose, onSeen }: Props) {
   }
 
   async function openViews() {
+    if (!story) return;
     setPaused(true);
     setViewsOpen(true);
-    try { setViews((await fetchStoryViews(story!._id)).views); } catch { setViews([]); }
+    try { setViews((await fetchStoryViews(story._id)).views); } catch { setViews([]); }
   }
 
   async function handleDelete() {
+    if (!story) return;
     if (!confirm('Supprimer cette story ?')) return;
-    try { await deleteStory(story!._id); onClose(); } catch { /* ignore */ }
+    try { await deleteStory(story._id); onClose(); } catch { /* ignore */ }
   }
 
   return (
@@ -153,7 +157,7 @@ export function StoryViewer({ groups, initialGroup, onClose, onSeen }: Props) {
       {/* Média + zones tap */}
       <div
         style={css('position:absolute;inset:0;display:flex;align-items:center;justify-content:center')}
-        onPointerDown={() => setPaused(true)}
+        onPointerDown={() => { setPaused(true); pressStartRef.current = performance.now(); }}
         onPointerUp={() => setPaused(false)}
         onPointerLeave={() => setPaused(false)}
       >
@@ -167,8 +171,8 @@ export function StoryViewer({ groups, initialGroup, onClose, onSeen }: Props) {
         ) : (
           <img key={story._id} src={story.media.url} alt="" style={css('max-width:100%;max-height:100%;object-fit:contain')} />
         )}
-        <div style={css('position:absolute;inset:0 50% 120px 0')} onClick={goPrev} />
-        <div style={css('position:absolute;inset:0 0 120px 50%')} onClick={goNext} />
+        <div style={css('position:absolute;inset:0 50% 120px 0')} onClick={() => { if (performance.now() - pressStartRef.current > 250) return; goPrev(); }} />
+        <div style={css('position:absolute;inset:0 0 120px 50%')} onClick={() => { if (performance.now() - pressStartRef.current > 250) return; goNext(); }} />
       </div>
 
       {/* Barres de progression */}
