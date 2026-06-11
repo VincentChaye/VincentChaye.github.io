@@ -73,6 +73,20 @@ const messageMediaFilter = (_, file, cb) => {
   else cb(new Error("format_invalide"));
 };
 
+const storyMediaStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    const isVideo = file.mimetype.startsWith("video/");
+    return {
+      folder: "zonedegrimpe/stories",
+      resource_type: isVideo ? "video" : "image",
+      ...(isVideo
+        ? {}
+        : { transformation: [{ width: 1080, height: 1920, crop: "limit", quality: "auto:good" }] }),
+    };
+  },
+});
+
 export const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 },
@@ -99,6 +113,12 @@ export const uploadCover = multer({
 
 export const uploadMessageMedia = multer({
   storage: messageMediaStorage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: messageMediaFilter,
+});
+
+export const uploadStoryMedia = multer({
+  storage: storyMediaStorage,
   limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: messageMediaFilter,
 });
