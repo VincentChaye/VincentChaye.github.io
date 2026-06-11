@@ -17,6 +17,7 @@ export function storiesRouter(db) {
   stories.createIndex({ userId: 1, expiresAt: -1 });
   stories.createIndex({ purgeAt: 1 }, { expireAfterSeconds: 0 });
   highlights.createIndex({ userId: 1 });
+  highlights.createIndex({ storyIds: 1 });
 
   const userProjection = { displayName: 1, username: 1, avatarUrl: 1, "privacy.isPrivate": 1 };
 
@@ -256,7 +257,7 @@ export function storiesRouter(db) {
             _id: h._id,
             name: h.name,
             coverUrl: h.coverUrl ?? items[0]?.media?.url ?? null,
-            storyCount: h.storyIds.length,
+            storyCount: allowed ? items.length : h.storyIds.length,
             stories: items,
           };
         }),
@@ -436,8 +437,23 @@ export function storiesRouter(db) {
       if (!story) return res.status(404).json({ error: "story_not_found" });
       if (story.userId === req.auth.uid) return res.status(400).json({ error: "cannot_react_own_story" });
 
-      await stories.updateOne({ _id: oid }, { $pull: { reactions: { uid: req.auth.uid } } });
-      await stories.updateOne({ _id: oid }, { $push: { reactions: { uid: req.auth.uid, emoji, at: new Date() } } });
+      const author = await users.findOne({ _id: new ObjectId(story.userId) }, { projection: userProjection });
+      if (!author) return res.status(404).json({ error: "user_not_found" });
+      if (!(await canView(req.auth.uid, author))) return res.status(403).json({ error: "forbidden" });
+
+      await stories.updateOne(
+        { _id: oid },
+        [{
+          $set: {
+            reactions: {
+              $concatArrays: [
+                { $filter: { input: { $ifNull: ["$reactions", []] }, cond: { $ne: ["$$this.uid", req.auth.uid] } } },
+                [{ uid: req.auth.uid, emoji, at: "$$NOW" }],
+              ],
+            },
+          },
+        }]
+      );
 
       const fromUser = await users.findOne(
         { _id: new ObjectId(req.auth.uid) },
