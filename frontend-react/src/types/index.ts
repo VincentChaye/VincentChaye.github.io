@@ -298,7 +298,7 @@ export interface MessageAttachment {
   mimeType?: string;
 }
 
-export type SharedObjectType = 'spot' | 'route' | 'logbook';
+export type SharedObjectType = 'spot' | 'route' | 'logbook' | 'story';
 
 export interface SharedObject {
   type: SharedObjectType;
