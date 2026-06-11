@@ -21,6 +21,7 @@ import { outingsRouter } from "./src/routes/outings.routes.js";
 import { materielSpecsRouter } from "./src/routes/materiel-specs.routes.js";
 import { userMaterielRouter } from "./src/routes/user-materiel.routes.js";
 import { feedRouter } from "./src/routes/feed.routes.js";
+import { storiesRouter } from "./src/routes/stories.routes.js";
 import { initWebPush } from "./src/notifications.js";
 import { initSocketIO } from "./src/socket.js";
 
@@ -138,6 +139,7 @@ if (hasUri) {
   app.use("/api/materiel-specs", materielSpecsRouter(db));
   app.use("/api/user-materiel", userMaterielRouter(db));
   app.use("/api/feed", feedRouter(db));
+  app.use("/api/stories", storiesRouter(db));
 
   // Init Web Push (si VAPID configure)
   initWebPush();
