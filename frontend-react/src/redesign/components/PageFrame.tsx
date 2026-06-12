@@ -53,7 +53,13 @@ export function PageFrame({ children, tab, flush }: { children: ReactNode; tab?:
                 `sc-enter` = animation d'entrée d'écran (interactions.css), distincte de .sc.active. */}
             {/* flush = barre collée en bas (composer Conversation). En natif, on réserve le home-indicator
                 (env safe-area) sinon le composer sticky:bottom:0 colle au bord bas du device. */}
-            <div className="sc active sc-enter" style={flush ? { paddingBottom: isNativeApp ? 'env(safe-area-inset-bottom)' : 0 } : undefined}>
+            <div
+              className="sc active sc-enter"
+              style={flush ? { paddingBottom: isNativeApp ? 'env(safe-area-inset-bottom)' : 0 } : undefined}
+              // `nb-scrolled` sur `.lg-root` → fond verre du header sticky `.nb` (cf. native.css).
+              // classList direct (pas de state) : pas de re-render à chaque frame de scroll.
+              onScroll={(e) => rootRef.current?.classList.toggle('nb-scrolled', e.currentTarget.scrollTop > 8)}
+            >
               {/* Bandeau hors ligne — pilule discrète en haut du contenu, pointer-events:none */}
               {(isOfflineMode || pendingMutations > 0) && (
                 <div style={{

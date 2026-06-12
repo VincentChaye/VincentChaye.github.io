@@ -32,10 +32,14 @@
 }
 
 /* ── Safe-area HAUT ──
-   Le contenu défile sous le notch ; la nav `.nb` réservait déjà ~60px (ex-fausse barre d'état) :
-   on compense pour que l'espace total haut reste ≈ constant (≈60px), notch ou pas.
-   La bande de safe-area laisse voir le fond rocheux `.bgs` (plein écran, derrière tout). */
+   Sur device, la barre d'état est réelle : les 60px que `.nb` réservait pour la fausse barre web
+   créaient un grand vide sous le notch (60px + env()). On ne garde que la safe-area + un léger
+   souffle ; la hauteur fixe (102px, pensée pour le cadre web) repasse en auto. */
 .lg-root.native { --safe-top: env(safe-area-inset-top); --panel-top: env(safe-area-inset-top); }
+.lg-root.native .nb {
+  height: auto;
+  padding-top: calc(var(--safe-top) + 8px);
+}
 
 /* ── Safe-area BAS ──
    La tab bar flottante (`bottom:20px`) remonte au-dessus du home-indicator, et le scroll garde sa
@@ -54,10 +58,19 @@
   display: none;
 }
 
-/* ── Header non sticky sur les pages racines de la tab bar (app native) ──
-   Le `.nb` sticky restait collé en haut pendant le scroll : son fond étant transparent,
-   le contenu passait sous le titre (illisible), et un fond opaque dénaturait le design.
-   On le laisse simplement défiler avec le contenu. */
-.lg-root.native.has-tab .nb {
-  position: relative;
+/* ── Header sticky + verre au scroll (app native) ──
+   Le `.nb` reste collé en haut : les actions (Paramètres, Amis…) doivent rester accessibles
+   pendant le scroll. Pour que le contenu qui passe dessous reste lisible sans dénaturer le
+   design au repos, son fond `.nbb` est transparent en haut de page et passe en verre flouté
+   dès que ça défile (classe `nb-scrolled` posée par PageFrame sur `.lg-root`). */
+.lg-root.native .nb .nbb {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: rgba(12, 8, 4, 0.62);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.lg-root.native.nb-scrolled .nb .nbb {
+  opacity: 1;
 }
