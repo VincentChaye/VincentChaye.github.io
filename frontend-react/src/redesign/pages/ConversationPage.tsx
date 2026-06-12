@@ -116,6 +116,17 @@ export function ConversationPage() {
         </div>
       );
     }
+    if (m.sharedObject?.type === 'story') {
+      const o = m.sharedObject;
+      return (
+        <div style={css('display:flex;flex-direction:column;gap:6px;max-width:210px')}>
+          <span style={css(`font-size:11px;${sent ? 'color:rgba(26,15,5,.6)' : 'color:rgba(240,236,230,.5)'}`)}>↪ En réponse à une story</span>
+          {o.imageUrl && <img src={o.imageUrl} alt="" style={css('width:120px;border-radius:12px;display:block')} />}
+          {o.subtitle && <span style={css(`font-size:12px;font-style:italic;${sent ? 'color:rgba(26,15,5,.7)' : 'color:rgba(240,236,230,.6)'}`)}>{o.subtitle}</span>}
+          {m.content?.trim() && <span style={css(sent ? SENT_TEXT : RECV_TEXT)}>{m.content}</span>}
+        </div>
+      );
+    }
     if (m.sharedObject) {
       const o = m.sharedObject;
       return (
