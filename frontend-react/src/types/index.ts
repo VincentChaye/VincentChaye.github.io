@@ -106,6 +106,21 @@ export interface SpotPhoto {
   status?: 'pending' | 'approved' | 'rejected';
 }
 
+export interface TopoPoint {
+  color: 'hand' | 'foot';
+  /** Index séquentiel par couleur (sert au chaînage de la polyline) */
+  order: number;
+  /** Coordonnées normalisées 0..1 relatives à l'image */
+  x: number;
+  y: number;
+}
+
+export interface RouteTopo {
+  points: TopoPoint[];
+  updatedBy?: UserRef;
+  updatedAt?: string;
+}
+
 export interface ClimbingRoute {
   _id: string;
   spotId: string;
@@ -116,6 +131,7 @@ export interface ClimbingRoute {
   bolts?: number;
   description?: string;
   imageUrl?: string;
+  topo?: RouteTopo;
   status?: 'approved' | 'pending' | 'rejected';
   createdBy: UserRef;
   createdAt: string;

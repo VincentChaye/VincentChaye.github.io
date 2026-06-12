@@ -187,7 +187,7 @@ export function AdminGearPage() {
 
       {/* Formulaire (création / édition) */}
       {showForm && (
-        <div onClick={() => setShowForm(false)} className="lg-fade" style={css('position:absolute;inset:0;z-index:400;background:rgba(8,5,3,.80);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;flex-direction:column;justify-content:flex-end;padding:40px 14px 14px')}>
+        <div onClick={() => setShowForm(false)} className="lg-fade" style={css('position:fixed;inset:0;z-index:400;background:rgba(8,5,3,.80);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;flex-direction:column;justify-content:flex-end;padding:40px 14px 14px')}>
           <div onClick={(e) => e.stopPropagation()} className="g lg-item-in" style={css('border-radius:22px;overflow:hidden;display:flex;flex-direction:column;max-height:100%')}>
             <div style={css('position:relative;z-index:2;display:flex;flex-direction:column;min-height:0')}>
               <div style={css('display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid rgba(255,255,255,.07)')}>

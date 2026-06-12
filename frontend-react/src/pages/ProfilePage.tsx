@@ -32,12 +32,9 @@ interface RecentReview {
   createdAt: string;
 }
 
-const STYLE_CLS: Record<string, string> = {
-  onsight: 'bg-grade-easy/10 text-grade-easy border-grade-easy/20',
-  flash: 'bg-grade-medium/10 text-grade-medium border-grade-medium/20',
-  redpoint: 'bg-grade-hard/10 text-grade-hard border-grade-hard/20',
-  repeat: 'bg-surface-2 text-text-secondary border-border-subtle',
-};
+const FLASH_CLS = 'bg-grade-medium/10 text-grade-medium border-grade-medium/20';
+/* Les entrées historiques « onsight » comptent comme un flash. */
+const isFlash = (style: string) => style === 'flash' || style === 'onsight';
 
 interface PublicProfile {
   displayName: string;
@@ -399,9 +396,11 @@ export function ProfilePage() {
                                   {a.grade}
                                 </span>
                               )}
-                              <span className={cn('hidden rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide sm:inline', STYLE_CLS[a.style] || STYLE_CLS.repeat)}>
-                                {t(`logbook.style.${a.style}`)}
-                              </span>
+                              {isFlash(a.style) && (
+                                <span className={cn('hidden rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide sm:inline', FLASH_CLS)}>
+                                  {t('logbook.style.flash')}
+                                </span>
+                              )}
                             </div>
                           </div>
                         );

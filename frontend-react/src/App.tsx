@@ -3,7 +3,6 @@ import { useEffect, lazy, Suspense } from 'react';
 import { Toaster } from 'sonner';
 import { Layout } from '@/components/layout/Layout';
 import { HomePage } from '@/pages/HomePage';
-import { MapPage } from '@/pages/MapPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 import { MySpotsPage } from '@/pages/MySpotsPage';
@@ -27,6 +26,10 @@ import { useAuthStore } from '@/stores/auth.store';
 const SpotPage = lazy(() =>
   import('@/pages/SpotPage').then((m) => ({ default: m.SpotPage })),
 );
+// Carte web — lazy : embarque maplibre-gl (~250 Ko gzip), à garder hors du bundle initial.
+const MapPage = lazy(() =>
+  import('@/pages/MapPage').then((m) => ({ default: m.MapPage })),
+);
 // Redesign Liquid Glass v2 — vitrine isolée (hors Layout), chargée à la demande.
 const RedesignGallery = lazy(() =>
   import('@/redesign').then((m) => ({ default: m.RedesignGallery })),
@@ -34,6 +37,12 @@ const RedesignGallery = lazy(() =>
 // Swap (design Liquid Glass) câblé aux vraies données — routes additives.
 const RedesignSpotPage = lazy(() =>
   import('@/redesign/pages/SpotDetailPage').then((m) => ({ default: m.SpotDetailPage })),
+);
+const RedesignAddRoutePage = lazy(() =>
+  import('@/redesign/pages/AddRoutePage').then((m) => ({ default: m.AddRoutePage })),
+);
+const RedesignRouteDetailPage = lazy(() =>
+  import('@/redesign/pages/RouteDetailPage').then((m) => ({ default: m.RouteDetailPage })),
 );
 const RedesignSearchPage = lazy(() =>
   import('@/redesign/pages/SearchPage').then((m) => ({ default: m.SearchPage })),
@@ -201,6 +210,22 @@ function App() {
           element={
             <Suspense fallback={null}>
               <RedesignSpotPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/redesign/spot/:id/add-route"
+          element={
+            <Suspense fallback={null}>
+              <RedesignAddRoutePage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/redesign/route/:id"
+          element={
+            <Suspense fallback={null}>
+              <RedesignRouteDetailPage />
             </Suspense>
           }
         />
@@ -383,6 +408,7 @@ function App() {
             <Route path="/messages" element={<Navigate to="/redesign/messages" replace />} />
             <Route path="/messages/:id" element={<ParamRedirect to="/redesign/messages/:id" />} />
             <Route path="/spot/:id" element={<ParamRedirect to="/redesign/spot/:id" />} />
+            <Route path="/route/:id" element={<ParamRedirect to="/redesign/route/:id" />} />
             <Route path="/login" element={<Navigate to="/redesign/login" replace />} />
             <Route path="/register" element={<Navigate to="/redesign/login" replace />} />
             <Route path="/me" element={<Navigate to="/redesign/profile" replace />} />
@@ -403,7 +429,7 @@ function App() {
         ) : (
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/map" element={<MapPage />} />
+            <Route path="/map" element={<Suspense fallback={null}><MapPage /></Suspense>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/my-spots" element={<MySpotsPage />} />
@@ -423,6 +449,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/spot/:id" element={<Suspense fallback={null}><SpotPage /></Suspense>} />
+            <Route path="/route/:id" element={<ParamRedirect to="/redesign/route/:id" />} />
           </Route>
         )}
       </Routes>

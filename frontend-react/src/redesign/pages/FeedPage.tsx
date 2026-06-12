@@ -21,9 +21,9 @@ interface FeedItem {
   username?: string; displayName?: string; avatarUrl?: string;
   createdAt: string; spot: { id: string; name: string; type?: string };
   route?: { id?: string; name?: string } | null; grade?: string; style?: string;
+  caption?: string | null; media?: { url: string; type: 'image' | 'video' }[];
 }
 
-const STYLE_FR: Record<string, string> = { onsight: 'À vue', flash: 'Flash', redpoint: 'Redpoint', repeat: 'Répétition' };
 
 function gradeColors(grade?: string): { bg: string; border: string; color: string } {
   const g = (grade ?? '').toLowerCase().trim();
@@ -102,15 +102,31 @@ export function FeedPage() {
                     </div>
                   </div>
 
+                  {/* Médias du post (ascension publiée avec photos/vidéos) */}
+                  {it.type === 'logbook' && (it.media?.length ?? 0) > 0 && (
+                    <div style={css(`display:grid;grid-template-columns:repeat(${Math.min(it.media!.length, 2)},1fr);gap:2px;margin-bottom:12px`)}>
+                      {it.media!.slice(0, 4).map((m) => (
+                        m.type === 'video' ? (
+                          <video key={m.url} src={m.url} controls muted playsInline preload="metadata" style={css('width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#000')} />
+                        ) : (
+                          <img key={m.url} src={m.url} alt="" loading="lazy" style={css('width:100%;aspect-ratio:4/3;object-fit:cover;display:block')} />
+                        )
+                      ))}
+                    </div>
+                  )}
+
                   {/* Body */}
                   {it.type === 'logbook' ? (
                     <div style={css('padding:0 16px 16px')}>
+                      {it.caption && (
+                        <div style={css('font-size:14px;line-height:1.5;color:rgba(240,236,230,.85);margin-bottom:10px')}>{it.caption}</div>
+                      )}
                       <div style={css('display:flex;align-items:center;gap:8px')}>
                         <div style={css(`width:38px;height:38px;border-radius:11px;background:${c.bg};border:1px solid ${c.border};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:${c.color};flex-shrink:0`)}>{it.grade || '—'}</div>
                         <div style={css('min-width:0')}>
                           <div style={css('font-size:15px;font-weight:700;color:#f0ece6')}>{it.route?.name || it.spot?.name || 'Ascension'}</div>
                         </div>
-                        {it.style && <div style={css('margin-left:auto')}><Tag variant={it.style === 'flash' ? 'a' : 'g'} style={css('font-size:11px')}>{STYLE_FR[it.style] ?? it.style}</Tag></div>}
+                        {(it.style === 'flash' || it.style === 'onsight') && <div style={css('margin-left:auto')}><Tag variant="a" style={css('font-size:11px')}>Flash</Tag></div>}
                       </div>
                     </div>
                   ) : (

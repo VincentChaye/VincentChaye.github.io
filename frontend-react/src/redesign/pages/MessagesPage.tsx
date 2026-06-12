@@ -10,7 +10,6 @@ import { PageFrame } from '../components/PageFrame';
 import { NavBar } from '../components/NavBar';
 import { ConversationRow } from '../components/ConversationRow';
 import { Pressable } from '../components/primitives';
-import { BackChevronIcon } from '../lib/icons';
 
 /**
  * SWAP — Messagerie (design Liquid Glass) câblé aux vraies données PROTÉGÉES.
@@ -117,7 +116,7 @@ export function MessagesPage() {
   if (!isAuthenticated) {
     return (
       <PageFrame tab="messagerie">
-        <NavBar><div className="nbi"><Pressable className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Retour</Pressable><span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Messages</span></div></NavBar>
+        <NavBar><div className="nbi"><span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Messages</span></div></NavBar>
         <div style={css('padding:60px 28px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center')}>
           <div style={css('font-size:15px;color:rgba(240,236,230,.6)')}>Connecte-toi pour voir tes messages.</div>
           <Pressable onClick={() => navigate('/redesign/login?next=/redesign/messages')} style={css('padding:12px 22px;border-radius:9999px;background:linear-gradient(145deg,rgba(212,160,48,.88),rgba(232,184,75,.94));color:#1a0f05;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 18px rgba(212,160,48,.28)')}>Se connecter</Pressable>
@@ -133,7 +132,6 @@ export function MessagesPage() {
     <PageFrame tab="messagerie">
       <NavBar>
         <div className="nbi" style={newConvOpen ? { opacity: 0, pointerEvents: 'none', transition: 'opacity .2s' } : { opacity: 1, transition: 'opacity .2s' }}>
-          <Pressable className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Retour</Pressable>
           <span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Messages</span>
           <Pressable aria-label="Nouvelle conversation" onClick={() => setNewConvOpen(true)} style={css('position:absolute;right:0;width:32px;height:32px;border-radius:50%;background:rgba(212,160,48,.15);border:1px solid rgba(212,160,48,.25);display:flex;align-items:center;justify-content:center;color:#D4A030;cursor:pointer;font-size:20px')}>+</Pressable>
         </div>
@@ -191,7 +189,7 @@ export function MessagesPage() {
       {newConvOpen && <div onClick={() => { setNewConvOpen(false); setDmQuery(''); setDmResults([]); setGroupQuery(''); setGroupResults([]); }} style={css('position:fixed;inset:0;z-index:49;background:rgba(0,0,0,0.55)')} />}
 
       {/* Panneau latéral nouvelle conversation */}
-      <div style={css(`position:fixed;top:var(--panel-top);right:0;bottom:0;width:88vw;max-width:360px;z-index:50;background:rgba(18,12,6,.72);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);border-radius:26px 0 0 26px;border:1px solid rgba(212,160,48,.18);border-right:none;box-shadow:-8px 0 48px rgba(0,0,0,.55),inset 1px 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.32,0,.67,0);transform:${newConvOpen ? 'translateX(0)' : 'translateX(110%)'};pointer-events:${newConvOpen ? 'auto' : 'none'}`)}>
+      <div style={css(`position:fixed;top:var(--panel-top);right:0;bottom:0;width:88vw;max-width:360px;z-index:50;background:rgba(18,12,6,.72);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);border-radius:26px 0 0 26px;border:1px solid rgba(212,160,48,.18);border-right:none;box-shadow:-8px 0 48px rgba(0,0,0,.55),inset 1px 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.32,0,.67,0),visibility .35s;transform:${newConvOpen ? 'translateX(0)' : 'translateX(110%)'};visibility:${newConvOpen ? 'visible' : 'hidden'};pointer-events:${newConvOpen ? 'auto' : 'none'}`)}>
 
         {/* Reflet haut Apple */}
         <div style={css('position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),rgba(212,160,48,.35),rgba(255,255,255,.22),transparent);border-radius:26px 0 0 0;pointer-events:none')} />

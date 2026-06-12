@@ -34,14 +34,11 @@ interface EditForm {
   notes: string;
 }
 
-const STYLE_CLS: Record<string, string> = {
-  onsight: 'bg-grade-easy/10 text-grade-easy border-grade-easy/20',
-  flash: 'bg-grade-medium/10 text-grade-medium border-grade-medium/20',
-  redpoint: 'bg-grade-hard/10 text-grade-hard border-grade-hard/20',
-  repeat: 'bg-surface-2 text-text-secondary border-border-subtle',
-};
+const FLASH_CLS = 'bg-grade-medium/10 text-grade-medium border-grade-medium/20';
+/* Les entrées historiques « onsight » comptent comme un flash. */
+const isFlash = (style: string) => style === 'flash' || style === 'onsight';
 
-const STYLES = ['onsight', 'flash', 'redpoint', 'repeat'] as const;
+const STYLES = ['flash', 'redpoint'] as const;
 type Period = 'all' | 'month' | '3months' | 'year';
 
 function sortGrades(items: { grade: string; count: number }[]) {
@@ -214,7 +211,9 @@ export function LogbookPage() {
     .reduce((sum, m) => sum + m.count, 0);
 
   const PERIODS: Period[] = ['all', 'month', '3months', 'year'];
-  const filteredEntries = filterByPeriod(entries, filterPeriod).filter((e) => !filterStyle || e.style === filterStyle);
+  const filteredEntries = filterByPeriod(entries, filterPeriod).filter(
+    (e) => !filterStyle || (filterStyle === 'flash' ? isFlash(e.style) : !isFlash(e.style)),
+  );
 
   return (
     <div className="px-4 py-6 md:pb-8">
@@ -339,12 +338,12 @@ export function LogbookPage() {
                             <p className="truncate text-xs text-text-secondary">{entry.spotName}</p>
                           )}
                         </div>
-                        {/* Style pill */}
+                        {/* Pill Flash — rien si pas flashé */}
                         <span className={cn(
                           'rounded-full px-2.5 py-0.5 text-center text-[10px] font-bold uppercase tracking-wide',
-                          STYLE_CLS[entry.style] || STYLE_CLS.repeat,
+                          isFlash(entry.style) && FLASH_CLS,
                         )}>
-                          {t(`logbook.style.${entry.style}`)}
+                          {isFlash(entry.style) ? t('logbook.style.flash') : ''}
                         </span>
                         {/* Date */}
                         <span className="text-xs text-text-secondary">
@@ -399,9 +398,9 @@ export function LogbookPage() {
                           </span>
                           <span className={cn(
                             'truncate rounded-full px-1.5 py-0.5 text-center text-[9px] font-bold uppercase tracking-wide',
-                            STYLE_CLS[entry.style] || STYLE_CLS.repeat,
+                            isFlash(entry.style) && FLASH_CLS,
                           )}>
-                            {t(`logbook.style.${entry.style}`)}
+                            {isFlash(entry.style) ? t('logbook.style.flash') : ''}
                           </span>
                           <ChevronDown className={cn(
                             'h-3.5 w-3.5 shrink-0 text-text-secondary/40 transition-transform duration-200',

@@ -39,7 +39,7 @@ const gearIcon = (color: string) => (
 
 function badgeFor(status: GearEpiStatus | null): { label: string; style: string } {
   if (status === 'retire') return { label: 'Retiré', style: BADGE_WARN };
-  if (status === 'watch') return { label: '⚠ Bientôt', style: BADGE_WARN };
+  if (status === 'watch') return { label: 'Bientôt', style: BADGE_WARN };
   if (status === 'ok') return { label: 'OK', style: BADGE_OK };
   return { label: 'Suivi', style: BADGE_NEUTRAL };
 }
@@ -108,7 +108,7 @@ export function GearPage() {
         {/* Stats */}
         <div style={css('display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:4px 0 20px')}>
           <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css('font-size:22px;font-weight:800;letter-spacing:-.5px;color:#f0ece6;margin-bottom:3px')}>{actifs}</div><div style={css(STAT_LABEL)}>EPI actifs</div></div></div>
-          <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css(`font-size:22px;font-weight:800;letter-spacing:-.5px;color:${watch ? '#E88080' : '#f0ece6'};margin-bottom:3px`)}>{watch}</div><div style={css(STAT_LABEL)}>⚠ Expire bientôt</div></div></div>
+          <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css(`font-size:22px;font-weight:800;letter-spacing:-.5px;color:${watch ? '#E88080' : '#f0ece6'};margin-bottom:3px`)}>{watch}</div><div style={css(STAT_LABEL)}>Expire bientôt</div></div></div>
           <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css('font-size:22px;font-weight:800;letter-spacing:-.5px;color:#f0ece6;margin-bottom:3px')}>{retire}</div><div style={css(STAT_LABEL)}>Retraité</div></div></div>
         </div>
 

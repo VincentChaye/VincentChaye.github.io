@@ -1,9 +1,11 @@
 // backend/server.js
+// dotenv en premier : les modules importés ci-dessous (upload.js, etc.)
+// lisent process.env dès leur évaluation.
+import "dotenv/config";
 import http from "http";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import dotenv from "dotenv";
 import { connectToDb } from "./src/db.js";
 import { spotsRouter } from "./src/routes/spots.routes.js";
 import { usersRouter } from "./src/routes/users.routes.js";
@@ -25,9 +27,6 @@ import { storiesRouter } from "./src/routes/stories.routes.js";
 import { initWebPush } from "./src/notifications.js";
 import { initSocketIO } from "./src/socket.js";
 
-
-
-dotenv.config();
 
 const app = express();
 const httpServer = http.createServer(app);

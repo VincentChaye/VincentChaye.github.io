@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { apiFetch } from '@/lib/api';
 import { useAuthStore } from '@/stores/auth.store';
 import { css } from '../lib/css';
+import { shareUrl, publicUrl } from '../lib/share';
 import { PageFrame } from '../components/PageFrame';
 import { NavBar } from '../components/NavBar';
 import { IconButton } from '../components/primitives';
@@ -32,7 +33,7 @@ const ACT_CARD = 'border-radius:16px;padding:14px 16px;display:flex;gap:12px;ali
 const ACT_ICON = 'width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:2';
 
 const LEVEL_FR: Record<string, string> = { debutant: 'débutant', intermediaire: 'intermédiaire', confirme: 'confirmé', expert: 'expert', pro: 'pro' };
-const STYLE_VERB: Record<string, string> = { onsight: 'À vue de', flash: 'Flash de', redpoint: 'Enchaînement de', repeat: 'Répétition de' };
+const STYLE_VERB: Record<string, string> = { onsight: 'Flash de', flash: 'Flash de' };
 
 function relShort(iso?: string): string {
   if (!iso) return '';
@@ -90,9 +91,8 @@ export function PublicProfilePage() {
     }
   }
 
-  async function handleShare() {
-    const url = `${window.location.origin}/ZoneDeGrimpe/profile?id=${id}`;
-    try { if (navigator.share) await navigator.share({ url }); else await navigator.clipboard.writeText(url); } catch { /* annulé */ }
+  function handleShare() {
+    return shareUrl(publicUrl(`/profile/${id}`));
   }
 
   if (loading) return <PageFrame><div style={css('min-height:500px;display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.5);font-size:14px')}>Chargement…</div></PageFrame>;

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Send, ArrowLeft, MessageSquare, Plus, Search, Loader2,
   Settings, Users, UserPlus, UserMinus, Crown, Shield, LogOut, Trash2, Check, X, ChevronRight,
-  MapPin, Image, Video, Play,
+  MapPin, Image, Video, Play, Mountain, Gem, Building2, Store, TrendingUp,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useMessagesStore } from '@/stores/messages.store';
@@ -96,13 +96,13 @@ function GroupAvatar({ name, members, src, size = 10 }: {
 
 // ─── SpotTypeLabel ────────────────────────────────────────────────────────────
 
-function spotTypeIcon(type: string | null | undefined) {
+function SpotTypeIcon({ type, className }: { type: string | null | undefined; className?: string }) {
   switch (type) {
-    case 'crag': return '⛰️';
-    case 'boulder': return '🪨';
-    case 'indoor': return '🏛️';
-    case 'shop': return '🏪';
-    default: return '📍';
+    case 'crag': return <Mountain className={className} />;
+    case 'boulder': return <Gem className={className} />;
+    case 'indoor': return <Building2 className={className} />;
+    case 'shop': return <Store className={className} />;
+    default: return <MapPin className={className} />;
   }
 }
 
@@ -122,10 +122,10 @@ function SharedObjectCard({ obj, isMine }: { obj: SharedObject; isMine: boolean 
         )}
       >
         <div className={cn(
-          'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg',
-          isMine ? 'bg-white/15' : 'bg-sage/10'
+          'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
+          isMine ? 'bg-white/15 text-white' : 'bg-sage/10 text-sage'
         )}>
-          {spotTypeIcon(obj.spotType)}
+          <SpotTypeIcon type={obj.spotType} className="h-4 w-4" />
         </div>
         <div className="min-w-0 flex-1">
           <p className={cn('truncate text-xs font-semibold', isMine ? 'text-white' : 'text-text-primary')}>
@@ -150,8 +150,8 @@ function SharedObjectCard({ obj, isMine }: { obj: SharedObject; isMine: boolean 
         'mt-1 flex items-center gap-2 rounded-xl border p-2.5',
         isMine ? 'border-white/20 bg-white/10' : 'border-border-subtle bg-surface'
       )}>
-        <div className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg', isMine ? 'bg-white/15' : 'bg-sage/10')}>
-          🧗
+        <div className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-xl', isMine ? 'bg-white/15 text-white' : 'bg-sage/10 text-sage')}>
+          <TrendingUp className="h-4 w-4" />
         </div>
         <div className="min-w-0">
           <p className={cn('truncate text-xs font-semibold', isMine ? 'text-white' : 'text-text-primary')}>{obj.name}</p>
@@ -283,8 +283,8 @@ function SpotSearchModal({ onClose, onSelect }: SpotSearchModalProps) {
               })}
               className="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left hover:bg-surface-2 transition-colors"
             >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/10 text-base">
-                {spotTypeIcon(spot.type)}
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/10 text-sage">
+                <SpotTypeIcon type={spot.type} className="h-4 w-4" />
               </div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-text-primary">{spot.name}</p>
@@ -846,7 +846,7 @@ function ChatView({ myUid, conversation, messages, hasMore, typingUids, isOnline
             ))}
             {pendingShared && (
               <div className="relative flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-2 px-3 py-2 pr-8 max-w-[220px]">
-                <span className="text-base">{spotTypeIcon(pendingShared.spotType)}</span>
+                <SpotTypeIcon type={pendingShared.spotType} className="h-4 w-4 shrink-0 text-sage" />
                 <p className="truncate text-xs font-medium text-text-primary">{pendingShared.name}</p>
                 <button
                   onClick={() => setPendingShared(null)}

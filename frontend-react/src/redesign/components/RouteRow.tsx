@@ -11,11 +11,15 @@ export interface RouteRowProps {
   name: string;
   meta: string;
   tag: ReactNode;
+  onClick?: () => void;
 }
 
-export function RouteRow({ grade, gradeBg, gradeBorder, gradeColor, name, meta, tag }: RouteRowProps) {
+export function RouteRow({ grade, gradeBg, gradeBorder, gradeColor, name, meta, tag, onClick }: RouteRowProps) {
   return (
-    <GlassCard style={css('border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px')}>
+    <GlassCard
+      onClick={onClick}
+      style={css(`border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px${onClick ? ';cursor:pointer' : ''}`)}
+    >
       <div
         style={css(
           `width:44px;height:44px;border-radius:13px;background:${gradeBg};border:1px solid ${gradeBorder};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${gradeColor};flex-shrink:0`,

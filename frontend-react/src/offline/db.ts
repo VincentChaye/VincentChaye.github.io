@@ -8,7 +8,8 @@ export interface OfflinePack {
   spotId: string;
   radiusKm: number;
   corridor?: { from: [number, number]; to: [number, number]; widthKm: number };
-  layer: 'dark';
+  /** Couche des tuiles du pack — 'dark' pour les anciens packs, 'satellite' depuis la v6.3+ */
+  layer: 'dark' | 'satellite';
   /** Plage de zooms du RAYON ; le corridor éventuel est limité à 8–12. */
   zooms: { min: number; max: number };
   tileCount: number;

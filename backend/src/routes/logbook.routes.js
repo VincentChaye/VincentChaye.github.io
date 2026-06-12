@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { ObjectId } from "mongodb";
 import { requireAuth, optionalAuth } from "../auth.js";
+import { uploadLogbookMedia } from "../upload.js";
 
 export function logbookRouter(db) {
   const r = Router();
@@ -83,7 +84,7 @@ const VALID_STYLES = ["onsight", "flash", "redpoint", "repeat"];
   // --- POST /api/logbook --- requireAuth
   r.post("/", requireAuth, async (req, res) => {
     try {
-      const { spotId, routeId, date, style, notes, rating } = req.body || {};
+      const { spotId, routeId, date, style, notes, rating, posted, caption } = req.body || {};
 
       if (!spotId || !ObjectId.isValid(spotId)) {
         return res.status(400).json({ error: "invalid_spot_id" });
@@ -99,6 +100,9 @@ const VALID_STYLES = ["onsight", "flash", "redpoint", "repeat"];
       }
       if (rating !== undefined && (!Number.isInteger(rating) || rating < 1 || rating > 5)) {
         return res.status(400).json({ error: "invalid_rating" });
+      }
+      if (caption !== undefined && (typeof caption !== "string" || caption.length > 500)) {
+        return res.status(400).json({ error: "invalid_caption" });
       }
 
       // Fetch spot/route names for denormalization
@@ -126,6 +130,10 @@ const VALID_STYLES = ["onsight", "flash", "redpoint", "repeat"];
         style,
         notes: notes || null,
         rating: rating || null,
+        // Publication sur le fil : choix explicite à la validation, médias ajoutés ensuite
+        posted: posted === true,
+        caption: typeof caption === "string" && caption.trim() ? caption.trim() : null,
+        media: [],
         createdAt: new Date(),
       };
 
@@ -135,6 +143,37 @@ const VALID_STYLES = ["onsight", "flash", "redpoint", "repeat"];
       console.error(e);
       return res.status(500).json({ error: "server_error" });
     }
+  });
+
+  // --- POST /api/logbook/:id/media --- requireAuth, auteur — photos/vidéos du post
+  r.post("/:id/media", requireAuth, (req, res) => {
+    uploadLogbookMedia.array("media", 5)(req, res, async (err) => {
+      if (err) {
+        console.error("[logbook media upload]", err);
+        return res.status(400).json({ error: err.message || "upload_failed" });
+      }
+      try {
+        if (!ObjectId.isValid(req.params.id)) return res.status(400).json({ error: "bad_id" });
+        const entry = await logbook.findOne({ _id: new ObjectId(req.params.id) });
+        if (!entry) return res.status(404).json({ error: "not_found" });
+        if (entry.userId !== req.auth.uid) return res.status(403).json({ error: "forbidden" });
+        if (!req.files?.length) return res.status(400).json({ error: "media_required" });
+
+        const media = req.files.map((f) => ({
+          url: f.path,
+          publicId: f.filename,
+          type: f.mimetype.startsWith("video/") ? "video" : "image",
+        }));
+        await logbook.updateOne(
+          { _id: entry._id },
+          { $push: { media: { $each: media } }, $set: { updatedAt: new Date() } }
+        );
+        return res.json({ ok: true, media });
+      } catch (e) {
+        console.error(e);
+        return res.status(500).json({ error: "server_error" });
+      }
+    });
   });
 
   // --- PATCH /api/logbook/:id --- requireAuth, auteur

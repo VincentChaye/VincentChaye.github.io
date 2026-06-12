@@ -43,7 +43,6 @@ const STAT_VALUE = 'font-size:24px;font-weight:800;letter-spacing:-.8px;color:#f
 const STAT_LABEL = 'font-size:10px;color:rgba(240,236,230,.6);text-transform:uppercase;letter-spacing:.6px';
 const EMPTY = 'border-radius:16px;padding:16px;font-size:13px;color:rgba(240,236,230,.6);text-align:center';
 
-const STYLE_LABEL: Record<string, string> = { onsight: 'Onsight', flash: 'Flash', redpoint: 'Redpoint', repeat: 'Répét.' };
 
 /** Couleur du badge de cotation selon la bande (1er caractère). Aligné sur SpotDetailPage. */
 function gradeColors(grade?: string | null): { box: string; color: string } {
@@ -55,13 +54,10 @@ function gradeColors(grade?: string | null): { box: string; color: string } {
   return { box: 'background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10)', color: 'rgba(240,236,230,.6)' };
 }
 
-/** Tag du style d'ascension, fidèle aux couleurs de la maquette. */
+/** Tag « Flash » si la voie a été flashée (onsight historique inclus), rien sinon. */
 function styleTag(style: string): ReactNode {
-  const label = STYLE_LABEL[style] ?? style;
-  if (style === 'onsight') return <Tag variant="g" style={css('font-size:10px;padding:3px 8px')}>{label}</Tag>;
-  if (style === 'flash') return <Tag variant="a" style={css('font-size:10px;padding:3px 8px')}>{label}</Tag>;
-  if (style === 'redpoint') return <Tag style={css('background:rgba(150,120,200,.12);border:1px solid rgba(150,120,200,.2);color:#B8A0E8;font-size:10px;padding:3px 8px')}>{label}</Tag>;
-  return <Tag style={css('font-size:10px;padding:3px 8px')}>{label}</Tag>;
+  if (style === 'flash' || style === 'onsight') return <Tag variant="a" style={css('font-size:10px;padding:3px 8px')}>Flash</Tag>;
+  return null;
 }
 
 /** Date relative courte : « Aujourd'hui » / « Hier » / « 3 mai ». */

@@ -117,6 +117,26 @@ export const uploadMessageMedia = multer({
   fileFilter: messageMediaFilter,
 });
 
+const logbookMediaStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    const isVideo = file.mimetype.startsWith("video/");
+    return {
+      folder: "zonedegrimpe/logbook",
+      resource_type: isVideo ? "video" : "image",
+      ...(isVideo
+        ? {}
+        : { transformation: [{ width: 1920, height: 1080, crop: "limit", quality: "auto:good" }] }),
+    };
+  },
+});
+
+export const uploadLogbookMedia = multer({
+  storage: logbookMediaStorage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: messageMediaFilter,
+});
+
 export const uploadStoryMedia = multer({
   storage: storyMediaStorage,
   limits: { fileSize: 50 * 1024 * 1024 },

@@ -72,10 +72,16 @@
 @keyframes gp{0%,100%{opacity:.7}50%{opacity:1}}
 
 /* PAGES */
-.lg-root .pw{position:absolute;inset:0;z-index:10;border-radius:52px;overflow:hidden}
+/* `.pw` porte un transform neutre : il devient le containing block des `position:fixed`
+   des pages (overlays, sheets) → ancrés au cadre (web) / à l'écran (natif) et clippés par
+   son overflow:hidden, au lieu de fuir le cadre ou de défiler avec `.sc`. */
+.lg-root .pw{position:absolute;inset:0;z-index:10;border-radius:52px;overflow:hidden;transform:translateZ(0)}
 .lg-root .sc{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:110px;opacity:0;transform:translateX(30px);transition:opacity .3s,transform .3s;pointer-events:none;scrollbar-width:none}
 .lg-root .sc::-webkit-scrollbar{display:none}
-.lg-root .sc.active{opacity:1;transform:translateX(0);pointer-events:all}
+/* `transform:none` (pas translateX(0)) : un transform résiduel ferait de `.sc` (le scroller)
+   le containing block des `position:fixed` → backdrops qui défilent, sheets cachées qui
+   étendent le scroll. */
+.lg-root .sc.active{opacity:1;transform:none;pointer-events:all}
 
 /* NAVBAR */
 .lg-root{--safe-top:0px;--panel-top:59px}

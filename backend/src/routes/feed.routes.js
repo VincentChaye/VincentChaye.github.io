@@ -33,7 +33,8 @@ export function feedRouter(db) {
       // Fetch logbook + spots in parallel
       const [logbookItems, spotItems] = await Promise.all([
         logbook
-          .find({ userId: { $in: publicUserIds }, ...cursorFilter })
+          // `posted: false` = l'utilisateur a choisi de ne pas publier (anciennes entrées sans le champ restent visibles)
+          .find({ userId: { $in: publicUserIds }, posted: { $ne: false }, ...cursorFilter })
           .sort({ createdAt: -1 })
           .limit(limit + 10)
           .toArray(),
@@ -115,6 +116,8 @@ export function feedRouter(db) {
             route: route ? { id: l.routeId, name: route.name || l.routeName } : (l.routeName ? { name: l.routeName } : null),
             grade: l.grade,
             style: l.style,
+            caption: l.caption ?? null,
+            media: l.media ?? [],
           };
         }),
         ...spotItems.map((s) => {

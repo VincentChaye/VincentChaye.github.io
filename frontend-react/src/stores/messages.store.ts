@@ -249,10 +249,10 @@ export const useMessagesStore = create<MessagesStore>((set, get) => ({
       const previewContent =
         msg.content ||
         (msg.attachments?.length
-          ? msg.attachments[0].type === 'video' ? '🎥 Vidéo' : '📷 Photo'
+          ? msg.attachments[0].type === 'video' ? 'Vidéo' : 'Photo'
           : null) ||
-        (msg.sharedObject?.type === 'spot' ? '📍 Spot partagé' : null) ||
-        (msg.sharedObject?.type === 'route' ? '🧗 Voie partagée' : null) ||
+        (msg.sharedObject?.type === 'spot' ? 'Spot partagé' : null) ||
+        (msg.sharedObject?.type === 'route' ? 'Voie partagée' : null) ||
         '';
       const conversations = sortByUpdatedAt(
         s.conversations.map((c) =>

@@ -5,6 +5,17 @@ import { requireAuth, requireAdmin, optionalAuth } from "../auth.js";
 import { uploadRouteImage, cloudinary } from "../upload.js";
 import { getDisplayName } from "../helpers.js";
 
+const topoPointSchema = z.object({
+  color: z.enum(["hand", "foot"]),
+  order: z.number().int().min(0),
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+});
+
+const topoSchema = z.object({
+  points: z.array(topoPointSchema).max(200),
+});
+
 const createRouteSchema = z.object({
   spotId: z.string().regex(/^[a-f\d]{24}$/i, "invalid_spot_id"),
   name: z.string().min(1).max(120),
@@ -203,6 +214,73 @@ export function climbingRoutesRouter(db) {
       res.json(result);
     } catch (e) {
       console.error("[POST /climbing-routes/by-spots]", e);
+      res.status(500).json({ error: "server_error" });
+    }
+  });
+
+  // PUT /api/climbing-routes/:id/topo — Enregistrer le topo d'une voie (auteur ou admin)
+  r.put("/:id/topo", requireAuth, async (req, res) => {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "bad_id" });
+    }
+    try {
+      const route = await routes.findOne({ _id: new ObjectId(req.params.id) });
+      if (!route) return res.status(404).json({ error: "not_found" });
+
+      const isAdmin = req.auth.roles?.includes("admin");
+      const isAuthor = route.createdBy?.uid === req.auth.uid;
+      if (!isAdmin && !isAuthor) {
+        return res.status(403).json({ error: "forbidden" });
+      }
+
+      const parsed = topoSchema.parse(req.body);
+      const displayName = await getDisplayName(users, req.auth.uid);
+
+      const updated = await routes.findOneAndUpdate(
+        { _id: new ObjectId(req.params.id) },
+        {
+          $set: {
+            topo: {
+              points: parsed.points,
+              updatedBy: { uid: req.auth.uid, displayName },
+              updatedAt: new Date(),
+            },
+            updatedAt: new Date(),
+          },
+        },
+        { returnDocument: "after" }
+      );
+
+      res.json({ ok: true, route: updated });
+    } catch (e) {
+      if (e.name === "ZodError") {
+        return res.status(400).json({ error: "invalid_payload", detail: e.errors?.map(err => err.message).join(", ") });
+      }
+      console.error("[PUT /climbing-routes/:id/topo]", e);
+      res.status(500).json({ error: "server_error" });
+    }
+  });
+
+  // GET /api/climbing-routes/:id — Détail d'une voie
+  // Public : approved uniquement ; admin et auteur voient pending/rejected
+  r.get("/:id", optionalAuth, async (req, res) => {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "bad_id" });
+    }
+    try {
+      const route = await routes.findOne({ _id: new ObjectId(req.params.id) });
+      if (!route) return res.status(404).json({ error: "not_found" });
+
+      const isAdmin = req.auth?.roles?.includes("admin") ?? false;
+      const isAuthor = route.createdBy?.uid === req.auth?.uid;
+      const isHidden = route.status === "pending" || route.status === "rejected";
+      if (isHidden && !isAdmin && !isAuthor) {
+        return res.status(404).json({ error: "not_found" });
+      }
+
+      res.json(route);
+    } catch (e) {
+      console.error("[GET /climbing-routes/:id]", e);
       res.status(500).json({ error: "server_error" });
     }
   });

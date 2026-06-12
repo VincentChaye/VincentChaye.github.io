@@ -1,26 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, Marker } from 'react-leaflet';
-import { OfflineTileLayer } from '@/offline/OfflineTileLayer';
 import { useOfflineStore } from '@/offline/offline.store';
-import MarkerClusterGroup from 'react-leaflet-cluster';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import { isOfflineEnabled } from '@/offline/env';
+import { useMapLibre, getTerrain3DPref, setTerrain3DPref } from '@/map/useMapLibre';
+import { addSpotsLayers, updateSpots, wireSpotInteractions } from '@/map/spotsLayer';
+import { clusterTextFont, type BaseLayerKey } from '@/map/style';
 import { apiFetch } from '@/lib/api';
 import { normalizeSpotType } from '../lib/spotType';
 import { css } from '../lib/css';
 import { PageFrame } from '../components/PageFrame';
 import { FilterPill } from '../components/FilterPill';
 import { Pressable } from '../components/primitives';
-import { SearchIcon, FilterLinesIcon, BackChevronIcon } from '../lib/icons';
+import { SearchIcon, FilterLinesIcon, MountainIcon, SatelliteIcon, LayersIcon } from '../lib/icons';
 
 /**
- * SWAP — Carte (design Liquid Glass) câblé aux vraies données (PUBLIC), vrai Leaflet.
- * Route additive `/redesign/map`. Tuiles sombres CARTO, marqueurs réels `/api/spots` (clusterisés),
- * filtres par type, recherche → `/redesign/search`, marqueur → `/redesign/spot/:id`, FAB → propose.
- * Overlays glass de la maquette conservés (le blur se calcule contre les tuiles). i18n FR.
+ * SWAP — Carte (design Liquid Glass) câblé aux vraies données (PUBLIC), MapLibre GL JS.
+ * Route additive `/redesign/map`. Fond vector MapTiler sombre + relief 3D, spots réels
+ * `/api/spots` (source GeoJSON clusterisée), filtres par type, recherche → `/redesign/search`,
+ * point → `/redesign/spot/:id`, FAB → propose. Overlays glass de la maquette conservés. i18n FR.
  */
 
 type SpotType = 'crag' | 'boulder' | 'indoor' | 'shop';
@@ -36,35 +33,10 @@ interface MapSpot {
 }
 
 const TYPE_COLOR: Record<SpotType, string> = { crag: '#D4A030', boulder: '#88D880', indoor: '#88BBEE', shop: '#B8A0E8' };
-const dotIcon = (color: string) => L.divIcon({
-  className: '',
-  html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,.65);box-shadow:0 0 8px ${color}99"></div>`,
-  iconSize: [14, 14], iconAnchor: [7, 7],
-});
-const ICONS: Record<SpotType, L.DivIcon> = { crag: dotIcon(TYPE_COLOR.crag), boulder: dotIcon(TYPE_COLOR.boulder), indoor: dotIcon(TYPE_COLOR.indoor), shop: dotIcon(TYPE_COLOR.shop) };
 
-/* ---------- Tile layers ---------- */
-type MapLayerKey = 'dark' | 'satellite' | 'topo';
-const TILE_LAYERS: Record<MapLayerKey, { url: string; attribution: string; maxZoom: number; subdomains?: string }> = {
-  dark: {
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 19,
-    subdomains: 'abcd',
-  },
-  satellite: {
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: '&copy; <a href="https://www.esri.com/">Esri</a>',
-    maxZoom: 18,
-  },
-  topo: {
-    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
-    maxZoom: 17,
-  },
-};
-const MAP_LAYER_LABELS: Record<MapLayerKey, string> = { dark: '🌑 Standard', satellite: '🛰️ Satellite', topo: '🗻 Relief' };
-const MAP_LAYER_ORDER: MapLayerKey[] = ['satellite', 'dark', 'topo'];
+/* ---------- Fonds de carte (vector MapTiler sombre + rasters, cf. src/map/style.ts) ---------- */
+const MAP_LAYER_LABELS: Record<BaseLayerKey, string> = { outdoor: 'Outdoor', satellite: 'Satellite', topo: 'Relief' };
+const MAP_LAYER_ORDER: BaseLayerKey[] = ['satellite', 'outdoor', 'topo'];
 
 /* ---------- Grade scale ---------- */
 const GRADES = ['3','4','5','5+','6a','6a+','6b','6b+','6c','6c+','7a','7a+','7b','7b+','7c','7c+','8a','8a+','8b','8b+','8c','8c+','9a'];
@@ -81,30 +53,89 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number): numb
 
 export function MapPage() {
   const navigate = useNavigate();
-  const mapRef = useRef<L.Map | null>(null);
   const [spots, setSpots] = useState<MapSpot[]>([]);
 
   /* Layer selector */
-  const [mapLayer, setMapLayer] = useState<MapLayerKey>('satellite');
+  const [mapLayer, setMapLayer] = useState<BaseLayerKey>('satellite');
 
-  /* Bascule automatique vers la couche 'dark' en mode hors ligne (I7).
-     Mémorise la couche précédente pour la restaurer au retour en ligne. */
+  /* Relief 3D opt-in (coûteux sur appareils modestes) — préférence persistée */
+  const [terrain3D, setTerrain3D] = useState(getTerrain3DPref);
+
+  /* MapLibre — style vector sombre (Liquid Glass) ; satellite via le
+     protocole zdg:// (cache IndexedDB) quand le mode hors ligne est disponible. */
+  const { containerRef, map, setBaseLayer, setTerrainEnabled, zoomIn, zoomOut } = useMapLibre({
+    center: [2.4, 46.6],
+    zoom: 5,
+    styleVariant: 'dark',
+    initialLayer: 'satellite',
+    terrain3D,
+    offlineSatellite: isOfflineEnabled(),
+  });
+
+  const toggleTerrain3D = () => {
+    setTerrain3D((prev) => {
+      const next = !prev;
+      setTerrain3DPref(next);
+      setTerrainEnabled(next);
+      map?.easeTo({ pitch: next ? 45 : 0, duration: 600 });
+      return next;
+    });
+  };
+
+  /* Bascule automatique vers la couche 'satellite' en mode hors ligne (I7) — c'est la
+     couche téléchargée par les packs (cf. packs.ts SATELLITE_URL_TEMPLATE).
+     Mémorise la couche précédente pour la restaurer au retour en ligne.
+     Le relief 3D (DEM réseau) est coupé hors ligne. */
   const offlineMode = useOfflineStore((s) => s.mode);
-  const prevLayerRef = useRef<MapLayerKey | null>(null);
+  const prevLayerRef = useRef<BaseLayerKey | null>(null);
   useEffect(() => {
+    // `map` n'est exposé qu'une fois le style chargé — toucher au terrain avant
+    // lève "Style is not done loading" (crash ErrorBoundary au montage)
+    if (!map) return;
     if (offlineMode === 'offline') {
-      if (mapLayer !== 'dark') {
+      setTerrainEnabled(false);
+      if (mapLayer !== 'satellite') {
         prevLayerRef.current = mapLayer;
-        setMapLayer('dark');
+        setMapLayer('satellite');
       }
     } else {
+      setTerrainEnabled(terrain3D);
       if (prevLayerRef.current) {
         setMapLayer(prevLayerRef.current);
         prevLayerRef.current = null;
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [offlineMode]);
+  }, [offlineMode, map]);
+
+  /* Applique le fond sélectionné */
+  useEffect(() => {
+    if (map) setBaseLayer(mapLayer);
+  }, [map, mapLayer, setBaseLayer]);
+
+  /* Couches spots (dots clusterisés) + navigation vers la fiche au clic */
+  const [spotsLayerReady, setSpotsLayerReady] = useState(false);
+  useEffect(() => {
+    if (!map) return;
+    let cancelled = false;
+    let unwire: (() => void) | undefined;
+    void addSpotsLayers(map, {
+      palette: TYPE_COLOR,
+      marker: 'dot',
+      clusterColor: '#D4A030',
+      textFont: clusterTextFont(),
+    }).then(() => {
+      if (cancelled) return;
+      unwire = wireSpotInteractions(map, (id) => navigate(`/redesign/spot/${id}`));
+      setSpotsLayerReady(true);
+    });
+    return () => {
+      cancelled = true;
+      unwire?.();
+      setSpotsLayerReady(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map]);
 
   /* Filter sheet */
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -174,6 +205,11 @@ export function MapPage() {
     return list;
   }, [spots, filterType, filterGradeMin, filterGradeMax, filterOrientation, filterDistance, userPos]);
 
+  /* Pousse les spots filtrés dans la source MapLibre (setData → re-cluster auto) */
+  useEffect(() => {
+    if (map && spotsLayerReady) updateSpots(map, filtered);
+  }, [map, spotsLayerReady, filtered]);
+
   const activeFiltersCount = [filterType, filterGradeMin, filterGradeMax, filterOrientation, filterDistance > 0].filter(Boolean).length;
 
   return (
@@ -182,36 +218,14 @@ export function MapPage() {
           au lieu d'un 844px figé qui cassait sur tout device ≠ iPhone 390×844. Absolu → le map
           déborde sous la tab bar flottante (full-bleed) et ignore le padding-bottom du scroll. */}
       <div style={css('position:absolute;inset:0;overflow:hidden')}>
-        {/* Vrai Leaflet */}
-        <MapContainer
-          ref={mapRef}
-          center={[46.6, 2.4]}
-          zoom={5}
-          zoomControl={false}
+        {/* MapLibre GL */}
+        <div
+          ref={containerRef}
           style={{ position: 'absolute', inset: 0, height: '100%', width: '100%', background: '#0d1a0a' }}
-        >
-          <OfflineTileLayer
-            key={mapLayer}
-            url={TILE_LAYERS[mapLayer].url}
-            attribution={TILE_LAYERS[mapLayer].attribution}
-            subdomains={TILE_LAYERS[mapLayer].subdomains ?? 'abc'}
-            maxZoom={TILE_LAYERS[mapLayer].maxZoom}
-            layerKey={mapLayer}
-          />
-          <MarkerClusterGroup chunkedLoading>
-            {filtered.map((s) => (
-              <Marker key={s.id} position={[s.lat, s.lng]} icon={ICONS[s.type] ?? ICONS.crag} eventHandlers={{ click: () => navigate(`/redesign/spot/${s.id}`) }} />
-            ))}
-          </MarkerClusterGroup>
-        </MapContainer>
-
-        {/* Back */}
-        <Pressable aria-label="Retour" onClick={() => navigate(-1)} style={css('position:absolute;top:calc(80px + var(--safe-top));left:16px;z-index:20;width:40px;height:40px;border-radius:50%;background:rgba(12,8,4,.70);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:#f0ece6;cursor:pointer')}>
-          <BackChevronIcon width={10} height={16} />
-        </Pressable>
+        />
 
         {/* Search */}
-        <div style={css('position:absolute;top:calc(80px + var(--safe-top));left:68px;right:16px;z-index:20')}>
+        <div style={css('position:absolute;top:calc(80px + var(--safe-top));left:16px;right:16px;z-index:20')}>
           <div style={css('border-radius:9999px;padding:12px 16px;display:flex;align-items:center;gap:10px;background:rgba(12,8,4,.70);backdrop-filter:blur(28px) saturate(1.7);-webkit-backdrop-filter:blur(28px) saturate(1.7);border:1px solid rgba(212,160,48,.18);box-shadow:0 4px 20px rgba(0,0,0,.4);cursor:pointer;position:relative;overflow:hidden')}>
             <Pressable onClick={() => navigate('/redesign/search')} style={css('text-align:left;display:flex;align-items:center;gap:10px;flex:1')}>
               <div style={css('color:rgba(212,160,48,.7);position:relative;z-index:1')}><SearchIcon width={16} height={16} /></div>
@@ -230,20 +244,31 @@ export function MapPage() {
           </div>
         </div>
 
+        {/* Relief 3D opt-in — masqué hors ligne (DEM réseau) */}
+        {offlineMode !== 'offline' && (
+          <Pressable onClick={toggleTerrain3D}
+               style={css(`position:absolute;right:16px;top:50%;transform:translateY(calc(-50% - 112px));z-index:20;width:38px;height:38px;border-radius:12px;background:${terrain3D ? 'rgba(212,160,48,.85)' : 'rgba(12,8,4,.70)'};backdrop-filter:blur(20px);border:1px solid ${terrain3D ? 'rgba(212,160,48,.4)' : 'rgba(255,255,255,.10)'};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-weight:700;color:${terrain3D ? '#1a0f05' : 'rgba(240,236,230,.75)'}`)}
+               aria-label={`Relief 3D ${terrain3D ? 'activé' : 'désactivé'}`}
+               aria-pressed={terrain3D}
+               title="Relief 3D">
+            3D
+          </Pressable>
+        )}
+
         {/* Sélecteur de couche carte — masqué en mode hors ligne (I7) */}
         {offlineMode !== 'offline' && (
           <Pressable onClick={() => setMapLayer(l => MAP_LAYER_ORDER[(MAP_LAYER_ORDER.indexOf(l) + 1) % MAP_LAYER_ORDER.length])}
                style={css('position:absolute;right:16px;top:50%;transform:translateY(calc(-50% - 64px));z-index:20;width:38px;height:38px;border-radius:12px;background:rgba(12,8,4,.70);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px')}
                aria-label={`Changer de fond de carte (actuel : ${MAP_LAYER_LABELS[mapLayer]})`}
                title={MAP_LAYER_LABELS[mapLayer]}>
-            <span aria-hidden>{mapLayer === 'dark' ? '🌑' : mapLayer === 'satellite' ? '🛰️' : '🗻'}</span>
+            {mapLayer === 'outdoor' ? <MountainIcon aria-hidden width={18} height={18} /> : mapLayer === 'satellite' ? <SatelliteIcon aria-hidden width={18} height={18} /> : <LayersIcon aria-hidden width={18} height={18} />}
           </Pressable>
         )}
 
         {/* Zoom */}
         <div style={css('position:absolute;right:16px;top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:2px')}>
-          <Pressable hit={false} aria-label="Zoom avant" onClick={() => mapRef.current?.zoomIn()} style={css('width:38px;height:38px;border-radius:12px 12px 4px 4px;background:rgba(12,8,4,.70);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.75);cursor:pointer;font-size:18px')}>+</Pressable>
-          <Pressable hit={false} aria-label="Zoom arrière" onClick={() => mapRef.current?.zoomOut()} style={css('width:38px;height:38px;border-radius:4px 4px 12px 12px;background:rgba(12,8,4,.70);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.75);cursor:pointer;font-size:18px')}>−</Pressable>
+          <Pressable hit={false} aria-label="Zoom avant" onClick={zoomIn} style={css('width:38px;height:38px;border-radius:12px 12px 4px 4px;background:rgba(12,8,4,.70);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.75);cursor:pointer;font-size:18px')}>+</Pressable>
+          <Pressable hit={false} aria-label="Zoom arrière" onClick={zoomOut} style={css('width:38px;height:38px;border-radius:4px 4px 12px 12px;background:rgba(12,8,4,.70);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.75);cursor:pointer;font-size:18px')}>−</Pressable>
         </div>
 
         {/* Compteur */}

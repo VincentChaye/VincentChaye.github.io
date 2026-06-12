@@ -4,7 +4,7 @@ import type { ScreenId } from '../lib/nav';
 import { NavBar } from '../components/NavBar';
 import { IconButton, Tag } from '../components/primitives';
 import { StoryItem } from '../components/StoryItem';
-import { UsersIcon } from '../lib/icons';
+import { UsersIcon, ShareUploadIcon } from '../lib/icons';
 
 const FOOTER = 'border-top:1px solid rgba(255,255,255,.06);padding:12px 16px;display:flex;gap:20px';
 const FOOTER_ITEM = 'display:flex;align-items:center;gap:6px;font-size:13px;color:rgba(240,236,230,.50);cursor:pointer';
@@ -60,7 +60,7 @@ export function FeedScreen({ active, goTo }: { active: ScreenId; goTo: (id: Scre
             <div style={css(FOOTER)}>
               <div style={css(FOOTER_ITEM)}>{' '}<span>24</span></div>
               <div style={css(FOOTER_ITEM)}>{' '}<span>8</span></div>
-              <div style={css(`${FOOTER_ITEM};margin-left:auto`)}>⬆</div>
+              <div style={css(`${FOOTER_ITEM};margin-left:auto`)}><ShareUploadIcon aria-hidden width={14} height={14} /></div>
             </div>
           </div>
         </div>

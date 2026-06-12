@@ -1,9 +1,6 @@
-import { useEffect, useState, useCallback, useRef, useMemo, lazy, Suspense, memo } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, CircleMarker } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useTranslation } from 'react-i18next';
-import L from 'leaflet';
 import {
   Search, LocateFixed, X, MapPin as MapPinIcon, Mountain, Gem, Building2,
   ShoppingBag, Plus, SlidersHorizontal, Layers,
@@ -13,57 +10,22 @@ import { getCurrentPosition } from '@/lib/geolocation';
 import { cn, SPOT_TYPES, parseGradeToNumber } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth.store';
 import { SpotSheet } from '@/components/spots/SpotSheet';
+import { useMapLibre, getTerrain3DPref, setTerrain3DPref } from '@/map/useMapLibre';
+import { addSpotsLayers, updateSpots, wireSpotInteractions, setUserLocation } from '@/map/spotsLayer';
+import { clusterTextFont, type BaseLayerKey } from '@/map/style';
 import type { Spot, SpotType } from '@/types';
-
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 /* ---------- Lazy-loaded wizards (code-split) ---------- */
 const ProposeSpotWizard = lazy(() =>
   import('@/components/spots/ProposeSpotWizard').then((m) => ({ default: m.ProposeSpotWizard })),
 );
 
-/* ---------- Fix Leaflet default icon path ---------- */
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
-/* ---------- Custom marker icons by type ---------- */
+/* ---------- Marker colors by type ---------- */
 const TYPE_COLORS: Record<SpotType, string> = {
   crag: '#5D7052',
   boulder: '#C18845',
   indoor: '#4A90D9',
   shop: '#8B5CF6',
-};
-
-function createTypeIcon(type: SpotType): L.DivIcon {
-  const color = TYPE_COLORS[type] || '#5D7052';
-  return L.divIcon({
-    className: '',
-    iconSize: [28, 28],
-    iconAnchor: [14, 28],
-    popupAnchor: [0, -28],
-    html: `<svg viewBox="0 0 24 24" width="28" height="28" fill="${color}" stroke="white" stroke-width="1.5">
-      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-      <circle cx="12" cy="9" r="3" fill="white"/>
-    </svg>`,
-  });
-}
-
-const typeIcons: Record<SpotType, L.DivIcon> = {
-  crag: createTypeIcon('crag'),
-  boulder: createTypeIcon('boulder'),
-  indoor: createTypeIcon('indoor'),
-  shop: createTypeIcon('shop'),
 };
 
 /* ---------- Filter chip config ---------- */
@@ -76,25 +38,8 @@ const FILTER_CHIPS: { type: SpotType; icon: typeof Mountain; key: string }[] = [
 
 const GRADE_OPTIONS = ['3','4','5','6a','6b','6c','7a','7b','7c','8a','8b','8c','9a'];
 
-type MapLayerKey = 'osm' | 'satellite' | 'topo';
-const TILE_LAYERS: Record<MapLayerKey, { url: string; attribution: string; maxZoom: number }> = {
-  osm: {
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 19,
-  },
-  satellite: {
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: '&copy; <a href="https://www.esri.com/">Esri</a>',
-    maxZoom: 18,
-  },
-  topo: {
-    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
-    maxZoom: 17,
-  },
-};
-const MAP_LAYER_ORDER: MapLayerKey[] = ['satellite', 'osm', 'topo'];
+/* Fond vector MapTiler Outdoor + rasters satellite/topo — définis dans src/map/style.ts */
+const MAP_LAYER_ORDER: BaseLayerKey[] = ['satellite', 'outdoor', 'topo'];
 
 /* ---------- Spot data normalization ---------- */
 function normalizeSpot(s: Record<string, unknown>, i: number): Spot | null {
@@ -164,19 +109,24 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 /* ---------- LocateButton ---------- */
-function LocateButton({ onLocated }: { onLocated: (lat: number, lng: number) => void }) {
-  const map = useMap();
+function LocateButton({
+  flyTo,
+  onLocated,
+}: {
+  flyTo: (lng: number, lat: number, zoom?: number) => void;
+  onLocated: (lat: number, lng: number) => void;
+}) {
   const { t } = useTranslation();
 
   const handleLocate = useCallback(async () => {
     try {
       const { latitude, longitude } = await getCurrentPosition({ enableHighAccuracy: true });
-      map.flyTo([latitude, longitude], 13, { duration: 0.8 });
+      flyTo(longitude, latitude, 13);
       onLocated(latitude, longitude);
     } catch {
-      map.locate({ setView: true, maxZoom: 13 });
+      // Géolocalisation refusée ou indisponible
     }
-  }, [map, onLocated]);
+  }, [flyTo, onLocated]);
 
   return (
     <button
@@ -196,73 +146,6 @@ function LocateButton({ onLocated }: { onLocated: (lat: number, lng: number) => 
     </button>
   );
 }
-
-/* ---------- FlyToSpot ---------- */
-function FlyToSpot({ spot }: { spot: Spot | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (spot) map.flyTo([spot.lat, spot.lng], 14, { duration: 0.8 });
-  }, [spot, map]);
-  return null;
-}
-
-/* ---------- UserLocationMarker ---------- */
-function UserLocationMarker({ position }: { position: { lat: number; lng: number } | null }) {
-  if (!position) return null;
-  return (
-    <>
-      <Circle
-        center={[position.lat, position.lng]}
-        radius={100}
-        pathOptions={{ color: '#4A90D9', fillColor: '#4A90D9', fillOpacity: 0.1, weight: 1 }}
-      />
-      <CircleMarker
-        center={[position.lat, position.lng]}
-        radius={7}
-        pathOptions={{ color: 'white', fillColor: '#4A90D9', fillOpacity: 1, weight: 2 }}
-      />
-    </>
-  );
-}
-
-/* ---------- Memoized MarkerLayer (avoids re-rendering 20K markers on unrelated state changes) ---------- */
-const MarkerLayer = memo(function MarkerLayer({
-  spots,
-  onSelect,
-}: {
-  spots: Spot[];
-  onSelect: (spot: Spot) => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <MarkerClusterGroup
-      chunkedLoading
-      maxClusterRadius={50}
-      spiderfyOnMaxZoom
-      showCoverageOnHover={false}
-      disableClusteringAtZoom={16}
-    >
-      {spots.map((spot) => (
-        <Marker
-          key={spot.id}
-          position={[spot.lat, spot.lng]}
-          icon={typeIcons[spot.type] || typeIcons.crag}
-          eventHandlers={{
-            click: () => onSelect(spot),
-          }}
-        >
-          <Popup>
-            <strong>{spot.name}</strong>
-            <br />
-            <span className="text-xs text-gray-500">
-              {t(SPOT_TYPES[spot.type]?.key || 'spot.type.crag')}
-            </span>
-          </Popup>
-        </Marker>
-      ))}
-    </MarkerClusterGroup>
-  );
-});
 
 /* ---------- MapPage ---------- */
 export function MapPage() {
@@ -289,13 +172,74 @@ export function MapPage() {
   const [filterDistance, setFilterDistance] = useState(0); // 0 = no limit
 
   // Map layer
-  const [mapLayer, setMapLayer] = useState<MapLayerKey>('satellite');
+  const [mapLayer, setMapLayer] = useState<BaseLayerKey>('satellite');
   const cycleLayer = useCallback(() => {
     setMapLayer((prev) => {
       const idx = MAP_LAYER_ORDER.indexOf(prev);
       return MAP_LAYER_ORDER[(idx + 1) % MAP_LAYER_ORDER.length];
     });
   }, []);
+
+  // Relief 3D opt-in (coûteux sur appareils modestes) — préférence persistée
+  const [terrain3D, setTerrain3D] = useState(getTerrain3DPref);
+
+  // MapLibre — centre en [lng, lat]
+  const {
+    containerRef,
+    map,
+    flyTo,
+    setBaseLayer,
+    setTerrainEnabled,
+  } = useMapLibre({
+    center: [2.5, 46.5],
+    zoom: 6,
+    pitch: terrain3D ? 45 : 0,
+    styleVariant: 'outdoor',
+    initialLayer: 'satellite',
+    terrain3D,
+  });
+
+  const toggleTerrain3D = useCallback(() => {
+    setTerrain3D((prev) => {
+      const next = !prev;
+      setTerrain3DPref(next);
+      setTerrainEnabled(next);
+      map?.easeTo({ pitch: next ? 45 : 0, duration: 600 });
+      return next;
+    });
+  }, [map, setTerrainEnabled]);
+
+  // Couches spots (source GeoJSON clusterisée) + interactions — une fois la carte prête
+  const [spotsLayerReady, setSpotsLayerReady] = useState(false);
+  const spotsRef = useRef<Spot[]>([]);
+  useEffect(() => {
+    if (!map) return;
+    let cancelled = false;
+    let unwire: (() => void) | undefined;
+    void addSpotsLayers(map, {
+      palette: TYPE_COLORS,
+      marker: 'pin',
+      clusterColor: '#5D7052',
+      textFont: clusterTextFont(),
+    }).then(() => {
+      if (cancelled) return;
+      unwire = wireSpotInteractions(map, (id) => {
+        const found = spotsRef.current.find((s) => s.id === id);
+        if (found) setSelectedSpot(found);
+      });
+      setSpotsLayerReady(true);
+    });
+    return () => {
+      cancelled = true;
+      unwire?.();
+      setSpotsLayerReady(false);
+    };
+  }, [map]);
+
+  // Bascule de fond de carte
+  useEffect(() => {
+    if (map) setBaseLayer(mapLayer);
+  }, [map, mapLayer, setBaseLayer]);
 
   // Wizards
   const [showPropose, setShowPropose] = useState(false);
@@ -384,6 +328,22 @@ export function MapPage() {
     return result;
   }, [spots, filterType, filterGradeMin, filterOrientation, filterRock, filterDistance, userPos]);
 
+  // Pousse les spots filtrés dans la source MapLibre (setData → re-cluster auto)
+  useEffect(() => {
+    spotsRef.current = filteredSpots;
+    if (map && spotsLayerReady) updateSpots(map, filteredSpots);
+  }, [map, spotsLayerReady, filteredSpots]);
+
+  // Vol vers un spot (recherche, ?spot=id)
+  useEffect(() => {
+    if (flyTarget) flyTo(flyTarget.lng, flyTarget.lat, 14);
+  }, [flyTarget, flyTo]);
+
+  // Marqueur de position utilisateur
+  useEffect(() => {
+    if (map) setUserLocation(map, userPos);
+  }, [map, userPos]);
+
   // Debounced search query (300ms)
   const debouncedSearch = useDebounce(searchQuery, 300);
 
@@ -412,11 +372,6 @@ export function MapPage() {
 
   const handleLocated = useCallback((lat: number, lng: number) => {
     setUserPos({ lat, lng });
-  }, []);
-
-  // Stable callback for marker selection (avoids re-creating on each render)
-  const handleMarkerSelect = useCallback((spot: Spot) => {
-    setSelectedSpot(spot);
   }, []);
 
   const handleSpotCreated = useCallback(() => {
@@ -561,31 +516,11 @@ export function MapPage() {
 
       {/* ── Map area ── */}
       <div className="relative flex-1 min-w-0">
-      {/* Map */}
-      <MapContainer
-        center={[46.5, 2.5]}
-        zoom={6}
-        className="h-full w-full"
-        zoomControl={false}
-      >
-        <TileLayer
-          key={mapLayer}
-          attribution={TILE_LAYERS[mapLayer].attribution}
-          url={TILE_LAYERS[mapLayer].url}
-          maxZoom={TILE_LAYERS[mapLayer].maxZoom}
-        />
+      {/* Map (MapLibre GL) */}
+      <div ref={containerRef} className="h-full w-full" />
 
-        {!loading && (
-          <MarkerLayer spots={filteredSpots} onSelect={handleMarkerSelect} />
-        )}
-
-        {/* User location marker */}
-        <UserLocationMarker position={userPos} />
-
-        <FlyToSpot spot={flyTarget} />
-
-        {/* Right-side controls */}
-        <div className="absolute right-3 top-3 z-[1000] flex flex-col gap-2">
+      {/* Right-side controls */}
+      <div className="absolute right-3 top-3 z-[1000] flex flex-col gap-2">
           {/* Search — mobile only */}
           <button
             onClick={() => setSearchOpen(!searchOpen)}
@@ -604,7 +539,7 @@ export function MapPage() {
             {searchOpen ? <X className="h-[18px] w-[18px]" /> : <Search className="h-[18px] w-[18px]" />}
           </button>
 
-          <LocateButton onLocated={handleLocated} />
+          <LocateButton flyTo={flyTo} onLocated={handleLocated} />
 
           {/* Layer switcher */}
           <button
@@ -622,6 +557,24 @@ export function MapPage() {
             type="button"
           >
             <Layers className="h-[18px] w-[18px]" />
+          </button>
+
+          {/* Terrain 3D toggle */}
+          <button
+            onClick={toggleTerrain3D}
+            className={cn(
+              'flex h-10 w-10 cursor-pointer items-center justify-center',
+              'rounded-xl bg-surface/95 backdrop-blur-md shadow-card',
+              'border border-border-subtle/50',
+              'text-text-secondary transition-all duration-200',
+              'hover:bg-surface hover:text-sage hover:shadow-elevated',
+              'active:scale-95 text-xs font-bold',
+              terrain3D && 'bg-sage text-white border-sage hover:bg-sage-hover hover:text-white',
+            )}
+            title={t('map.terrain_3d')}
+            type="button"
+          >
+            3D
           </button>
 
           {/* Filter toggle — mobile only */}
@@ -642,7 +595,6 @@ export function MapPage() {
             <SlidersHorizontal className="h-[18px] w-[18px]" />
           </button>
         </div>
-      </MapContainer>
 
       {/* Search overlay — mobile only */}
       {searchOpen && (

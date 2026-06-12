@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { css } from '../lib/css';
 import {
   type Highlight, type Story, type StoryGroup,
   fetchHighlights, fetchUserStories, createHighlight, deleteHighlight,
 } from '../lib/stories';
+import { StarIcon } from '../lib/icons';
 import { StoryViewer } from './StoryViewer';
 
 interface Props {
@@ -100,7 +102,7 @@ export function HighlightsRow({ uid, isSelf, userInfo }: Props) {
           <button key={h._id} onClick={() => h.stories.length && setViewing(h)} style={css('background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;width:62px;flex-shrink:0;padding:0')}>
             <div style={css('width:54px;height:54px;border-radius:50%;padding:2px;background:rgba(255,255,255,.18)')}>
               <div style={css('width:100%;height:100%;border-radius:50%;overflow:hidden;background:#241a10;border:2px solid #0f0a06;display:flex;align-items:center;justify-content:center;font-size:18px')}>
-                {h.coverUrl ? <img src={h.coverUrl} alt="" style={css('width:100%;height:100%;object-fit:cover')} /> : '⭐'}
+                {h.coverUrl ? <img src={h.coverUrl} alt="" style={css('width:100%;height:100%;object-fit:cover')} /> : <StarIcon aria-hidden width={22} height={22} />}
               </div>
             </div>
             <span style={css('font-size:10.5px;color:rgba(240,236,230,.7);max-width:60px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis')}>{h.name}</span>
@@ -117,13 +119,16 @@ export function HighlightsRow({ uid, isSelf, userInfo }: Props) {
       {viewing && viewerGroups.length > 0 && (
         <>
           <StoryViewer groups={viewerGroups} initialGroup={0} onClose={() => setViewing(null)} />
-          {isSelf && (
-            <button onClick={() => removeHighlight(viewing)} style={css('position:fixed;top:calc(20px + var(--safe-top, 0px));right:56px;z-index:1001;background:none;border:none;color:rgba(255,255,255,.7);font-size:13px;font-weight:600;cursor:pointer')}>Supprimer</button>
+          {isSelf && createPortal(
+            <button onClick={() => removeHighlight(viewing)} style={css('position:fixed;top:calc(20px + var(--safe-top, 0px));right:56px;z-index:1001;background:none;border:none;color:rgba(255,255,255,.7);font-size:13px;font-weight:600;cursor:pointer')}>Supprimer</button>,
+            document.body,
           )}
         </>
       )}
 
-      {creating && (
+      {/* Portal vers <body> : monté dans `.pw` (transform), un position:fixed resterait confiné
+          au stacking context de la page (z:10) et passerait sous la TabBar (`.tbw` z:200). */}
+      {creating && createPortal(
         <div style={css('position:fixed;inset:0;z-index:1000;background:rgba(10,7,4,.94);backdrop-filter:blur(14px);display:flex;flex-direction:column;padding:calc(16px + var(--safe-top, 0px)) 18px calc(16px + var(--safe-bottom, 0px))')}>
           <div style={css('display:flex;align-items:center;justify-content:space-between;margin-bottom:14px')}>
             <span style={css('font-size:17px;font-weight:800;color:#f0ece6')}>Nouvelle « À la une »</span>
@@ -152,7 +157,8 @@ export function HighlightsRow({ uid, isSelf, userInfo }: Props) {
           >
             {saving ? 'Création…' : `Créer (${selected.size})`}
           </button>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

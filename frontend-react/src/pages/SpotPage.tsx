@@ -391,12 +391,11 @@ export function SpotPage() {
   /* ---------- Logger grimpe ---------- */
   const [showLogger, setShowLogger] = useState(false);
   const [logRouteId, setLogRouteId] = useState('');
-  const [logStyle, setLogStyle] = useState('redpoint');
+  const [logFlash, setLogFlash] = useState(false);
   const [logGrade, setLogGrade] = useState('');
   const [logDate, setLogDate] = useState(new Date().toISOString().slice(0, 10));
   const [logComment, setLogComment] = useState('');
   const [logging, setLogging] = useState(false);
-  const LOG_STYLES = ['onsight', 'flash', 'redpoint', 'repeat'] as const;
 
   useEffect(() => { if (spot) setLogGrade(spot.niveau_max ?? ''); }, [spot?.niveau_max]);
 
@@ -411,7 +410,7 @@ export function SpotPage() {
     if (logRouteId && loggedRouteIds.has(logRouteId)) { toast.error(t('logbook.route_already_logged')); return; }
     setLogging(true);
     try {
-      const payload: Record<string, unknown> = { spotId: spot.id, style: logStyle, date: logDate };
+      const payload: Record<string, unknown> = { spotId: spot.id, style: logFlash ? 'flash' : 'redpoint', date: logDate };
       if (logRouteId) payload.routeId = logRouteId;
       if (logComment.trim()) payload.notes = logComment.trim();
       await apiFetch('/api/logbook', { method: 'POST', auth: true, body: JSON.stringify(payload) });
@@ -648,11 +647,9 @@ export function SpotPage() {
                   </select>
                 )}
                 <div className="flex gap-2">
-                  {LOG_STYLES.map((s) => (
-                    <button key={s} type="button" onClick={() => setLogStyle(s)} className={cn('flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all', logStyle === s ? 'bg-sage text-white' : 'border border-border-subtle bg-surface text-text-secondary hover:bg-surface-2')}>
-                      {t(`logbook.style.${s}`)}
-                    </button>
-                  ))}
+                  <button type="button" onClick={() => setLogFlash(!logFlash)} className={cn('flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all', logFlash ? 'bg-sage text-white' : 'border border-border-subtle bg-surface text-text-secondary hover:bg-surface-2')}>
+                    {t('logbook.style.flash')}
+                  </button>
                 </div>
                 <div className="flex gap-2">
                   <input type="text" value={logGrade} onChange={(e) => setLogGrade(e.target.value)} placeholder={t('logbook.form_grade')} className="w-1/2 rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm outline-none focus:border-sage" />
@@ -709,8 +706,8 @@ export function SpotPage() {
                         <span className={cn('flex w-14 shrink-0 items-center justify-center rounded-lg px-2 py-1.5 text-center text-xs font-bold', badgeCls)}>
                           {r.grade || '—'}
                         </span>
-                        {/* Route info */}
-                        <div className="min-w-0 flex-1">
+                        {/* Route info — cliquable vers la page de détail (topo) */}
+                        <div className="min-w-0 flex-1 cursor-pointer" onClick={() => navigate(`/route/${r._id}`)}>
                           <div className="flex items-center gap-1.5">
                             <span className="truncate text-sm font-medium text-text-primary">{r.name}</span>
                             {r.status === 'pending' && (

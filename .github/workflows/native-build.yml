@@ -35,6 +35,8 @@ jobs:
       - name: Build web (capacitor mode)
         working-directory: frontend-react
         run: npm run build:native
+        env:
+          VITE_MAPTILER_KEY: ${{ secrets.VITE_MAPTILER_KEY }}
 
       - name: Generate native assets (icons + splash)
         working-directory: frontend-react
@@ -87,6 +89,8 @@ jobs:
       - name: Build web (capacitor mode)
         working-directory: frontend-react
         run: npm run build:native
+        env:
+          VITE_MAPTILER_KEY: ${{ secrets.VITE_MAPTILER_KEY }}
 
       - name: Generate native assets (icons + splash)
         working-directory: frontend-react

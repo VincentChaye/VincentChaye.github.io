@@ -7,7 +7,7 @@ import { PageFrame } from '../components/PageFrame';
 import { NavBar } from '../components/NavBar';
 import { SectionHeader, Tag, type TagVariant } from '../components/primitives';
 import { AdminUserRow } from '../components/AdminUserRow';
-import { BackChevronIcon } from '../lib/icons';
+import { BackChevronIcon, UsersIcon, ClimberIcon } from '../lib/icons';
 
 /**
  * SWAP — Admin (design Liquid Glass) câblé aux vraies données ADMIN (`requireAdmin`).
@@ -134,14 +134,14 @@ export function AdminPage() {
       <div style={css('padding:0 20px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px')}>
         <div className="g" onClick={() => navigate('/redesign/admin/users')} style={css('border-radius:16px;padding:16px;cursor:pointer')}>
           <div style={css('position:relative;z-index:2')}>
-            <div style={css('font-size:22px;margin-bottom:6px')}>👥</div>
+            <div style={css('margin-bottom:6px')}><UsersIcon aria-hidden width={22} height={22} /></div>
             <div style={css('font-size:14px;font-weight:700;color:#f0ece6')}>Utilisateurs</div>
             <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>Rôles, ban, suppression</div>
           </div>
         </div>
         <div className="g" onClick={() => navigate('/redesign/admin/gear')} style={css('border-radius:16px;padding:16px;cursor:pointer')}>
           <div style={css('position:relative;z-index:2')}>
-            <div style={css('font-size:22px;margin-bottom:6px')}>🧗</div>
+            <div style={css('margin-bottom:6px')}><ClimberIcon aria-hidden width={22} height={22} /></div>
             <div style={css('font-size:14px;font-weight:700;color:#f0ece6')}>Matériel</div>
             <div style={css('font-size:12px;color:rgba(240,236,230,.6)')}>Catalogue EPI</div>
           </div>
@@ -154,7 +154,7 @@ export function AdminPage() {
         {loading ? (
           <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Chargement…</div>
         ) : spots.length === 0 ? (
-          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Aucun spot en attente. 🎉</div>
+          <div className="g" style={css('border-radius:20px;padding:16px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Aucun spot en attente.</div>
         ) : spots.map((s) => {
           const id = String(s._id);
           const tt = TYPE_TAG[(s.type as string) ?? 'crag'] ?? TYPE_TAG.crag;

@@ -11,7 +11,7 @@ const CATEGORIES: GearCategory[] = [
   'harness', 'shoes', 'carabiner', 'machard', 'crashpad', 'quicklink',
 ];
 
-const PLACEHOLDER = 'https://placehold.co/80x80/e5e7eb/9ca3af?text=📦';
+const PLACEHOLDER = 'https://placehold.co/80x80/e5e7eb/9ca3af?text=+';
 
 export function GearCataloguePage() {
   const { t } = useTranslation();

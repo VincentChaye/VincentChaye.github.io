@@ -18,13 +18,13 @@ import {
   EST_BYTES_PER_TILE,
   type TileCoord,
 } from './tiles';
-import { getAllSpotsOffline, persistRoutesForSpots } from './spots';
+import { getAllSpotsOffline, persistRoutesForSpots, fetchAndPersistSpotsInBBox } from './spots';
 
 /* ---------- Constantes ---------- */
 
-/** Template de tuiles sombres CARTO (= couche 'dark' de MapPage) */
-export const DARK_URL_TEMPLATE =
-  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+/** Template de tuiles satellite Esri (= couche 'satellite' de MapPage, ordre ArcGIS {z}/{y}/{x}) */
+export const SATELLITE_URL_TEMPLATE =
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 
 /* ---------- Types publics ---------- */
 
@@ -143,7 +143,7 @@ async function _createPack(
     ...(opts.corridorFrom
       ? { corridor: { from: opts.corridorFrom, to: opts.center, widthKm: 3 } }
       : {}),
-    layer: 'dark',
+    layer: 'satellite',
     zooms: { min: PACK_ZOOM_MIN, max: MAX_ZOOM_PACK },
     tileCount: tiles.length,
     bytes: 0,
@@ -156,9 +156,8 @@ async function _createPack(
   let routesError = false;
 
   try {
-    // Téléchargement des tuiles
-    const result = await downloadTiles(tiles, 'dark', DARK_URL_TEMPLATE, {
-      subdomains: 'abcd',
+    // Téléchargement des tuiles (couche satellite — pas de sous-domaines chez Esri)
+    const result = await downloadTiles(tiles, 'satellite', SATELLITE_URL_TEMPLATE, {
       packId,
       signal,
       onProgress,
@@ -177,9 +176,12 @@ async function _createPack(
       return partialPack;
     }
 
-    // Spots couverts : features dans la bbox du rayon
+    // Spots couverts : fetch API de la bbox + persistance hors ligne (pour qu'ils
+    // s'affichent sur la carte même si elle n'a jamais été ouverte en ligne).
+    // Repli sur le cache IndexedDB si le réseau échoue.
     const bbox = bboxAround(lng, lat, opts.radiusKm);
-    const allSpots = await getAllSpotsOffline() as {
+    const fetched = await fetchAndPersistSpotsInBBox(bbox);
+    const allSpots = (fetched ?? await getAllSpotsOffline()) as {
       geometry?: { coordinates?: number[] };
       properties?: Record<string, unknown>;
     }[];
@@ -216,7 +218,8 @@ async function _createPack(
     // Note I8 : si seules les voies échouent (routesError), spotIds est quand même
     // peuplé (coveredSpotIds) — les voies pourront être retéléchargées plus tard.
     let status: OfflinePack['status'];
-    if (result.failed > 0 || routesError) {
+    if (result.failed > 0 || routesError || fetched === null) {
+      // fetched === null : spots de la zone non rafraîchis depuis l'API (repli cache)
       status = 'partial';
     } else {
       status = 'ready';

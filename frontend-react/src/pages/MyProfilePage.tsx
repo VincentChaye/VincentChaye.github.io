@@ -169,21 +169,23 @@ export function MyProfilePage() {
 
             {/* Avatar */}
             <div className="relative shrink-0">
-              {user.avatarUrl ? (
-                <img
-                  src={user.avatarUrl}
-                  alt={user.displayName}
-                  className="h-[86px] w-[86px] rounded-full border-4 object-cover shadow-card md:h-[110px] md:w-[110px]"
-                  style={{ borderColor: 'var(--color-bg)' }}
-                />
-              ) : (
-                <div
-                  className="flex h-[86px] w-[86px] items-center justify-center rounded-full border-4 font-heading text-3xl font-bold text-white shadow-card md:h-[110px] md:w-[110px] md:text-4xl"
-                  style={{ background: 'linear-gradient(135deg, #5D7052, #C18845)', borderColor: 'var(--color-bg)' }}
-                >
-                  {initial}
-                </div>
-              )}
+              <Link to={`/profile?id=${user._id}`} aria-label={t('profile.view_public')} className="block">
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.displayName}
+                    className="h-[86px] w-[86px] rounded-full border-4 object-cover shadow-card md:h-[110px] md:w-[110px]"
+                    style={{ borderColor: 'var(--color-bg)' }}
+                  />
+                ) : (
+                  <div
+                    className="flex h-[86px] w-[86px] items-center justify-center rounded-full border-4 font-heading text-3xl font-bold text-white shadow-card md:h-[110px] md:w-[110px] md:text-4xl"
+                    style={{ background: 'linear-gradient(135deg, #5D7052, #C18845)', borderColor: 'var(--color-bg)' }}
+                  >
+                    {initial}
+                  </div>
+                )}
+              </Link>
 
               {/* Crayon avatar */}
               <button

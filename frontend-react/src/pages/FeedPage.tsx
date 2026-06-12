@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Activity, MapPin, BookOpen, Loader2,
   Heart, MessageCircle, Share2, TrendingUp,
+  Mountain, Gem, Building2, Store, type LucideIcon,
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useAuthStore } from '@/stores/auth.store';
@@ -66,8 +67,8 @@ function gradeColor(grade?: string): string {
   return '#7c3aed';
 }
 
-const SPOT_TYPE_ICON: Record<string, string> = {
-  crag: '🧗', boulder: '🪨', indoor: '🏛️', shop: '🏪',
+const SPOT_TYPE_ICON: Record<string, LucideIcon> = {
+  crag: Mountain, boulder: Gem, indoor: Building2, shop: Store,
 };
 
 /* ── FeedCard ────────────────────────────────────────────── */
@@ -115,11 +116,14 @@ function FeedCard({ item, relDate }: { item: FeedItem; relDate: (s: string) => s
         )}
 
         {/* Spot type badge */}
-        {item.type === 'spot' && item.spot.type && (
-          <span className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-sm">
-            {SPOT_TYPE_ICON[item.spot.type] ?? '📍'} {item.spot.type}
-          </span>
-        )}
+        {item.type === 'spot' && item.spot.type && (() => {
+          const TypeIcon = SPOT_TYPE_ICON[item.spot.type] ?? MapPin;
+          return (
+            <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-sm">
+              <TypeIcon size={11} className="inline-block" /> {item.spot.type}
+            </span>
+          );
+        })()}
       </div>
 
       {/* Header: avatar + user info */}

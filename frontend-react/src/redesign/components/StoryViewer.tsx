@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '@/lib/api';
 import { useMessagesStore } from '@/stores/messages.store';
@@ -8,6 +9,7 @@ import {
   type Story, type StoryGroup, type StoryViewEntry,
   markStoryViewed, fetchStoryViews, reactToStory, deleteStory,
 } from '../lib/stories';
+import { MapPinIcon, TrashIcon, EyeIcon } from '../lib/icons';
 
 const PHOTO_MS = 5000;
 const QUICK_EMOJIS = ['🔥', '💪', '🧗', '👏'];
@@ -152,7 +154,9 @@ export function StoryViewer({ groups, initialGroup, onClose, onSeen }: Props) {
     try { await deleteStory(story._id); onClose(); } catch { /* ignore */ }
   }
 
-  return (
+  /* Portal vers <body> : monté dans `.pw` (transform), un position:fixed resterait confiné
+     au stacking context de la page (z:10) et passerait sous la TabBar (`.tbw` z:200). */
+  return createPortal(
     <div style={css(OVERLAY)}>
       {/* Média + zones tap */}
       <div
@@ -200,7 +204,7 @@ export function StoryViewer({ groups, initialGroup, onClose, onSeen }: Props) {
         </div>
         <div style={css('flex:1')} />
         {isMine && (
-          <button onClick={handleDelete} aria-label="Supprimer" style={css('background:none;border:none;color:rgba(255,255,255,.7);font-size:16px;cursor:pointer;padding:6px')}>🗑</button>
+          <button onClick={handleDelete} aria-label="Supprimer" style={css('background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;padding:6px;display:flex;align-items:center')}><TrashIcon aria-hidden width={16} height={16} /></button>
         )}
         <button onClick={onClose} aria-label="Fermer" style={css('background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:6px;line-height:1')}>✕</button>
       </div>
@@ -212,7 +216,7 @@ export function StoryViewer({ groups, initialGroup, onClose, onSeen }: Props) {
             <button
               onClick={() => { onClose(); navigate(`/redesign/spot/${story.spotId}`); }}
               style={css('display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border:1px solid rgba(212,160,48,.4);border-radius:20px;padding:6px 12px;color:#E8B84B;font-size:12px;font-weight:700;cursor:pointer')}
-            >📍 {story.spotName ?? 'Voir le spot'}</button>
+            ><MapPinIcon aria-hidden width={14} height={14} /> {story.spotName ?? 'Voir le spot'}</button>
           )}
           {story.caption && (
             <div style={css('background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border-radius:12px;padding:8px 12px;color:#fff;font-size:14px;max-width:100%')}>{story.caption}</div>
@@ -224,7 +228,7 @@ export function StoryViewer({ groups, initialGroup, onClose, onSeen }: Props) {
       <div style={css(FOOT)}>
         {isMine ? (
           <button onClick={openViews} style={css('display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:8px 14px;color:#fff;font-size:13px;font-weight:600;cursor:pointer')}>
-            👁 {story.viewCount ?? 0} vue{(story.viewCount ?? 0) > 1 ? 's' : ''}
+            <EyeIcon aria-hidden width={15} height={15} /> {story.viewCount ?? 0} vue{(story.viewCount ?? 0) > 1 ? 's' : ''}
           </button>
         ) : (
           <>
@@ -273,6 +277,7 @@ export function StoryViewer({ groups, initialGroup, onClose, onSeen }: Props) {
           </div>
         </div>
       )}
-    </div>
+    </div>,
+    document.body,
   );
 }

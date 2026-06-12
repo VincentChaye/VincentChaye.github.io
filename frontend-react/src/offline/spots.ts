@@ -37,6 +37,32 @@ export async function persistAllSpots(features: unknown[]): Promise<void> {
 }
 
 /**
+ * Récupère depuis l'API les spots d'une bbox et les persiste dans IndexedDB.
+ * Garantit que les spots d'une zone téléchargée sont visibles sur la carte hors ligne,
+ * même si l'utilisateur n'a jamais ouvert la carte en ligne (le store `spots` serait vide).
+ * Retourne les features, ou null en cas d'échec réseau (l'appelant se replie sur le cache).
+ */
+export async function fetchAndPersistSpotsInBBox(bbox: {
+  minLat: number;
+  minLng: number;
+  maxLat: number;
+  maxLng: number;
+}): Promise<unknown[] | null> {
+  try {
+    const qs = `minLng=${bbox.minLng}&minLat=${bbox.minLat}&maxLng=${bbox.maxLng}&maxLat=${bbox.maxLat}`;
+    const data = await apiFetch<{ features?: unknown[] }>(
+      `/api/spots?${qs}&limit=20000&format=geojson`,
+      { timeoutMs: 30000 },
+    );
+    const features = data?.features ?? [];
+    await persistAllSpots(features);
+    return features;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Retourne toutes les features brutes depuis IndexedDB.
  * Retourne [] si le store est vide ou en cas d'erreur.
  */

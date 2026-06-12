@@ -17,8 +17,8 @@ export const CORRIDOR_ZOOM_MIN = 8;
 export const MAX_ZOOM_CORRIDOR = 12;
 /** Nombre maximum de tuiles par pack (utilisé par les UIs pour validation) */
 export const MAX_TILES_PER_PACK = 8000;
-/** Poids estimé en octets par tuile (15 Ko) */
-export const EST_BYTES_PER_TILE = 15_000;
+/** Poids estimé en octets par tuile (25 Ko — JPEG satellite Esri, plus lourd que les PNG CARTO) */
+export const EST_BYTES_PER_TILE = 25_000;
 /** Nombre max de tuiles visitées conservées en cache passif */
 export const VISITED_TILES_CAP = 1000;
 

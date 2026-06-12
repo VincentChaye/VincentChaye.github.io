@@ -10,7 +10,7 @@ import { css } from '../lib/css';
 import { PageFrame } from '../components/PageFrame';
 import { NavBar } from '../components/NavBar';
 import { Pressable } from '../components/primitives';
-import { BackChevronIcon, SearchIcon } from '../lib/icons';
+import { BackChevronIcon, SearchIcon, MapPinIcon, CameraIcon, VideoIcon, PaperclipIcon } from '../lib/icons';
 
 /**
  * SWAP — Conversation (design Liquid Glass) câblé aux vraies données PROTÉGÉES.
@@ -30,7 +30,7 @@ const AVATAR = 'width:28px;height:28px;border-radius:50%;background:linear-gradi
 const SYS = 'text-align:center;margin:6px 0;font-size:11px;color:rgba(240,236,230,.6);font-weight:500';
 const MENU_ROW = 'display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;font-size:14px;color:#f0ece6;font-weight:500';
 
-const SYS_LABEL: Record<string, string> = { outing_created: '📅 Sortie créée', outing_completed: '✅ Sortie terminée' };
+const SYS_LABEL: Record<string, string> = { outing_created: 'Sortie créée', outing_completed: 'Sortie terminée' };
 type PickSpot = { id: string; name: string; type: SpotType; min: string | null; max: string | null };
 
 export function ConversationPage() {
@@ -112,7 +112,7 @@ export function ConversationPage() {
         <div style={css('display:flex;flex-direction:column;gap:6px')}>
           {m.attachments.map((a, i) => a.type === 'image'
             ? <img key={i} src={a.url} alt="" style={css('max-width:210px;width:100%;border-radius:12px;display:block')} />
-            : <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" style={css(`font-size:14px;${sent ? 'color:#1a0f05' : 'color:#D4A030'};text-decoration:underline`)}>🎥 Vidéo</a>)}
+            : <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" style={css(`font-size:14px;${sent ? 'color:#1a0f05' : 'color:#D4A030'};text-decoration:underline;display:inline-flex;align-items:center;gap:4px`)}><VideoIcon aria-hidden width={14} height={14} /> Vidéo</a>)}
         </div>
       );
     }
@@ -131,7 +131,7 @@ export function ConversationPage() {
       const o = m.sharedObject;
       return (
         <div onClick={() => o.type === 'spot' && navigate(`/redesign/spot/${o.id}`)} style={css(`border-radius:12px;background:${sent ? 'rgba(255,255,255,.18)' : 'rgba(212,160,48,.10)'};border:1px solid ${sent ? 'rgba(255,255,255,.28)' : 'rgba(212,160,48,.20)'};padding:9px 11px;display:flex;align-items:center;gap:10px;cursor:pointer;min-width:180px`)}>
-          <div style={css(`width:34px;height:34px;border-radius:10px;background:${sent ? 'rgba(255,255,255,.2)' : 'rgba(212,160,48,.15)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px`)}>📍</div>
+          <div style={css(`width:34px;height:34px;border-radius:10px;background:${sent ? 'rgba(255,255,255,.2)' : 'rgba(212,160,48,.15)'};display:flex;align-items:center;justify-content:center;flex-shrink:0`)}><MapPinIcon aria-hidden width={16} height={16} /></div>
           <div style={css('min-width:0;flex:1')}>
             <div style={css(`font-size:13px;font-weight:700;${sent ? 'color:#1a0f05' : 'color:#f0ece6'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis`)}>{o.name}</div>
             {o.subtitle && <div style={css(`font-size:11px;${sent ? 'color:rgba(26,15,5,.6)' : 'color:rgba(240,236,230,.5)'}`)}>{o.subtitle}</div>}
@@ -171,7 +171,7 @@ export function ConversationPage() {
           {list === undefined ? (
             <div style={css('flex:1;display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.5);font-size:14px')}>Chargement…</div>
           ) : list.length === 0 ? (
-            <div style={css('flex:1;display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.6);font-size:14px;text-align:center;padding:40px 20px')}>Aucun message. Dis bonjour 👋</div>
+            <div style={css('flex:1;display:flex;align-items:center;justify-content:center;color:rgba(240,236,230,.6);font-size:14px;text-align:center;padding:40px 20px')}>Aucun message. Dis bonjour.</div>
           ) : (
             list.map((m) => {
               if (m.systemEvent) return <div key={m._id} className="lg-item-in" style={css(SYS)}>{SYS_LABEL[m.systemEvent.type] ?? 'Événement'}</div>;
@@ -196,9 +196,9 @@ export function ConversationPage() {
           {menuOpen && (
             <div className="g lg-pop" style={css('position:absolute;bottom:72px;left:16px;width:200px;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.5)')}>
               <div style={css('position:relative;z-index:2')}>
-                <Pressable style={css(`width:100%;text-align:left;${MENU_ROW};border-bottom:1px solid rgba(255,255,255,.06)`)} onClick={() => photoRef.current?.click()}><span aria-hidden>📷</span> Photo</Pressable>
-                <Pressable style={css(`width:100%;text-align:left;${MENU_ROW};border-bottom:1px solid rgba(255,255,255,.06)`)} onClick={() => openSpotPicker()}><span aria-hidden>📍</span> Partager un spot</Pressable>
-                <Pressable style={css(`width:100%;text-align:left;${MENU_ROW}`)} onClick={() => fileRef.current?.click()}><span aria-hidden>📎</span> Fichier</Pressable>
+                <Pressable style={css(`width:100%;text-align:left;${MENU_ROW};border-bottom:1px solid rgba(255,255,255,.06)`)} onClick={() => photoRef.current?.click()}><CameraIcon aria-hidden width={16} height={16} /> Photo</Pressable>
+                <Pressable style={css(`width:100%;text-align:left;${MENU_ROW};border-bottom:1px solid rgba(255,255,255,.06)`)} onClick={() => openSpotPicker()}><MapPinIcon aria-hidden width={16} height={16} /> Partager un spot</Pressable>
+                <Pressable style={css(`width:100%;text-align:left;${MENU_ROW}`)} onClick={() => fileRef.current?.click()}><PaperclipIcon aria-hidden width={16} height={16} /> Fichier</Pressable>
               </div>
             </div>
           )}
@@ -242,7 +242,7 @@ export function ConversationPage() {
                   <div style={css('padding:24px;text-align:center;color:rgba(240,236,230,.6);font-size:13px')}>Aucun spot.</div>
                 ) : filteredSpots.map((s) => (
                   <Pressable key={s.id} onClick={() => shareSpot(s)} style={css('width:100%;text-align:left;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;cursor:pointer')}>
-                    <div aria-hidden style={css('width:32px;height:32px;border-radius:9px;background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px')}>📍</div>
+                    <div aria-hidden style={css('width:32px;height:32px;border-radius:9px;background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0')}><MapPinIcon aria-hidden width={14} height={14} /></div>
                     <div style={css('min-width:0;flex:1')}>
                       <div style={css('font-size:14px;font-weight:600;color:#f0ece6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis')}>{s.name}</div>
                       <div style={css('font-size:11px;color:rgba(240,236,230,.6)')}>{[SPOT_TYPE_LABEL[s.type], (s.min || s.max) ? `${s.min || '?'}→${s.max || '?'}` : null].filter(Boolean).join(' · ')}</div>

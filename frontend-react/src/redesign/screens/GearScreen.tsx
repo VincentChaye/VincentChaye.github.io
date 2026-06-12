@@ -38,7 +38,7 @@ export function GearScreen({ active, goTo }: { active: ScreenId; goTo: (id: Scre
         {/* Stats */}
         <div style={css('display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:4px 0 20px')}>
           <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css('font-size:22px;font-weight:800;letter-spacing:-.5px;color:#f0ece6;margin-bottom:3px')}>7</div><div style={css(STAT_LABEL)}>EPI actifs</div></div></div>
-          <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css('font-size:22px;font-weight:800;letter-spacing:-.5px;color:#E88080;margin-bottom:3px')}>2</div><div style={css(STAT_LABEL)}>⚠ Expire bientôt</div></div></div>
+          <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css('font-size:22px;font-weight:800;letter-spacing:-.5px;color:#E88080;margin-bottom:3px')}>2</div><div style={css(STAT_LABEL)}>Expire bientôt</div></div></div>
           <div className="g" style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css('font-size:22px;font-weight:800;letter-spacing:-.5px;color:#f0ece6;margin-bottom:3px')}>1</div><div style={css(STAT_LABEL)}>Retraité</div></div></div>
         </div>
 
@@ -46,7 +46,7 @@ export function GearScreen({ active, goTo }: { active: ScreenId; goTo: (id: Scre
         <div style={css(SECTION)}>Cordes</div>
         <div className="g" style={css(CARD)}>
           <GearRow border iconBox="background:rgba(212,160,48,.12);border:1px solid rgba(212,160,48,.2)" icon={ROPE('#D4A030')} name="Petzl Volta 9.2mm" sub="60m · En service depuis 14 mois" badge="OK" badgeStyle={BADGE_OK} />
-          <GearRow iconBox="background:rgba(232,128,128,.12);border:1px solid rgba(232,128,128,.2)" icon={ROPE('#E88080')} name="Black Diamond 9.6mm" sub="70m · Expire dans 2 mois" badge="⚠ Bientôt" badgeStyle={BADGE_WARN} />
+          <GearRow iconBox="background:rgba(232,128,128,.12);border:1px solid rgba(232,128,128,.2)" icon={ROPE('#E88080')} name="Black Diamond 9.6mm" sub="70m · Expire dans 2 mois" badge="Bientôt" badgeStyle={BADGE_WARN} />
         </div>
 
         {/* Baudriers & Casques */}

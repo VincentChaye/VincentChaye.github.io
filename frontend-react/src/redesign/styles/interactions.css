@@ -73,10 +73,15 @@
    route sortante montée (View Transitions / AnimatePresence). */
 @keyframes lgScreenIn {
   from { opacity: 0; transform: translateX(26px); }
-  to   { opacity: 1; transform: translateX(0); }
+  /* `none` (pas translateX(0)) : le fill-mode `both` fige la valeur finale, et un transform
+     résiduel ferait de .sc le containing block des position:fixed (overlays cassés). */
+  to   { opacity: 1; transform: none; }
 }
 .lg-root .sc-enter {
-  animation: lgScreenIn .34s cubic-bezier(.32, .72, 0, 1) both;
+  /* `backwards` (pas `both`) : une animation qui « fill forwards » reste appliquée à vie et
+     maintient .sc comme containing block des position:fixed même avec transform:none.
+     Fin d'animation = mêmes valeurs que .sc.active (opacity:1, transform:none) → pas de saut. */
+  animation: lgScreenIn .34s cubic-bezier(.32, .72, 0, 1) backwards;
 }
 
 /* ── 3. BULLES DE MESSAGE / LIGNES — montée + fondu (joue 1x au montage) ── */
