@@ -41,6 +41,7 @@ const NOTIF_ICONS: Record<NotificationType, typeof Bell> = {
   photo_rejected: XCircle,
   gear_epi_warning: Package,
   gear_epi_retire: Package,
+  story_reaction: Star,
 };
 
 const NOTIF_COLORS: Record<NotificationType, string> = {
@@ -55,6 +56,7 @@ const NOTIF_COLORS: Record<NotificationType, string> = {
   photo_rejected: 'bg-red-100 text-red-500',
   gear_epi_warning: 'bg-amber-brand/10 text-amber-brand',
   gear_epi_retire: 'bg-red-100 text-red-500',
+  story_reaction: 'bg-amber-brand/10 text-amber-brand',
 };
 
 function useRelativeDate() {

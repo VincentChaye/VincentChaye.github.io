@@ -20,7 +20,8 @@ export type NotificationType =
   | 'photo_approved'
   | 'photo_rejected'
   | 'gear_epi_warning'
-  | 'gear_epi_retire';
+  | 'gear_epi_retire'
+  | 'story_reaction';
 
 export type GearCategory =
   | 'rope' | 'quickdraw' | 'belay_auto' | 'belay_tube'
