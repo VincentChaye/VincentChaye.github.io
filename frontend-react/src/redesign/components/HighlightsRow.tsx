@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { css } from '../lib/css';
 import {
   type Highlight, type Story, type StoryGroup,
-  fetchHighlights, fetchUserStories, createHighlight, deleteHighlight,
+  fetchHighlights, fetchUserStories, createHighlight, deleteHighlight, storyPosterUrl,
 } from '../lib/stories';
 import { StarIcon } from '../lib/icons';
 import { StoryViewer } from './StoryViewer';
@@ -27,9 +27,7 @@ function ArchiveItem({ story, on, onToggle }: ArchiveItemProps) {
       onClick={() => onToggle(story._id)}
       style={css(`position:relative;aspect-ratio:9/16;border-radius:12px;overflow:hidden;border:2px solid ${on ? '#D4A030' : 'transparent'};background:#241a10;cursor:pointer;padding:0`)}
     >
-      {story.media.type === 'image'
-        ? <img src={story.media.url} alt="" style={css('width:100%;height:100%;object-fit:cover')} />
-        : <video src={story.media.url} muted style={css('width:100%;height:100%;object-fit:cover')} />}
+      <img src={storyPosterUrl(story.media.url)} alt="" loading="lazy" style={css('width:100%;height:100%;object-fit:cover')} />
       {on && (
         <span style={css('position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:#D4A030;color:#1a0f05;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center')}>
           ✓
@@ -102,7 +100,7 @@ export function HighlightsRow({ uid, isSelf, userInfo }: Props) {
           <button key={h._id} onClick={() => h.stories.length && setViewing(h)} style={css('background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;width:62px;flex-shrink:0;padding:0')}>
             <div style={css('width:54px;height:54px;border-radius:50%;padding:2px;background:rgba(255,255,255,.18)')}>
               <div style={css('width:100%;height:100%;border-radius:50%;overflow:hidden;background:#241a10;border:2px solid #0f0a06;display:flex;align-items:center;justify-content:center;font-size:18px')}>
-                {h.coverUrl ? <img src={h.coverUrl} alt="" style={css('width:100%;height:100%;object-fit:cover')} /> : <StarIcon aria-hidden width={22} height={22} />}
+                {h.coverUrl ? <img src={storyPosterUrl(h.coverUrl)} alt="" style={css('width:100%;height:100%;object-fit:cover')} /> : <StarIcon aria-hidden width={22} height={22} />}
               </div>
             </div>
             <span style={css('font-size:10.5px;color:rgba(240,236,230,.7);max-width:60px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis')}>{h.name}</span>

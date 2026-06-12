@@ -99,7 +99,7 @@ export function AdminPage() {
   if (!isAuthenticated || !isAdmin) {
     return (
       <PageFrame>
-        <NavBar><div className="nbi"><div className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Retour</div><span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Admin</span></div></NavBar>
+        <NavBar><div className="nbi"><div className="back-btn" onClick={() => navigate('/redesign/settings')}><BackChevronIcon width={9} height={15} /> Réglages</div><span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Admin</span></div></NavBar>
         <div style={css('padding:60px 28px;text-align:center;color:rgba(240,236,230,.6);font-size:15px')}>
           {isAuthenticated ? 'Accès réservé aux administrateurs.' : (
             <div style={css('display:flex;flex-direction:column;align-items:center;gap:16px')}>
@@ -116,7 +116,7 @@ export function AdminPage() {
     <PageFrame>
       <NavBar>
         <div className="nbi">
-          <div className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Retour</div>
+          <div className="back-btn" onClick={() => navigate('/redesign/settings')}><BackChevronIcon width={9} height={15} /> Réglages</div>
           <span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Admin</span>
         </div>
       </NavBar>

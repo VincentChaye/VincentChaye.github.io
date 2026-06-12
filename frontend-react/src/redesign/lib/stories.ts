@@ -40,6 +40,15 @@ export interface Highlight {
   stories: Story[];
 }
 
+/** Vignette statique d'un média de story : pour une vidéo Cloudinary, renvoie la
+ *  première frame en jpg (so_0) au lieu de l'URL vidéo — rien à télécharger en boucle. */
+export function storyPosterUrl(url: string): string {
+  if (!url.includes('/video/upload/')) return url;
+  return url
+    .replace('/video/upload/', '/video/upload/so_0/')
+    .replace(/\.[a-z0-9]+(\?.*)?$/i, '.jpg$1');
+}
+
 export function fetchStoriesFeed(): Promise<{ groups: StoryGroup[] }> {
   return apiFetch('/api/stories/feed', { auth: true });
 }

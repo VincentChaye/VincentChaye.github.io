@@ -86,7 +86,7 @@ export function ProfilePage() {
         <div className="nbi">
           <div style={css('flex:1')} />
           <div className="na">
-            <IconButton aria-label="Paramètres" style={css('cursor:pointer')} onClick={() => navigate('/settings')}>{GEAR}</IconButton>
+            <IconButton aria-label="Paramètres" style={css('cursor:pointer')} onClick={() => navigate('/redesign/settings')}>{GEAR}</IconButton>
           </div>
         </div>
       </NavBar>
@@ -123,7 +123,7 @@ export function ProfilePage() {
         {isOfflineEnabled() && (
           <ProfileMenuRow onClick={() => navigate('/redesign/offline')} iconBox="background:rgba(136,216,128,.12);border:1px solid rgba(136,216,128,.20)" iconColor="#88D880" label="Mode hors ligne" icon={<DownloadIcon width={16} height={16} />} />
         )}
-        <ProfileMenuRow onClick={() => navigate('/settings')} iconBox="background:rgba(80,130,200,.12);border:1px solid rgba(80,130,200,.20)" iconColor="#88BBEE" label="Paramètres" icon={GEAR} />
+        <ProfileMenuRow onClick={() => navigate('/redesign/settings')} iconBox="background:rgba(80,130,200,.12);border:1px solid rgba(80,130,200,.20)" iconColor="#88BBEE" label="Paramètres" icon={GEAR} />
         <ProfileMenuRow onClick={handleLogout} marginTop iconBox="background:rgba(200,80,80,.12);border:1px solid rgba(200,80,80,.20)" iconColor="#E88080" labelColor="rgba(240,150,150,.85)" label="Se déconnecter" icon={LOGOUT} />
       </div>
       <div style={css('height:20px')} />

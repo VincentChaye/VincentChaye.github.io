@@ -62,8 +62,10 @@
    Le `.nb` reste collé en haut : les actions (Paramètres, Amis…) doivent rester accessibles
    pendant le scroll. Pour que le contenu qui passe dessous reste lisible sans dénaturer le
    design au repos, son fond `.nbb` est transparent en haut de page et passe en verre flouté
-   dès que ça défile (classe `nb-scrolled` posée par PageFrame sur `.lg-root`). */
-.lg-root.native .nb .nbb {
+   dès que ça défile (classe `nb-scrolled` posée par PageFrame sur `.lg-root`).
+   Scopé `:has(.nbi)` : les navbars « fantômes » sans contenu de barre (ex. Accueil, juste la
+   cloche flottante) ne doivent pas matérialiser un header au scroll. */
+.lg-root.native .nb:has(.nbi) .nbb {
   opacity: 0;
   transition: opacity 0.25s ease;
   background: rgba(12, 8, 4, 0.62);
@@ -71,6 +73,6 @@
   -webkit-backdrop-filter: blur(24px) saturate(1.5);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
-.lg-root.native.nb-scrolled .nb .nbb {
+.lg-root.native.nb-scrolled .nb:has(.nbi) .nbb {
   opacity: 1;
 }
