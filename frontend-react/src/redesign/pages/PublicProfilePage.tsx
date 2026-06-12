@@ -7,6 +7,7 @@ import { PageFrame } from '../components/PageFrame';
 import { NavBar } from '../components/NavBar';
 import { IconButton } from '../components/primitives';
 import { BackChevronIcon, Share2Icon, ActivityIcon } from '../lib/icons';
+import { HighlightsRow } from '../components/HighlightsRow';
 
 /**
  * SWAP — Profil public (design Liquid Glass) câblé aux vraies données (PUBLIC).
@@ -133,6 +134,14 @@ export function PublicProfilePage() {
           <div style={css('display:flex;flex-direction:column;gap:2px;margin-bottom:20px')}>
             <span style={css('font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:rgba(212,160,48,.65);font-weight:600')}>Grimpeur {levelLabel}</span>
           </div>
+        )}
+
+        {isAuthenticated && id && prof && (
+          <HighlightsRow
+            uid={id}
+            isSelf={isSelf}
+            userInfo={{ username: prof.username ?? null, displayName: prof.displayName ?? null, avatarUrl: prof.avatarUrl ?? null }}
+          />
         )}
 
         {!isSelf && (

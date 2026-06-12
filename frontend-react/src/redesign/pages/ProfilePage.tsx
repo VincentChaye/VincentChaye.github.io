@@ -10,6 +10,7 @@ import { IconButton } from '../components/primitives';
 import { ProfileMenuRow } from '../components/ProfileMenuRow';
 import { BookOpenIcon, DownloadIcon } from '../lib/icons';
 import { isOfflineEnabled } from '@/offline/env';
+import { HighlightsRow } from '../components/HighlightsRow';
 
 /**
  * SWAP — Profil (« mon profil », design Liquid Glass) câblé aux vraies données PROTÉGÉES.
@@ -103,6 +104,11 @@ export function ProfilePage() {
             {maxGrade !== '—' && <span style={css('font-size:15px;font-weight:700;color:rgba(240,236,230,.80);letter-spacing:-.3px')}>Max {maxGrade}</span>}
           </div>
         )}
+        <HighlightsRow
+          uid={user._id}
+          isSelf
+          userInfo={{ username: user.username ?? null, displayName: user.displayName ?? null, avatarUrl: user.avatarUrl ?? null }}
+        />
         <div style={css('display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:280px;margin:0 auto 24px')}>
           <div role="button" onClick={() => navigate('/redesign/logbook')} style={css(STAT + ';cursor:pointer')}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{ascents ?? '—'}</div><div style={css(STAT_LABEL)}>Ascensions</div></div></div>
           <div role="button" onClick={() => navigate('/redesign/my-spots')} style={css(STAT + ';cursor:pointer')}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{spotsClimbed ?? '—'}</div><div style={css(STAT_LABEL)}>Spots</div></div></div>
