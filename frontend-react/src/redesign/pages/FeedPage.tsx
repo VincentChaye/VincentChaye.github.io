@@ -5,7 +5,7 @@ import { css } from '../lib/css';
 import { PageFrame } from '../components/PageFrame';
 import { NavBar } from '../components/NavBar';
 import { IconButton, Tag } from '../components/primitives';
-import { BackChevronIcon, UsersIcon } from '../lib/icons';
+import { UsersIcon } from '../lib/icons';
 
 /**
  * SWAP — Social (design Liquid Glass) câblé aux vraies données (PUBLIC).
@@ -67,7 +67,6 @@ export function FeedPage() {
     <PageFrame tab="fil">
       <NavBar>
         <div className="nbi">
-          <div className="back-btn" onClick={() => navigate(-1)}><BackChevronIcon width={9} height={15} /> Retour</div>
           <span className="nt" style={css('position:absolute;left:50%;transform:translateX(-50%)')}>Social</span>
           <div className="na">
             <IconButton aria-label="Amis" style={css('cursor:pointer')} onClick={() => navigate('/redesign/friends')}><UsersIcon width={16} height={16} /></IconButton>

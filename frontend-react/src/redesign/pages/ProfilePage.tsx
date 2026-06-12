@@ -91,7 +91,7 @@ export function ProfilePage() {
       </NavBar>
 
       <div style={css('text-align:center;padding:20px 20px 0')}>
-        <div style={css('width:88px;height:88px;border-radius:50%;margin:0 auto 14px;background:linear-gradient(145deg,rgba(212,160,48,.25),rgba(184,134,30,.35));border:2.5px solid rgba(212,160,48,.35);display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:800;color:#f0ece6;box-shadow:0 0 30px rgba(212,160,48,.18),0 4px 20px rgba(0,0,0,.4);position:relative;overflow:hidden')}>
+        <div role="button" aria-label="Voir mon profil public" onClick={() => navigate(`/redesign/profile/${user._id}`)} style={css('width:88px;height:88px;border-radius:50%;margin:0 auto 14px;background:linear-gradient(145deg,rgba(212,160,48,.25),rgba(184,134,30,.35));border:2.5px solid rgba(212,160,48,.35);display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:800;color:#f0ece6;box-shadow:0 0 30px rgba(212,160,48,.18),0 4px 20px rgba(0,0,0,.4);position:relative;overflow:hidden;cursor:pointer')}>
           {user.avatarUrl ? <img src={user.avatarUrl} alt="" style={css('width:100%;height:100%;object-fit:cover')} /> : initial}
           <div style={css('position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(212,160,48,.2)')} />
         </div>
@@ -104,7 +104,7 @@ export function ProfilePage() {
           </div>
         )}
         <div style={css('display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:280px;margin:0 auto 24px')}>
-          <div style={css(STAT)}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{ascents ?? '—'}</div><div style={css(STAT_LABEL)}>Ascensions</div></div></div>
+          <div role="button" onClick={() => navigate('/redesign/logbook')} style={css(STAT + ';cursor:pointer')}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{ascents ?? '—'}</div><div style={css(STAT_LABEL)}>Ascensions</div></div></div>
           <div role="button" onClick={() => navigate('/redesign/my-spots')} style={css(STAT + ';cursor:pointer')}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{spotsClimbed ?? '—'}</div><div style={css(STAT_LABEL)}>Spots</div></div></div>
           <div role="button" onClick={() => navigate('/redesign/friends')} style={css(STAT + ';cursor:pointer')}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{pub.friendsCount}</div><div style={css(STAT_LABEL)}>Amis</div></div></div>
           <div role="button" onClick={() => navigate('/redesign/my-spots?tab=contrib')} style={css(STAT + ';cursor:pointer')}><div style={css('position:relative;z-index:2')}><div style={css(STAT_VALUE)}>{pub.spotsContributed}</div><div style={css(STAT_LABEL)}>Contribs</div></div></div>
