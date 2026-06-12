@@ -6,14 +6,14 @@ import { PageFrame } from '../components/PageFrame';
 import { NavBar } from '../components/NavBar';
 import { IconButton, Tag } from '../components/primitives';
 import { UsersIcon } from '../lib/icons';
+import { StoriesStrip } from '../components/StoriesStrip';
 
 /**
  * SWAP — Social (design Liquid Glass) câblé aux vraies données (PUBLIC).
  * Route additive `/redesign/feed`. `/api/feed/global` (comme la page live, sans auth). Items =
  * `logbook` (ascension) ou `spot` (proposition). Clic carte spot → `/redesign/spot/:id`.
  *
- * Honnête : pas de « stories » ni de compteurs likes/commentaires côté backend → strip stories +
- * footer social retirés (pas de données réelles). i18n en dur (FR).
+ * Strip stories branché sur `/api/stories/feed`. i18n en dur (FR).
  */
 
 interface FeedItem {
@@ -73,6 +73,8 @@ export function FeedPage() {
           </div>
         </div>
       </NavBar>
+
+      <StoriesStrip />
 
       <div style={css('padding:16px 20px;display:flex;flex-direction:column;gap:14px')}>
         {items === null ? (
