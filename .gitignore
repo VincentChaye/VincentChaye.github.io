@@ -1,22 +1,32 @@
-backend/.env
-graphify-out/
-CLAUDE.md
-.claude/
-backend/node_modules
+# Dépendances / build
+node_modules/
+dist/
+.env
+.env.local
+
+# Sorties de build natif Capacitor
+frontend-react/android/app/build/
+frontend-react/android/.gradle/
+frontend-react/ios/App/build/
+frontend-react/ios/App/Pods/
+frontend-react/ios/DerivedData/
+
+# OS / IDE
 .DS_Store
 Thumbs.db
-.vscode
+.vscode/
 .idea/
-*.md
-./ZoneDeGrimpe/
-ZoneDeGrimpe/
+
+# Claude (instructions locales)
+CLAUDE.md
+.claude/
+
+# Artefacts / caches (filet si jamais ils reviennent à la racine)
 .playwright-mcp/
-# Screenshots de test (root seulement)
-/*.png
+graphify-out/
+shots/
 audit/
-ZDG/
-# Artefacts locaux (root seulement)
+/*.png
 /*.ipa
 /*.7z
-/design.htlm
-shots/
+/*.htlm
