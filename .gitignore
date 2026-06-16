@@ -1,21 +1,51 @@
 # Dépendances / build
 node_modules/
 dist/
+dist-ssr/
+*.local
+
+# Env (le template .env.example et .env.capacitor sont versionnés)
 .env
 .env.local
 
-# Sorties de build natif Capacitor
-frontend-react/android/app/build/
-frontend-react/android/.gradle/
-frontend-react/ios/App/build/
-frontend-react/ios/App/Pods/
-frontend-react/ios/DerivedData/
+# Sorties de build natif Capacitor (Android / iOS)
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+android/capacitor-cordova-android-plugins/
+ios/App/build/
+ios/App/Pods/
+ios/DerivedData/
+
+# Assets natifs générés par @capacitor/assets (recréés en CI)
+icons/
+assets/
+android/app/src/main/res/drawable*/splash*.png
+android/app/src/main/res/mipmap-*/
+ios/App/App/Assets.xcassets/AppIcon.appiconset/
+ios/App/App/Assets.xcassets/Splash.imageset/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # OS / IDE
 .DS_Store
 Thumbs.db
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Claude (instructions locales)
 CLAUDE.md

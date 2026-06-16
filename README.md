@@ -32,15 +32,14 @@ iOS native.
 ## Démarrage
 
 ```bash
-cd frontend-react
 npm install
 npm run dev        # serveur Vite (port 5173), proxy /api → http://localhost:3000
 ```
 
 Le backend doit tourner à part (repo `zonedegrimpe-backend`, port 3000). Clé requise pour la carte :
-`VITE_MAPTILER_KEY` (secret GitHub côté CI ; en local, `.env` dans `frontend-react/`).
+`VITE_MAPTILER_KEY` (secret GitHub côté CI ; en local, `.env` à la racine du repo).
 
-## Scripts (`frontend-react/`)
+## Scripts
 ```bash
 npm run dev          # dev Vite
 npm run build        # build web (base /ZoneDeGrimpe/) → GitHub Pages
@@ -63,7 +62,7 @@ si Android n'est plus visé).
 
 ## Déploiement (GitHub Pages)
 
-`.github/workflows/pages.yml` build `frontend-react` (`npm run build`, base `/ZoneDeGrimpe/`) et déploie sur
+`.github/workflows/pages.yml` build le frontend (`npm run build`, base `/ZoneDeGrimpe/`) et déploie sur
 GitHub Pages → `https://vincentchaye.github.io/ZoneDeGrimpe/`. **L'URL dépend du nom du repo** (`ZoneDeGrimpe`),
 conservé exprès. `native-build.yml` produit les binaires mobiles Capacitor (artefacts CI).
 

@@ -1,4 +1,4 @@
-// frontend-react/src/stores/messages.store.ts
+// src/stores/messages.store.ts
 import { create } from 'zustand';
 import type { Conversation, Message, MessageAttachment, SharedObject } from '@/types';
 import { apiFetch } from '@/lib/api';

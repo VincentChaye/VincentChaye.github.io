@@ -4,10 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'frontend-react/src/**'
-      - 'frontend-react/capacitor.config.ts'
-      - 'frontend-react/package.json'
-      - 'frontend-react/vite.config.ts'
+      - 'src/**'
+      - 'capacitor.config.ts'
+      - 'package.json'
+      - 'vite.config.ts'
       - '.github/workflows/native-build.yml'
   workflow_dispatch:
 
@@ -26,20 +26,17 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: frontend-react/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install JS dependencies
-        working-directory: frontend-react
         run: npm ci
 
       - name: Build web (capacitor mode)
-        working-directory: frontend-react
         run: npm run build:native
         env:
           VITE_MAPTILER_KEY: ${{ secrets.VITE_MAPTILER_KEY }}
 
       - name: Generate native assets (icons + splash)
-        working-directory: frontend-react
         run: |
           mkdir -p assets
           cp src/assets/ZoneDeGrimpeIcon.png assets/icon.png
@@ -56,17 +53,16 @@ jobs:
           $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Sync Capacitor → Android
-        working-directory: frontend-react
         run: npx cap sync android
 
       - name: Build debug APK
-        working-directory: frontend-react/android
+        working-directory: android
         run: ./gradlew assembleDebug --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
           name: zdg-android-debug
-          path: frontend-react/android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 14
 
   # ─────────────────────────────────────────────
@@ -80,31 +76,27 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: frontend-react/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install JS dependencies
-        working-directory: frontend-react
         run: npm ci
 
       - name: Build web (capacitor mode)
-        working-directory: frontend-react
         run: npm run build:native
         env:
           VITE_MAPTILER_KEY: ${{ secrets.VITE_MAPTILER_KEY }}
 
       - name: Generate native assets (icons + splash)
-        working-directory: frontend-react
         run: |
           mkdir -p assets
           cp src/assets/ZoneDeGrimpeIcon.png assets/icon.png
           npx capacitor-assets generate --iconBackgroundColor '#5D7052' --splashBackgroundColor '#5D7052' --ios
 
       - name: Sync Capacitor → iOS
-        working-directory: frontend-react
         run: npx cap sync ios
 
       - name: Build app (unsigned, iphoneos)
-        working-directory: frontend-react/ios/App
+        working-directory: ios/App
         run: |
           xcodebuild \
             -project App.xcodeproj \

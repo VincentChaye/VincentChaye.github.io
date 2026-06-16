@@ -1,4 +1,4 @@
-// frontend-react/src/lib/socket.ts
+// src/lib/socket.ts
 import { io, Socket } from 'socket.io-client';
 import { API_BASE_URL } from './api';
 
